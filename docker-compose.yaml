@@ -1,0 +1,38 @@
+version: '2'
+services:
+  api:
+    image: camptocamp/shared_config_manager:latest
+    environment:
+      STATS_VIEW: 1
+      # STATSD_ADDRESS: 172.17.0.1:8125
+      # STATSD_PREFIX: shared_config_manager.dev.app
+      C2C_SECRET: toto
+      LOG_LEVEL: DEBUG
+      C2CWSGI_LOG_LEVEL: DEBUG
+      OTHER_LOG_LEVEL: DEBUG
+      C2C_REDIS_URL: redis://redis:6379
+      C2C_BROADCAST_PREFIX: broadcast_api_
+      DEVELOPMENT: 1
+      C2C_PROFILER_PATH: /app_profiler
+      GUNICORN_PARAMS: '-b :8080 --reload'
+      MASTER_CONFIG: |
+        type: git
+        id: master
+        key: changeme
+        repo: /repos/master
+    volumes:
+    - ./app/shared_config_manager:/app/shared_config_manager:ro
+    - ./test_repos:/repos:rw
+    links:
+    - redis
+    ports:
+    - 8080:8080
+    user: root
+
+  redis:
+    image: redis:4
+    mem_limit: 64m
+    ports:
+    - 16379:6379
+    command: redis-server --save "" --appendonly no
+    user: www-data

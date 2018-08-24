@@ -1,0 +1,25 @@
+#!/bin/bash -e
+
+mkdir -p test_repos
+rm -rf test_repos/*
+cd test_repos
+
+git init master
+cd master
+cat > shared_config_manager.yaml <<END
+sources:
+  - id: test_git
+    type: git
+    repo: /repos/test_git
+    key: changeme
+END
+git add shared_config_manager.yaml
+git commit -a -m "Initial commit"
+cd ..
+
+git init test_git
+cd test_git
+echo "Hello world" > test
+git add test
+git commit -a -m "Initial commit"
+cd ..
