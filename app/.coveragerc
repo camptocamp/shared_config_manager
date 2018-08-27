@@ -1,0 +1,3 @@
+[run]
+source=/app/shared_config_manager
+branch=True
