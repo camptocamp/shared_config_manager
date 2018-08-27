@@ -27,6 +27,7 @@ services:
     - redis
     ports:
     - 8080:8080
+    hostname: api
 
   slave:
     image: camptocamp/shared_config_manager:latest
@@ -45,6 +46,7 @@ services:
     - /tmp/test_repos:/repos:rw
     links:
     - redis
+    hostname: slave
 
   redis:
     image: redis:4

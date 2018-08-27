@@ -51,6 +51,7 @@ class GitSource(BaseSource):
             output = subprocess.check_output(args, stderr=subprocess.STDOUT, **kwargs)
             if output:
                 LOG.debug(output.decode("utf-8"))
+            return output
         except subprocess.CalledProcessError as e:
             LOG.error(e.output)
             raise
@@ -63,3 +64,11 @@ class GitSource(BaseSource):
             return self._clone_dir()
         else:
             return os.path.join(self._clone_dir(), self._sub_dir)
+
+    def get_stats(self):
+        stats = super().get_stats()
+        stats.update(dict(repo=self._repo, branch=self._branch, sub_dir=self._sub_dir, hash=self._get_hash()))
+        return stats
+
+    def _get_hash(self):
+        return self._exec('git', 'rev-parse', 'HEAD', cwd=self._clone_dir()).decode("utf-8").strip()

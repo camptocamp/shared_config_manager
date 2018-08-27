@@ -32,11 +32,14 @@ def refresh(request):
 
 @stats_service.get()
 def stats(request):
+    slaves = _get_slave_stats()
+    slaves = {slave['hostname']: slave for slave in slaves}
     return {
-        'nb_heads': len(_count())
+        'slaves': slaves,
+        'nb_heads': len(slaves)
     }
 
 
 @broadcast.decorator(expect_answers=True)
-def _count():
-    return True
+def _get_slave_stats():
+    return {'sources': sources.get_stats()}

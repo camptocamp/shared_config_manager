@@ -34,3 +34,6 @@ class BaseSource(object):
 
     def is_master(self):
         return self._is_master
+
+    def get_stats(self):
+        return dict(id=self._id, target_dir=self._target_dir)

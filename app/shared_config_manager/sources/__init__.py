@@ -37,6 +37,7 @@ def reload_master_config():
         for source in config['sources']:
             try:
                 source_configs[source['id']] = _create_source(source)
+                source_configs[source['id']].refresh()  # TODO: only if changed
             except Exception:
                 LOG.error("Cannot load the %s config", source['id'], exc_info=True)
 
@@ -65,3 +66,10 @@ def _get_config(id_, key):
         raise HTTPNotFound(f"Unknown id {id_}")
     config.validate_key(key)
     return config
+
+
+def get_stats():
+    return {
+        id_: source.get_stats()
+        for id_, source in {**source_configs, master_config.get_id(): master_config}.items()
+    }
