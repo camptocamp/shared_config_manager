@@ -16,7 +16,7 @@ def wait_slaves():
     def what() -> bool:
         r = requests.get(BASE_URL + '1/stats')
         if r.status_code == 200:
-            return r.json()['nb_heads'] == 2
+            return len(r.json()['slaves']) == 2
         else:
             return False
 

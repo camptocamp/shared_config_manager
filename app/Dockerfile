@@ -26,7 +26,8 @@ RUN pip3 install --no-cache-dir -e . && \
     rm -rf /tmp/* /master_config/* /config/*
 
 ENV GUNICORN_PARAMS="-b :8080 --workers 1" \
-    LOG_LEVEL=DEBUG
+    LOG_LEVEL=DEBUG \
+    C2C_BROADCAST_PREFIX=broadcast_scm_
 
 # www-data
 USER 33

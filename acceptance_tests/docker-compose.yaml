@@ -11,7 +11,6 @@ services:
       C2CWSGI_LOG_LEVEL: DEBUG
       OTHER_LOG_LEVEL: DEBUG
       C2C_REDIS_URL: redis://redis:6379
-      C2C_BROADCAST_PREFIX: broadcast_api_
       DEVELOPMENT: 1
       COVERAGE: 1
       C2C_PROFILER_PATH: /app_profiler

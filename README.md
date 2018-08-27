@@ -56,6 +56,17 @@ could use a sizeable amount of RAM. So you could have only a couple of such cont
 as slaves. For that, change the command run by the container to ``
 
 
+## Tunnings
+
+A few environment variables can be used to tune the containers:
+
+* C2C_REDIS_URL: Must point to a running Redis (typical: `redis://redis:6379`)
+* MASTER_CONFIG: The master configuration (string containing the YAML config)
+* ROUTE_PREFIX: The prefix to use for the HTTP API (defaults to `/scm`)
+
+See [https://github.com/camptocamp/c2cwsgiutils] for other parameters.
+
+
 ## Example docker-compose for Rancher
 
 docker-compose.yaml:
@@ -67,10 +78,8 @@ services:
     image: camptocamp/shared_config_manager:latest
     environment: &scm_env
       C2C_REDIS_URL: redis://redis:6379
-      C2C_BROADCAST_PREFIX: &broadcast_prefix broadcast_api_
       MASTER_CONFIG: &master_config |
         type: git
-        id: master
         key: changeme
         repo: git@github.com:camptocamp/master_config.git
     links:
@@ -139,4 +148,50 @@ services:
       strategy: recreate
       healthy_threshold: 1
       response_timeout: 3000
+```
+
+
+# API
+
+## Refresh
+
+* `GET {ROUTE_PREFIX}/1/refresh/{ID}/{KEY}`
+
+Refresh the given source `{ID}`. Returns 200 in case of success and 500 in case of failure (with some details).
+
+To refresh the master configuration (list of sources), use `master` as ID.
+
+* `POST {ROUTE_PREFIX}/1/refresh/{ID}/{KEY}`
+
+Same as the GET API, but to be used with a GutHub webhook for push events. Will ignore events for other branches.
+
+
+## Status
+
+* `GET {ROUTE_PREFIX}/1/status`
+
+Returns something like that:
+
+```yaml
+{
+  "slaves":{
+    "scm_api_1":{
+      "hostname":"scm_api_1",
+      "pid":11,
+      "sources":{
+        "master":{
+          "hash":"9845a1f5a6218915592a8689685a3d4179720f13",
+          "id":"master",
+          "repo":"/repos/master",
+          "type":"git"
+        },
+        "test_git":{
+          "hash":"0af8f099bbbcf6a0ed41333136658b60627e36bd",
+          "repo":"/repos/test_git",
+          "type":"git"
+        }
+      }
+    }
+  }
+}
 ```
