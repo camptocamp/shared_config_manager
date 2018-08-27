@@ -7,7 +7,8 @@ MASTER_TARGET = "/master_config"
 
 
 class BaseSource(object):
-    def __init__(self, config, is_master):
+    def __init__(self, id_, config, is_master):
+        self._id = id_
         self._config = config
         self._is_master = is_master
 
@@ -15,6 +16,7 @@ class BaseSource(object):
         pass
 
     def _copy(self, source):
+        # TODO: used rsync instead
         self.delete_target_dir()
         shutil.copytree(source, self.get_path())
 
@@ -34,7 +36,7 @@ class BaseSource(object):
             return os.path.join(MASTER_TARGET if self._is_master else TARGET, self.get_id())
 
     def get_id(self):
-        return self._config['id']
+        return self._id
 
     def validate_key(self, key):
         if key != self._config['key']:
@@ -53,3 +55,6 @@ class BaseSource(object):
 
     def get_type(self):
         return self._config['type']
+
+    def delete(self):
+        self.delete_target_dir()

@@ -1,7 +1,7 @@
 from c2cwsgiutils import broadcast
 import logging
 import os
-from pyramid.httpexceptions import HTTPNotFound
+from pyramid.httpexceptions import HTTPNotFound, HTTPBadRequest
 import yaml
 
 from . import git
@@ -10,19 +10,20 @@ SOURCES = {
     'git': git.GitSource
 }
 LOG = logging.getLogger(__name__)
+MASTER_ID = 'master'
 master_source = None
 sources = {}
 
 
-def _create_source(config, is_master=False):
+def _create_source(id_, config, is_master=False):
     type_ = config['type']
-    return SOURCES[type_](config, is_master)
+    return SOURCES[type_](id_, config, is_master)
 
 
 def init():
     global master_source
     content = yaml.load(os.environ['MASTER_CONFIG'])
-    master_source = _create_source(content, is_master=True)
+    master_source = _create_source(MASTER_ID, content, is_master=True)
     reload_master_config()
 
 
@@ -32,24 +33,27 @@ def reload_master_config():
     master_source.refresh()
     with open(os.path.join(master_source.get_path(), 'shared_config_manager.yaml')) as config_file:
         config = yaml.load(config_file)
-        to_deletes = set(sources.keys()) - {source['id'] for source in config['sources']}
+        if MASTER_ID in config['sources']:
+            raise HTTPBadRequest(f'A source cannot have the "{MASTER_ID}" id')
+        to_deletes = set(sources.keys()) - set(config['sources'].keys())
         for to_delete in to_deletes:
             # TODO: test
             _delete_source(to_delete)
-        for source in config['sources']:
-            id_ = source['id']
-            if id_ not in sources:
+        for id_, source_config in config['sources'].items():
+            prev_source = sources.get(id_)
+            if prev_source is None:
                 # TODO: test
                 LOG.info("New source detected: %s", id_)
-            elif sources[id_].get_config() == source:
+            elif prev_source.get_config() == source_config:
                 LOG.debug("Source %s didn't change, not reloading it", id_)
                 continue
             else:
                 # TODO: test
                 LOG.info("Change detected in source %s, reloading it", id_)
+                _delete_source(id_)  # to be sure the old stuff is cleaned
 
             try:
-                sources[id_] = _create_source(source)
+                sources[id_] = _create_source(id_, source_config)
                 sources[id_].refresh()
             except Exception:
                 LOG.error("Cannot load the %s config", id_, exc_info=True)
@@ -57,7 +61,7 @@ def reload_master_config():
 
 def _delete_source(id_):
     global sources
-    sources[id_].delete_target_dir()
+    sources[id_].delete()
     del sources[id_]
 
 

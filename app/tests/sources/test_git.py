@@ -29,9 +29,8 @@ def repo():
 
 
 def test_git(repo):
-    git = sources._create_source({
+    git = sources._create_source('test_git', {
         'type': 'git',
-        'id': 'test_git',
         'key': 'changeme',
         'repo': repo
     })

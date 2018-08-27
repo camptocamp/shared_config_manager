@@ -1,3 +1,4 @@
+import fileinput
 import logging
 import os
 from pathlib import Path
@@ -11,23 +12,23 @@ LOG = logging.getLogger(__name__)
 
 
 class GitSource(BaseSource):
-    def __init__(self, config, is_master):
-        super().__init__(config, is_master)
+    def __init__(self, id_, config, is_master):
+        super().__init__(id_, config, is_master)
         self._setup_key(config.get('ssh_key'))
 
-    def _setup_key(self, key):
-        if key is None:
+    def _setup_key(self, ssh_key):
+        if ssh_key is None:
             return
         # TODO: test
         git_path = os.path.join(str(Path.home()), '.git')
         key_path = os.path.join(git_path, self.get_id()) + '.key'
         was_here = os.path.isfile(key_path)
-        with open(key_path, 'w') as key:
-            key.write(key)
+        with open(key_path, 'w') as ssh_key:
+            ssh_key.write(ssh_key)
 
         if not was_here:
             with open(os.path.join(git_path, 'config'), 'a') as config:
-                config.write(f'\nIdentityFile {key_path}\n')
+                config.write(f'IdentityFile {key_path}\n')
 
     def refresh(self):
         self._checkout()
@@ -79,3 +80,17 @@ class GitSource(BaseSource):
 
     def get_branch(self):
         return self._config.get('branch', 'master')
+
+    def delete(self):
+        super().delete()
+        self._exec('rm', '-rf', self._clone_dir())
+        ssh_key = self._config.get('ssh_key')
+        if ssh_key is not None:
+            git_path = os.path.join(str(Path.home()), '.git')
+            key_path = os.path.join(git_path, self.get_id()) + '.key'
+            if os.path.isfile(key_path):
+                os.remove(key_path)
+                with fileinput.input(os.path.join(git_path, 'config'), inplace=True) as config:
+                    for line in config:
+                        if line != f'IdentityFile {key_path}\n':
+                            print(line, end='')

@@ -12,7 +12,6 @@ First you need to configure the source for the master configuration using the
 env:
     MASTER_CONFIG: |
       type: git
-      id: master
       key: changeme
       repo: git@github.com:camptocamp/master_config.git
 ```
@@ -22,7 +21,7 @@ to configure all the sources. This configuration file looks like that:
 
 ```yaml
 sources:
-  - id: test_git
+  test_git:
     type: git
     repo: git@github.com:camptocamp/test_git.git
     key: changeme
@@ -30,14 +29,13 @@ sources:
 ```
 
 With this example, the config container will contain a `/config/test_git` directory that
-is a clone of the `git@github.com:camptocamp/test_git.git` repository.
+is a clone of the `git@github.com:camptocamp/test_git.git` repository and is identified as `test_git`.
 
 You can configure more than one source.
 
 ### Common source configuration parameters
 
 * `type`: the type of source
-* `id`: the id of the source, must be unique
 * `key`: the secret key that will be used to trigger a refresh of the source
 * `target_dir`: the location where the source will be copied (default to the value of `id` in `/config`)
 

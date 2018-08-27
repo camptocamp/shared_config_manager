@@ -18,7 +18,6 @@ services:
       GUNICORN_PARAMS: '-b :8080 --reload'
       MASTER_CONFIG: &master_config |
         type: git
-        id: master
         key: changeme
         repo: /repos/master
     volumes:
