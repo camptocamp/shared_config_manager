@@ -9,6 +9,13 @@ WORKDIR /app
 
 EXPOSE 8080
 
+RUN apt update && \
+    apt install -y --no-install-recommends ssh rsync && \
+    apt clean && \
+    rm -r /var/lib/apt/lists/* && \
+    echo "    VerifyHostKeyDNS yes" >> /etc/ssh/ssh_config && \
+    echo "    StrictHostKeyChecking no" >> /etc/ssh/ssh_config  # TODO: find better
+
 # Step #2 copy the rest of the files (watch for the .dockerignore)
 COPY . /app
 
@@ -19,9 +26,9 @@ RUN pip3 install --no-cache-dir -e . && \
     flake8 shared_config_manager tests && \
     pytest -vv --cov=shared_config_manager --color=yes tests && \
     python3 -m compileall -q . && \
-    mkdir -p /master_config /config && \
+    mkdir -p /master_config /config /var/www && \
     adduser www-data root && \
-    chown www-data:root /master_config /config && \
+    chown www-data:root /master_config /config /var/www && \
     chmod og+rwx /master_config /config && \
     rm -rf /tmp/* /master_config/* /config/*
 

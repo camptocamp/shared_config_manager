@@ -19,15 +19,16 @@ class GitSource(BaseSource):
     def _setup_key(self, ssh_key):
         if ssh_key is None:
             return
-        # TODO: test
-        git_path = os.path.join(str(Path.home()), '.git')
-        key_path = os.path.join(git_path, self.get_id()) + '.key'
+        ssh_path = os.path.join(str(Path.home()), '.ssh')
+        os.makedirs(ssh_path)
+        key_path = os.path.join(ssh_path, self.get_id()) + '.key'
         was_here = os.path.isfile(key_path)
-        with open(key_path, 'w') as ssh_key:
-            ssh_key.write(ssh_key)
+        with open(key_path, 'w') as ssh_key_file:
+            ssh_key_file.write(ssh_key)
+        os.chmod(key_path, 0o700)
 
         if not was_here:
-            with open(os.path.join(git_path, 'config'), 'a') as config:
+            with open(os.path.join(ssh_path, 'config'), 'a') as config:
                 config.write(f'IdentityFile {key_path}\n')
 
     def refresh(self):
@@ -57,7 +58,7 @@ class GitSource(BaseSource):
                 LOG.debug(output)
             return output
         except subprocess.CalledProcessError as e:
-            LOG.error(e.output)
+            LOG.error(e.output.decode("utf-8").strip())
             raise
 
     def _clone_dir(self):
@@ -86,11 +87,11 @@ class GitSource(BaseSource):
         self._exec('rm', '-rf', self._clone_dir())
         ssh_key = self._config.get('ssh_key')
         if ssh_key is not None:
-            git_path = os.path.join(str(Path.home()), '.git')
-            key_path = os.path.join(git_path, self.get_id()) + '.key'
+            ssh_path = os.path.join(str(Path.home()), '.ssh')
+            key_path = os.path.join(ssh_path, self.get_id()) + '.key'
             if os.path.isfile(key_path):
                 os.remove(key_path)
-                with fileinput.input(os.path.join(git_path, 'config'), inplace=True) as config:
+                with fileinput.input(os.path.join(ssh_path, 'config'), inplace=True) as config:
                     for line in config:
                         if line != f'IdentityFile {key_path}\n':
                             print(line, end='')

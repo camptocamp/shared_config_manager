@@ -33,6 +33,8 @@ dockerBuild {
 
     if (env.BRANCH_NAME == 'master') {
         stage("Publish master") {
+            checkout scm
+            setCronTrigger('H H(18-23) * * *')
             //push them
             withCredentials([[$class          : 'UsernamePasswordMultiBinding', credentialsId: 'dockerhub',
                               usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
