@@ -71,7 +71,7 @@ acceptance: build_acceptance build
 	docker rm scm_acceptance_$(DOCKER_TAG)_$$PPID; \
 	status=$$status$$?; \
 	#generate the HTML report for code coverage \
-	docker run -v $(THIS_DIR)/reports/coverage/api:/reports/coverage/api:ro --name scm_acceptance_reports_$(DOCKER_TAG)_$$PPID $(DOCKER_BASE)_api:$(DOCKER_TAG) c2cwsgiutils_coverage_report.py; \
+	docker run -v $(THIS_DIR)/reports/coverage/api:/reports/coverage/api:ro --name scm_acceptance_reports_$(DOCKER_TAG)_$$PPID $(DOCKER_BASE):$(DOCKER_TAG) c2cwsgiutils_coverage_report.py; \
 	status=$$status$$?; \
 	#copy the HTML locally \
 	docker cp scm_acceptance_reports_$(DOCKER_TAG)_$$PPID:/tmp/coverage/api reports/coverage; \

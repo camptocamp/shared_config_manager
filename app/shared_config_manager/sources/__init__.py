@@ -30,16 +30,33 @@ def reload_master_config():
     global source_configs, master_config
     LOG.info("Reloading the master config")
     master_config.refresh()
-    LOG.info("Conf path: %s", os.path.join(master_config.get_path(), 'shared_config_manager.yaml'))
     with open(os.path.join(master_config.get_path(), 'shared_config_manager.yaml')) as config_file:
         config = yaml.load(config_file)
-        source_configs = {}
+        to_deletes = set(source_configs.keys()) - {source['id'] for source in config['sources']}
+        for to_delete in to_deletes:
+            # TODO: test
+            _delete_source(to_delete)
         for source in config['sources']:
+            id_ = source['id']
+            if id_ not in source_configs:
+                LOG.info("New source detected: %s", id_)
+            elif source_configs[id_].get_config() == source:
+                LOG.debug("Source %s didn't change, not reloading it", id_)
+                continue
+            else:
+                LOG.info("Change detected in source %s, reloading it", id_)
+
             try:
-                source_configs[source['id']] = _create_source(source)
-                source_configs[source['id']].refresh()  # TODO: only if changed
+                source_configs[id_] = _create_source(source)
+                source_configs[id_].refresh()
             except Exception:
-                LOG.error("Cannot load the %s config", source['id'], exc_info=True)
+                LOG.error("Cannot load the %s config", id_, exc_info=True)
+
+
+def _delete_source(id_):
+    global source_configs
+    source_configs[id_].delete_target_dir()
+    del source_configs[id_]
 
 
 @broadcast.decorator(expect_answers=True)
