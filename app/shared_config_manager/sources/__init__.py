@@ -10,8 +10,8 @@ SOURCES = {
     'git': git.GitSource
 }
 LOG = logging.getLogger(__name__)
-master_config = None
-source_configs = {}
+master_source = None
+sources = {}
 
 
 def _create_source(config, is_master=False):
@@ -20,48 +20,50 @@ def _create_source(config, is_master=False):
 
 
 def init():
-    global master_config
+    global master_source
     content = yaml.load(os.environ['MASTER_CONFIG'])
-    master_config = _create_source(content, is_master=True)
+    master_source = _create_source(content, is_master=True)
     reload_master_config()
 
 
 def reload_master_config():
-    global source_configs, master_config
+    global sources, master_source
     LOG.info("Reloading the master config")
-    master_config.refresh()
-    with open(os.path.join(master_config.get_path(), 'shared_config_manager.yaml')) as config_file:
+    master_source.refresh()
+    with open(os.path.join(master_source.get_path(), 'shared_config_manager.yaml')) as config_file:
         config = yaml.load(config_file)
-        to_deletes = set(source_configs.keys()) - {source['id'] for source in config['sources']}
+        to_deletes = set(sources.keys()) - {source['id'] for source in config['sources']}
         for to_delete in to_deletes:
             # TODO: test
             _delete_source(to_delete)
         for source in config['sources']:
             id_ = source['id']
-            if id_ not in source_configs:
+            if id_ not in sources:
+                # TODO: test
                 LOG.info("New source detected: %s", id_)
-            elif source_configs[id_].get_config() == source:
+            elif sources[id_].get_config() == source:
                 LOG.debug("Source %s didn't change, not reloading it", id_)
                 continue
             else:
+                # TODO: test
                 LOG.info("Change detected in source %s, reloading it", id_)
 
             try:
-                source_configs[id_] = _create_source(source)
-                source_configs[id_].refresh()
+                sources[id_] = _create_source(source)
+                sources[id_].refresh()
             except Exception:
                 LOG.error("Cannot load the %s config", id_, exc_info=True)
 
 
 def _delete_source(id_):
-    global source_configs
-    source_configs[id_].delete_target_dir()
-    del source_configs[id_]
+    global sources
+    sources[id_].delete_target_dir()
+    del sources[id_]
 
 
 @broadcast.decorator(expect_answers=True)
 def refresh(id_, key):
-    config = _get_config(id_, key)
+    config = _get_source(id_, key)
     if config.is_master():
         reload_master_config()
     else:
@@ -70,15 +72,15 @@ def refresh(id_, key):
 
 
 def check_id_key(id_, key):
-    _get_config(id_, key)
+    return _get_source(id_, key)
 
 
-def _get_config(id_, key):
-    global master_config, source_configs
-    if master_config.get_id() == id_:
-        config = master_config
+def _get_source(id_, key):
+    global master_source, sources
+    if master_source.get_id() == id_:
+        config = master_source
     else:
-        config = source_configs.get(id_)
+        config = sources.get(id_)
     if config is None:
         raise HTTPNotFound(f"Unknown id {id_}")
     config.validate_key(key)
@@ -88,5 +90,5 @@ def _get_config(id_, key):
 def get_stats():
     return {
         id_: source.get_stats()
-        for id_, source in {**source_configs, master_config.get_id(): master_config}.items()
+        for id_, source in {**sources, master_source.get_id(): master_source}.items()
     }

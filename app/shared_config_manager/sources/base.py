@@ -50,3 +50,6 @@ class BaseSource(object):
 
     def get_config(self):
         return self._config
+
+    def get_type(self):
+        return self._config['type']

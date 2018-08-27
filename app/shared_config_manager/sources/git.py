@@ -36,7 +36,7 @@ class GitSource(BaseSource):
     def _checkout(self):
         dir = self._clone_dir()
         repo = self._config['repo']
-        branch = self._config.get('branch', 'master')
+        branch = self.get_branch()
         if os.path.isdir(os.path.join(dir, '.git')):
             LOG.info("Fetching a new version of %s", repo)
             self._exec('git', 'fetch', cwd=dir)
@@ -76,3 +76,6 @@ class GitSource(BaseSource):
 
     def _get_hash(self):
         return self._exec('git', 'rev-parse', 'HEAD', cwd=self._clone_dir())
+
+    def get_branch(self):
+        return self._config.get('branch', 'master')
