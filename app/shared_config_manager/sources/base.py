@@ -24,7 +24,14 @@ class BaseSource(object):
             shutil.rmtree(dest)
 
     def get_path(self):
-        return os.path.join(MASTER_TARGET if self._is_master else TARGET, self.get_target_dir())
+        if 'target_dir' in self._config:
+            target_dir = self._config['target_dir']
+            if target_dir.startswith('/'):
+                return target_dir
+            else:
+                return os.path.join(MASTER_TARGET if self._is_master else TARGET, target_dir)
+        else:
+            return os.path.join(MASTER_TARGET if self._is_master else TARGET, self.get_id())
 
     def get_id(self):
         return self._config['id']
@@ -40,9 +47,6 @@ class BaseSource(object):
         stats = dict(self._config)
         del stats['key']
         return stats
-
-    def get_target_dir(self):
-        return self._config.get('target_dir', self.get_id())
 
     def get_config(self):
         return self._config

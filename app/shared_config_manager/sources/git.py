@@ -18,6 +18,7 @@ class GitSource(BaseSource):
     def _setup_key(self, key):
         if key is None:
             return
+        # TODO: test
         git_path = os.path.join(str(Path.home()), '.git')
         key_path = os.path.join(git_path, self.get_id()) + '.key'
         was_here = os.path.isfile(key_path)
@@ -51,7 +52,8 @@ class GitSource(BaseSource):
             LOG.debug("Running: " + ' '.join(args))
             output = subprocess.check_output(args, stderr=subprocess.STDOUT, **kwargs)
             if output:
-                LOG.debug(output.decode("utf-8"))
+                output = output.decode("utf-8").strip()
+                LOG.debug(output)
             return output
         except subprocess.CalledProcessError as e:
             LOG.error(e.output)
@@ -73,4 +75,4 @@ class GitSource(BaseSource):
         return stats
 
     def _get_hash(self):
-        return self._exec('git', 'rev-parse', 'HEAD', cwd=self._clone_dir()).decode("utf-8").strip()
+        return self._exec('git', 'rev-parse', 'HEAD', cwd=self._clone_dir())

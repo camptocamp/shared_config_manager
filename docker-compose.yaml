@@ -2,7 +2,7 @@ version: '2'
 services:
   api:
     image: camptocamp/shared_config_manager:latest
-    environment:
+    environment: &scm_env
       STATS_VIEW: 1
       # STATSD_ADDRESS: 172.17.0.1:8125
       # STATSD_PREFIX: shared_config_manager.dev.app
@@ -21,34 +21,28 @@ services:
         key: changeme
         repo: /repos/master
     volumes:
-    - ./app/shared_config_manager:/app/shared_config_manager:ro
-    - /home/pvalsecchi/src/c2cwsgiutils/c2cwsgiutils:/opt/c2cwsgiutils/c2cwsgiutils:ro
-    - ./test_repos:/repos:rw
+      - ./app/shared_config_manager:/app/shared_config_manager:ro
+      #- /home/pvalsecchi/src/c2cwsgiutils/c2cwsgiutils:/opt/c2cwsgiutils/c2cwsgiutils:ro
+      - ./test_repos:/repos:rw
     links:
-    - redis
+      - redis
     ports:
-    - 8080:8080
+      - 8080:8080
 
   slave:
     image: camptocamp/shared_config_manager:latest
-    environment:
-      # STATSD_ADDRESS: 172.17.0.1:8125
-      # STATSD_PREFIX: shared_config_manager.dev.app
-      LOG_LEVEL: DEBUG
-      C2CWSGI_LOG_LEVEL: DEBUG
-      OTHER_LOG_LEVEL: DEBUG
-      C2C_REDIS_URL: redis://redis:6379
-      C2C_BROADCAST_PREFIX: *broadcast_prefix
-      MASTER_CONFIG: *master_config
+    environment: *scm_env
+    command: ['/app/shared_config_slave.py']
     volumes:
-    - ./test_repos:/repos:rw
+      - ./test_repos:/repos:rw
+      #- /home/pvalsecchi/src/c2cwsgiutils/c2cwsgiutils:/opt/c2cwsgiutils/c2cwsgiutils:ro
     links:
-    - redis
+      - redis
 
   redis:
     image: redis:4
     mem_limit: 64m
     ports:
-    - 16379:6379
+      - 16379:6379
     command: redis-server --save "" --appendonly no
     user: www-data

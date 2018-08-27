@@ -1,7 +1,7 @@
-from c2cwsgiutils import services, broadcast
+from c2cwsgiutils import services
 import logging
 
-from . import sources
+from . import sources, slave_stats
 
 refresh_service = services.create('refresh', '/1/refresh/{id}/{key}')
 stats_service = services.create('stats', '/1/stats')
@@ -30,16 +30,14 @@ def refresh(request):
         }
 
 
+# TODO: support github webhook
+
+
 @stats_service.get()
 def stats(request):
-    slaves = _get_slave_stats()
+    slaves = slave_stats.get_slave_stats()
     slaves = {slave['hostname']: slave for slave in slaves}
     return {
         'slaves': slaves,
         'nb_heads': len(slaves)
     }
-
-
-@broadcast.decorator(expect_answers=True)
-def _get_slave_stats():
-    return {'sources': sources.get_stats()}
