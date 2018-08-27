@@ -60,17 +60,15 @@ acceptance: build_acceptance build
 	rm -rf reports/coverage/api reports/acceptance*.xml
 	mkdir -p reports/coverage/api
 	#get the UT reports
-	docker run --rm $(DOCKER_BASE)_api:$(DOCKER_TAG) cat /app/.coverage > reports/coverage/api/coverage.ut.1
+	docker run --rm $(DOCKER_BASE):$(DOCKER_TAG) cat /app/.coverage > reports/coverage/api/coverage.ut.1
 	#run the tests
-	for module in app; do \
-	  docker run $(DOCKER_TTY) -e DOCKER_TAG=$(DOCKER_TAG) -v /var/run/docker.sock:/var/run/docker.sock --name scm_acceptance_$(DOCKER_TAG)_$$PPID $(DOCKER_BASE)_acceptance:$(DOCKER_TAG) \
-	    bash -c "py.test -vv --color=yes --junitxml /reports/acceptance_$$module.xml $(PYTEST_OPTS) acceptance/$$module; status=\$$?; junit2html /reports/acceptance_$$module.xml /reports/acceptance_$$module.html; exit \$$status\$$?"; \
-	  status=$$status$$?; \
-	  #copy the reports locally \
-	  docker cp scm_acceptance_$(DOCKER_TAG)_$$PPID:/reports ./; \
-	  status=$$status$$?; \
-	  docker rm scm_acceptance_$(DOCKER_TAG)_$$PPID; \
-	done; \
+	docker run $(DOCKER_TTY) -e DOCKER_TAG=$(DOCKER_TAG) -v /var/run/docker.sock:/var/run/docker.sock -v /tmp/test_repos:/tmp/test_repos --name scm_acceptance_$(DOCKER_TAG)_$$PPID $(DOCKER_BASE)_acceptance:$(DOCKER_TAG) \
+	bash -c "py.test -vv --color=yes --junitxml /reports/acceptance.xml $(PYTEST_OPTS) acceptance; status=\$$?; junit2html /reports/acceptance.xml /reports/acceptance.html; exit \$$status\$$?"; \
+	status=$$status$$?; \
+	#copy the reports locally \
+	docker cp scm_acceptance_$(DOCKER_TAG)_$$PPID:/reports ./; \
+	status=$$status$$?; \
+	docker rm scm_acceptance_$(DOCKER_TAG)_$$PPID; \
 	status=$$status$$?; \
 	#generate the HTML report for code coverage \
 	docker run -v $(THIS_DIR)/reports/coverage/api:/reports/coverage/api:ro --name scm_acceptance_reports_$(DOCKER_TAG)_$$PPID $(DOCKER_BASE)_api:$(DOCKER_TAG) c2cwsgiutils_coverage_report.py; \
@@ -91,5 +89,5 @@ run: build test_repos
 clean:
 	rm -rf reports .venv
 
-test_repos: create_test_repos
-	./create_test_repos
+test_repos: acceptance_tests/create_test_repos
+	./acceptance_tests/create_test_repos
