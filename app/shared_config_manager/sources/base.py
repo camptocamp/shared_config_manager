@@ -1,7 +1,10 @@
+import logging
 from pyramid.httpexceptions import HTTPForbidden
 import shutil
+import subprocess
 import os
 
+LOG = logging.getLogger(__name__)
 TARGET = "/config"
 MASTER_TARGET = "/master_config"
 
@@ -16,9 +19,9 @@ class BaseSource(object):
         pass
 
     def _copy(self, source):
-        # TODO: used rsync instead
-        self.delete_target_dir()
-        shutil.copytree(source, self.get_path())
+        os.makedirs(self.get_path(), exist_ok=True)
+        self._exec('rsync', '--archive', '--delete', '--exclude=.git', '--verbose',
+                   source + '/', self.get_path())
 
     def delete_target_dir(self):
         dest = self.get_path()
@@ -58,3 +61,15 @@ class BaseSource(object):
 
     def delete(self):
         self.delete_target_dir()
+
+    def _exec(self, *args, **kwargs):
+        try:
+            LOG.debug("Running: " + ' '.join(args))
+            output = subprocess.check_output(args, stderr=subprocess.STDOUT, **kwargs)
+            if output:
+                output = output.decode("utf-8").strip()
+                LOG.debug(output)
+            return output
+        except subprocess.CalledProcessError as e:
+            LOG.error(e.output.decode("utf-8").strip())
+            raise

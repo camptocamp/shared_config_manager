@@ -2,7 +2,6 @@ import fileinput
 import logging
 import os
 from pathlib import Path
-import subprocess
 import tempfile
 
 from .base import BaseSource
@@ -48,18 +47,6 @@ class GitSource(BaseSource):
             LOG.info("Cloning %s", repo)
             command = ['git', 'clone', '-b', branch, repo, self.get_id()]
             self._exec(*command, cwd=TEMP_DIR)
-
-    def _exec(self, *args, **kwargs):
-        try:
-            LOG.debug("Running: " + ' '.join(args))
-            output = subprocess.check_output(args, stderr=subprocess.STDOUT, **kwargs)
-            if output:
-                output = output.decode("utf-8").strip()
-                LOG.debug(output)
-            return output
-        except subprocess.CalledProcessError as e:
-            LOG.error(e.output.decode("utf-8").strip())
-            raise
 
     def _clone_dir(self):
         return os.path.join(TEMP_DIR, self.get_id())

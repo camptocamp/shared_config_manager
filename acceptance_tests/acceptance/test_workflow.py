@@ -23,7 +23,7 @@ def git_source(app_connection, test_repos):
 
     git init other
     cd other
-    echo -n "content1" > config.txt
+    echo -n "content" > config.txt
     git add config.txt
     git commit -a -m "Initial commit"
     """, shell=True)
@@ -44,24 +44,23 @@ def git_source(app_connection, test_repos):
     app_connection.get_json('1/refresh/master/changeme')
 
     for slave in ('api', 'slave'):
-        assert not os.path.exists(os.path.join('/tmp/slaves', slave, 'other'))
+        assert not os.path.exists(os.path.join('/tmp', 'slaves', slave, 'other'))
 
 
-def test_workflow(app_connection, git_source):
-    subprocess.check_call("ls -R /tmp/slaves", shell=True)
+def test_ok(app_connection, git_source):
     for slave in ('api', 'slave'):
-        with open(os.path.join('/tmp/slaves', slave, 'other', 'config.txt')) as config:
-            assert config.read() == 'content1'
+        with open(os.path.join('/tmp', 'slaves', slave, 'other', 'config.txt')) as config:
+            assert config.read() == 'content'
 
     subprocess.check_call(f"""
     set -e
     cd {git_source}
-    echo -n "content2" > config.txt
+    echo -n "content modified" > config.txt
     git commit -a -m "Second commit"
     """, shell=True)
 
     app_connection.get_json('1/refresh/other/changeme')
 
     for slave in ('api', 'slave'):
-        with open(os.path.join('/tmp/slaves', slave, 'other', 'config.txt')) as config:
-            assert config.read() == 'content2'
+        with open(os.path.join('/tmp', 'slaves', slave, 'other', 'config.txt')) as config:
+            assert config.read() == 'content modified'
