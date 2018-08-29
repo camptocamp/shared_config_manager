@@ -19,12 +19,16 @@ class GitSource(SshBaseSource):
         branch = self.get_branch()
         if os.path.isdir(os.path.join(dir, '.git')):
             LOG.info("Fetching a new version of %s", repo)
-            self._exec('git', 'fetch', cwd=dir)
+            self._exec('git', 'fetch', '--depth', '1', 'origin', branch, cwd=dir)
             self._exec('git', 'checkout', branch, cwd=dir)
             self._exec('git', 'reset', '--hard', f'origin/{branch}', cwd=dir)
+        elif 'sub_dir' in self._config:
+            LOG.info("Cloning %s (sparse)", repo)
+            self._exec('/app/git_sparse_clone', repo, branch, self.get_id(), self._config('sub_dir'),
+                       cwd=TEMP_DIR)
         else:
             LOG.info("Cloning %s", repo)
-            command = ['git', 'clone', '-b', branch, repo, self.get_id()]
+            command = ['git', 'clone', '-b', branch, '--depth', '1', repo, self.get_id()]
             self._exec(*command, cwd=TEMP_DIR)
 
     def _clone_dir(self):

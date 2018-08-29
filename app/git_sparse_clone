@@ -1,0 +1,15 @@
+#!/bin/bash -e
+
+
+repo="$1"
+branch="$2"
+target="$3"
+sub_dir="$4"
+
+mkdir -p "$target"
+cd "$target"
+git init
+git config core.sparseCheckout true
+git remote add origin "$repo"
+echo "$sub_dir" > .git/info/sparse-checkout
+git pull --depth 1 origin master
