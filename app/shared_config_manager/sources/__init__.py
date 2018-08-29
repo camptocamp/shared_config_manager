@@ -2,6 +2,7 @@ from c2cwsgiutils import broadcast
 import logging
 import os
 from pyramid.httpexceptions import HTTPNotFound, HTTPBadRequest
+from threading import Thread
 import yaml
 
 from . import git, rsync
@@ -25,7 +26,7 @@ def init():
     global master_source
     content = yaml.load(os.environ['MASTER_CONFIG'])
     master_source = _create_source(MASTER_ID, content, is_master=True)
-    reload_master_config()
+    Thread(target=reload_master_config, name="master_config_loader", daemon=True).start()
 
 
 def reload_master_config():
