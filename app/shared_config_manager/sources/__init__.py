@@ -63,7 +63,7 @@ def _delete_source(id_):
     del sources[id_]
 
 
-@broadcast.decorator(expect_answers=True)
+@broadcast.decorator(expect_answers=True, timeout=120)
 def refresh(id_, key):
     config = _get_source(id_, key)
     if config.is_master():

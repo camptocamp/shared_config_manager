@@ -93,7 +93,7 @@ services:
     labels:
       io.rancher.container.hostname_override: container_name
       lb.routing_key: scm-${ENVIRONMENT_NAME}
-      lb.haproxy_backend.timeout_server: "timeout server 60s"
+      lb.haproxy_backend.timeout_server: "timeout server 120s"
       lb.haproxy_backend.maxconn: default-server maxconn 1
 
   scm_slave:
