@@ -1,0 +1,20 @@
+#!/bin/bash -e
+
+if [[ ! -f /tmp/status ]]
+then
+    echo "INIT"
+    exit 2
+fi
+
+status="$(cat /tmp/status)"
+echo "$status"
+
+if [[ $status == 'READY' ]]
+then
+    exit 0
+elif [[ $status == 'LOADING' ]]
+then
+    exit 1
+else
+    exit 3
+fi
