@@ -42,11 +42,17 @@ You can configure more than one source.
 ### GIT source configuration parameters
 
 * `type`: `git`
-* `ssh_key`: the private SSH key to use as identity
+* `ssh_key`: the private SSH key to use as identity (optional)
 * `repo`: the GIT repository URL
 * `branch`: the GIT branch to use (defaults to `master`)
 * `sub_dir`: if only a sub_directory of the repository needs to be copied (defaults to the root of the
   repository)
+
+### Rsync source configuration parameters
+
+* `type`: `rsync`
+* `source`: the source for the rsync command
+* `ssh_key`: the private SSH key to use as identity (optional)
 
 
 ## Slave only mode

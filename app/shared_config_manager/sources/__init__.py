@@ -4,10 +4,11 @@ import os
 from pyramid.httpexceptions import HTTPNotFound, HTTPBadRequest
 import yaml
 
-from . import git
+from . import git, rsync
 
 SOURCES = {
-    'git': git.GitSource
+    'git': git.GitSource,
+    'rsync': rsync.RsyncSource
 }
 LOG = logging.getLogger(__name__)
 MASTER_ID = 'master'
