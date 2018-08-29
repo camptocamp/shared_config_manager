@@ -38,6 +38,7 @@ def test_git(repo):
     git.refresh()
     subprocess.check_call(['ls', '/config/test_git'])
     assert os.path.isfile('/config/test_git/test')
+    assert not os.path.isfile('/config/test_git/.git')
     with open('/config/test_git/test') as file:
         assert file.read() == 'Hello world'
 

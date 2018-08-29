@@ -18,10 +18,15 @@ class BaseSource(object):
     def refresh(self):
         pass
 
-    def _copy(self, source):
+    def _copy(self, source, excludes=None):
         os.makedirs(self.get_path(), exist_ok=True)
-        self._exec('rsync', '--archive', '--delete', '--exclude=.git', '--verbose',
-                   source + '/', self.get_path())
+        cmd = ['rsync', '--archive', '--delete', '--verbose']
+        if excludes is not None:
+            cmd += ['--exclude=' + exclude for exclude in excludes]
+        if 'excludes' in self._config:
+            cmd += ['--exclude=' + exclude for exclude in self._config['excludes']]
+        cmd += [source + '/', self.get_path()]
+        self._exec(*cmd)
 
     def delete_target_dir(self):
         dest = self.get_path()

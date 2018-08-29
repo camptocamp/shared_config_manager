@@ -38,6 +38,7 @@ You can configure more than one source.
 * `type`: the type of source
 * `key`: the secret key that will be used to trigger a refresh of the source
 * `target_dir`: the location where the source will be copied (default to the value of `id` in `/config`)
+* `excludes`: the list of files/directories to exclude
 
 ### GIT source configuration parameters
 
@@ -53,7 +54,6 @@ You can configure more than one source.
 * `type`: `rsync`
 * `source`: the source for the rsync command
 * `ssh_key`: the private SSH key to use as identity (optional)
-
 
 ## Slave only mode
 

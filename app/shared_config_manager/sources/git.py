@@ -11,7 +11,7 @@ LOG = logging.getLogger(__name__)
 class GitSource(SshBaseSource):
     def refresh(self):
         self._checkout()
-        self._copy(self._copy_dir())
+        self._copy(self._copy_dir(), excludes=['.git'])
 
     def _checkout(self):
         dir = self._clone_dir()
