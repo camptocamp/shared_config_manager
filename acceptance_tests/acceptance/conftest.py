@@ -15,7 +15,7 @@ LOG = logging.getLogger(__name__)
 
 def wait_slaves():
     def what() -> bool:
-        r = requests.get(BASE_URL + '1/stats')
+        r = requests.get(BASE_URL + '1/status')
         if r.status_code == 200:
             json = r.json()
             if len(json['slaves']) != 2:

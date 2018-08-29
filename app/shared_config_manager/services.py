@@ -5,7 +5,7 @@ from pyramid.httpexceptions import HTTPServerError
 from . import sources, slave_stats
 
 refresh_service = services.create('refresh', '/1/refresh/{id}/{key}')
-stats_service = services.create('stats', '/1/stats')
+stats_service = services.create('stats', '/1/status')
 LOG = logging.getLogger(__name__)
 
 
