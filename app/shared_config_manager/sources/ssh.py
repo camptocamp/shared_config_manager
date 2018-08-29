@@ -1,9 +1,11 @@
 import fileinput
 import os
-from pathlib import Path
-
 
 from .base import BaseSource
+
+# hack to work around an OpenShift "security"
+if os.getuid() not in (33, 0):
+    os.environ['HOME'] = '/var/www'
 
 
 class SshBaseSource(BaseSource):
@@ -14,8 +16,8 @@ class SshBaseSource(BaseSource):
     def _setup_key(self, ssh_key):
         if ssh_key is None:
             return
-        ssh_path = os.path.join(str(Path.home()), '.ssh')
-        os.makedirs(ssh_path)
+        ssh_path = self._ssh_path()
+        os.makedirs(ssh_path, exist_ok=True)
         key_path = os.path.join(ssh_path, self.get_id()) + '.key'
         was_here = os.path.isfile(key_path)
         with open(key_path, 'w') as ssh_key_file:
@@ -25,6 +27,9 @@ class SshBaseSource(BaseSource):
         if not was_here:
             with open(os.path.join(ssh_path, 'config'), 'a') as config:
                 config.write(f'IdentityFile {key_path}\n')
+
+    def _ssh_path(self):
+        return os.path.join(os.environ['HOME'], '.ssh')
 
     def get_stats(self):
         stats = super().get_stats()
@@ -36,7 +41,7 @@ class SshBaseSource(BaseSource):
         super().delete()
         ssh_key = self._config.get('ssh_key')
         if ssh_key is not None:
-            ssh_path = os.path.join(str(Path.home()), '.ssh')
+            ssh_path = self._ssh_path()
             key_path = os.path.join(ssh_path, self.get_id()) + '.key'
             if os.path.isfile(key_path):
                 os.remove(key_path)

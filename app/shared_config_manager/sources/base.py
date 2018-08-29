@@ -70,7 +70,7 @@ class BaseSource(object):
     def _exec(self, *args, **kwargs):
         try:
             LOG.debug("Running: " + ' '.join(args))
-            output = subprocess.check_output(args, stderr=subprocess.STDOUT, **kwargs)
+            output = subprocess.check_output(args, stderr=subprocess.STDOUT, env=dict(os.environ), **kwargs)
             if output:
                 output = output.decode("utf-8").strip()
                 LOG.debug(output)

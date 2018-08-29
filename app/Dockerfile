@@ -24,12 +24,12 @@ ARG GIT_HASH
 RUN pip3 install --no-cache-dir -e . && \
     c2cwsgiutils_genversion.py $GIT_HASH && \
     flake8 shared_config_manager tests && \
-    pytest -vv --cov=shared_config_manager --color=yes tests && \
-    python3 -m compileall -q . && \
     mkdir -p /master_config /config /var/www && \
     adduser www-data root && \
     chown www-data:root /master_config /config /var/www && \
-    chmod og+rwx /master_config /config && \
+    chmod og+rwx /master_config /config /var/www && \
+    pytest -vv --cov=shared_config_manager --color=yes tests && \
+    python3 -m compileall -q . && \
     rm -rf /tmp/* /master_config/* /config/*
 
 ENV GUNICORN_PARAMS="-b :8080 --workers 1" \
