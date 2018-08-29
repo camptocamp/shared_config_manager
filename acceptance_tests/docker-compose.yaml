@@ -21,6 +21,7 @@ services:
         repo: /repos/master
     volumes:
       - /tmp/test_repos:/repos:rw
+      - /tmp/slaves/api:/config:rw
     links:
       - redis
     ports:
@@ -33,6 +34,7 @@ services:
     command: ['/app/shared_config_slave.py']
     volumes:
       - /tmp/test_repos:/repos:rw
+      - /tmp/slaves/slave:/config:rw
     links:
       - redis
     hostname: slave

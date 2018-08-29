@@ -62,7 +62,7 @@ acceptance: build_acceptance build
 	#get the UT reports
 	docker run --rm $(DOCKER_BASE):$(DOCKER_TAG) cat /app/.coverage > reports/coverage/api/coverage.ut.1
 	#run the tests
-	docker run $(DOCKER_TTY) -e DOCKER_TAG=$(DOCKER_TAG) -v /var/run/docker.sock:/var/run/docker.sock -v /tmp/test_repos:/tmp/test_repos --name scm_acceptance_$(DOCKER_TAG)_$$PPID $(DOCKER_BASE)_acceptance:$(DOCKER_TAG) \
+	docker run $(DOCKER_TTY) -e DOCKER_TAG=$(DOCKER_TAG) -v /var/run/docker.sock:/var/run/docker.sock -v /tmp/test_repos:/tmp/test_repos -v /tmp/slaves/:/tmp/slaves --name scm_acceptance_$(DOCKER_TAG)_$$PPID $(DOCKER_BASE)_acceptance:$(DOCKER_TAG) \
 	bash -c "py.test -vv --color=yes --junitxml /reports/acceptance.xml $(PYTEST_OPTS) acceptance; status=\$$?; junit2html /reports/acceptance.xml /reports/acceptance.html; exit \$$status\$$?"; \
 	status=$$status$$?; \
 	#copy the reports locally \

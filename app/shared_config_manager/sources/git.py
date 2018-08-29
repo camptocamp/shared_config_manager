@@ -74,6 +74,8 @@ class GitSource(BaseSource):
     def get_stats(self):
         stats = super().get_stats()
         stats['hash'] = self._get_hash()
+        if 'ssh_key' in stats:
+            del stats['ssh_key']
         return stats
 
     def _get_hash(self):

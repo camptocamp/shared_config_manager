@@ -24,7 +24,7 @@ def refresh_webhook(request):
         raise HTTPServerError("Non GIT source %s cannot be refreshed by a webhook", id_)
 
     if request.headers.get('X-GitHub-Event') != 'push':
-        LOG.info("Ignoring webhook notif for a non-push event", source.get_branch(), id_)
+        LOG.info("Ignoring webhook notif for a non-push event on %s")
         return {'status': 200, 'nb_completed': 0}
 
     ref = request.json.get('ref')

@@ -1,4 +1,5 @@
 import logging
+import os
 import pytest
 import requests
 import subprocess
@@ -16,18 +17,28 @@ def wait_slaves():
     def what() -> bool:
         r = requests.get(BASE_URL + '1/stats')
         if r.status_code == 200:
-            return len(r.json()['slaves']) == 2
+            json = r.json()
+            if len(json['slaves']) != 2:
+                return False
+            for _, status in json['slaves'].items():
+                if set(status['sources'].keys()) != {'master', 'test_git'}:
+                    return False
+            return True
         else:
             return False
 
     utils.retry_timeout(what)
 
 
-@pytest.fixture(scope="session")
+@pytest.yield_fixture(scope="session")
 def composition(request, test_repos):
     """
     Fixture that start/stop the Docker composition used for all the tests.
     """
+    for slave in ('api', 'slave'):
+        path = os.path.join('/tmp/slaves', slave)
+        os.makedirs(path, exist_ok=True)
+        os.chown(path, 33, 0)
     result = Composition(request, PROJECT_NAME, '/acceptance_tests/docker-compose.yaml',
                          coverage_paths=[
                              PROJECT_NAME + "_api_1:/tmp/coverage",
@@ -35,7 +46,10 @@ def composition(request, test_repos):
                          ])
     utils.wait_url(BASE_URL + 'c2c/health_check?max_level=2')
     wait_slaves()
-    return result
+
+    yield result
+
+    subprocess.check_call("rm -rf /tmp/slaves/*", shell=True)
 
 
 @pytest.fixture

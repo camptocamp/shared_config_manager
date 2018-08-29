@@ -37,18 +37,15 @@ def reload_master_config():
             raise HTTPBadRequest(f'A source cannot have the "{MASTER_ID}" id')
         to_deletes = set(sources.keys()) - set(config['sources'].keys())
         for to_delete in to_deletes:
-            # TODO: test
             _delete_source(to_delete)
         for id_, source_config in config['sources'].items():
             prev_source = sources.get(id_)
             if prev_source is None:
-                # TODO: test
                 LOG.info("New source detected: %s", id_)
             elif prev_source.get_config() == source_config:
                 LOG.debug("Source %s didn't change, not reloading it", id_)
                 continue
             else:
-                # TODO: test
                 LOG.info("Change detected in source %s, reloading it", id_)
                 _delete_source(id_)  # to be sure the old stuff is cleaned
 
