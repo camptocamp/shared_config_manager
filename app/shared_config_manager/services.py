@@ -50,7 +50,7 @@ def _refresh(request):
 @stats_service.get()
 def stats(request):
     slaves = slave_stats.get_slave_stats()
-    slaves = {slave['hostname']: slave for slave in slaves}
+    slaves = {slave['hostname']: slave for slave in slaves if slave is not None}
     return {
         'slaves': slaves
     }
