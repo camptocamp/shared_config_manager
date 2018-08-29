@@ -24,7 +24,7 @@ class GitSource(SshBaseSource):
             self._exec('git', 'reset', '--hard', f'origin/{branch}', cwd=dir)
         elif 'sub_dir' in self._config:
             LOG.info("Cloning %s (sparse)", repo)
-            self._exec('/app/git_sparse_clone', repo, branch, self.get_id(), self._config('sub_dir'),
+            self._exec('/app/git_sparse_clone', repo, branch, self.get_id(), self._config['sub_dir'],
                        cwd=TEMP_DIR)
         else:
             LOG.info("Cloning %s", repo)
