@@ -3,9 +3,16 @@ import os
 
 from .base import BaseSource
 
+
+def _patch_openshift():
+    os.environ['HOME'] = '/var/www'
+    with open('/etc/passwd', 'a') as passwd:
+        passwd.write(f'www-data2:x:{os.getuid()}:0:www-data:/var/www:/usr/sbin/nologin\n')
+
+
 # hack to work around an OpenShift "security"
 if os.getuid() not in (33, 0):
-    os.environ['HOME'] = '/var/www'
+    _patch_openshift()
 
 
 class SshBaseSource(BaseSource):

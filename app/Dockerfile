@@ -28,6 +28,7 @@ RUN pip3 install --no-cache-dir -e . && \
     adduser www-data root && \
     chown www-data:root /master_config /config /var/www && \
     chmod og+rwx /master_config /config /var/www && \
+    chmod g+w /etc/passwd && \
     pytest -vv --cov=shared_config_manager --color=yes tests && \
     python3 -m compileall -q . && \
     rm -rf /tmp/* /master_config/* /config/*
