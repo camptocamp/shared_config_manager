@@ -11,6 +11,7 @@ class BaseEngine(object):
         self._glob = glob
         if self._config.get('environment_variables', False):
             self._data = dict(os.environ)
+            self._data.pop('MASTER_CONFIG', None)  # don't want to expose this one
             self._data.update(config.get('data', {}))
         else:
             self._data = config.get('data', {})
@@ -18,7 +19,11 @@ class BaseEngine(object):
     def evaluate(self, path):
         for path in pathlib.Path(path).glob(self._glob):
             LOG.info("Evaluating template: %s", path)
-            self._evaluate_file(str(path))
+            try:
+                self._evaluate_file(str(path))
+            except Exception:
+                LOG.warning("Failed applying the %s template: %s",
+                            self._config['type'], str(path), exc_info=True)
 
     def _evaluate_file(self, path):
         pass

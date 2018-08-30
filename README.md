@@ -65,11 +65,12 @@ You can configure more than one source.
 * `environment_variables`: If `true`, take into account the process' environment variables
   if not found in `data`
 
+
 ## Slave only mode
 
 By default the image starts a WSGI server listening on port 8080. In big deployments a full WSGI server
 could use a sizeable amount of RAM. So you could have only a couple of such containers and the rest running
-as slaves. For that, change the command run by the container to ``
+as slaves. For that, change the command run by the container to `/app/shared_config_slave.py`.
 
 
 ## Tunnings
