@@ -10,7 +10,7 @@ WORKDIR /app
 EXPOSE 8080
 
 RUN apt update && \
-    apt install -y --no-install-recommends ssh rsync && \
+    apt install -y --no-install-recommends ssh rsync gettext-base && \
     apt clean && \
     rm -r /var/lib/apt/lists/* && \
     echo "    VerifyHostKeyDNS yes" >> /etc/ssh/ssh_config && \

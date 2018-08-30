@@ -33,14 +33,17 @@ is a clone of the `git@github.com:camptocamp/test_git.git` repository and is ide
 
 You can configure more than one source.
 
-### Common source configuration parameters
+### Sources
+
+#### Common source configuration parameters
 
 * `type`: the type of source
 * `key`: the secret key that will be used to trigger a refresh of the source
 * `target_dir`: the location where the source will be copied (default to the value of `id` in `/config`)
 * `excludes`: the list of files/directories to exclude
+* `template_engines`: a list of template engine configurations
 
-### GIT source configuration parameters
+#### GIT source configuration parameters
 
 * `type`: `git`
 * `ssh_key`: the private SSH key to use as identity (optional)
@@ -49,11 +52,18 @@ You can configure more than one source.
 * `sub_dir`: if only a sub_directory of the repository needs to be copied (defaults to the root of the
   repository)
 
-### Rsync source configuration parameters
+#### Rsync source configuration parameters
 
 * `type`: `rsync`
 * `source`: the source for the rsync command
 * `ssh_key`: the private SSH key to use as identity (optional)
+
+### Template engines
+
+* `type`: can be `mako`  or `shell`
+* `data`: a dictionay of key/value to pass as a parameter to the template engine
+* `environment_variables`: If `true`, take into account the process' environment variables
+  if not found in `data`
 
 ## Slave only mode
 

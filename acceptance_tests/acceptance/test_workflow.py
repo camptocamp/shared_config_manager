@@ -33,6 +33,10 @@ def git_source(app_connection, test_repos):
     type: git
     repo: /repos/other
     key: changeme
+    template_engines:
+      - type: mako
+        data:
+          param: world
 """)
 
     subprocess.check_call(f"""
@@ -45,8 +49,8 @@ def git_source(app_connection, test_repos):
 
     git init other
     cd other
-    echo -n "content" > config.txt
-    git add config.txt
+    echo -n 'content ${{param}}' > config.txt.mako
+    git add config.txt.mako
     git commit -a -m "Initial commit"
     """, shell=True)
 
@@ -79,12 +83,12 @@ def git_source(app_connection, test_repos):
 def test_ok(app_connection, git_source):
     for slave in ('api', 'slave'):
         with open(os.path.join('/tmp', 'slaves', slave, 'other', 'config.txt')) as config:
-            assert config.read() == 'content'
+            assert config.read() == 'content world'
 
     subprocess.check_call(f"""
     set -e
     cd {git_source}
-    echo -n "content modified" > config.txt
+    echo -n "content modified" > config.txt.mako
     git commit -a -m "Second commit"
     """, shell=True)
 

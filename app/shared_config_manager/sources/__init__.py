@@ -8,7 +8,7 @@ import yaml
 
 from . import git, rsync
 
-SOURCES = {
+ENGINES = {
     'git': git.GitSource,
     'rsync': rsync.RsyncSource
 }
@@ -20,7 +20,7 @@ sources = {}
 
 def _create_source(id_, config, is_master=False):
     type_ = config['type']
-    return SOURCES[type_](id_, config, is_master)
+    return ENGINES[type_](id_, config, is_master)
 
 
 def init():

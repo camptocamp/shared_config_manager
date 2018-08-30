@@ -4,6 +4,8 @@ import shutil
 import subprocess
 import os
 
+from shared_config_manager import template_engines
+
 LOG = logging.getLogger(__name__)
 TARGET = "/config"
 MASTER_TARGET = "/master_config"
@@ -14,13 +16,22 @@ class BaseSource(object):
         self._id = id_
         self._config = config
         self._is_master = is_master
+        self._template_engines = [
+            template_engines.create_engine(engine_conf)
+            for engine_conf in config.get('template_engines', [])
+        ]
 
     def refresh(self):
+        self._do_refresh()
+        for engine in self._template_engines:
+            engine.evaluate(self.get_path())
+
+    def _do_refresh(self):
         pass
 
     def _copy(self, source, excludes=None):
         os.makedirs(self.get_path(), exist_ok=True)
-        cmd = ['rsync', '--archive', '--delete', '--verbose']
+        cmd = ['rsync', '--archive', '--delete', '--verbose', '--checksum']
         if excludes is not None:
             cmd += ['--exclude=' + exclude for exclude in excludes]
         if 'excludes' in self._config:
