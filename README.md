@@ -163,7 +163,7 @@ services:
 
 * `GET {ROUTE_PREFIX}/1/refresh/{ID}/{KEY}`
 
-Refresh the given source `{ID}`. Returns 200 in case of success and 500 in case of failure (with some details).
+Refresh the given source `{ID}`. Returns 200 in case of success. The actual work is done asynchronously.
 
 To refresh the master configuration (list of sources), use `master` as ID.
 

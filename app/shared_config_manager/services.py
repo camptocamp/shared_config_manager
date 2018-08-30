@@ -25,26 +25,21 @@ def refresh_webhook(request):
 
     if request.headers.get('X-GitHub-Event') != 'push':
         LOG.info("Ignoring webhook notif for a non-push event on %s")
-        return {'status': 200, 'nb_completed': 0}
+        return {'status': 200, 'ignored': True, 'reason': 'Not a push'}
 
     ref = request.json.get('ref')
     if ref is None:
         raise HTTPServerError("Webhook for %s is missing the ref", id_)
     if ref != 'refs/heads/' + source.get_branch():
         LOG.info("Ignoring webhook notif for non-matching branch %s on %s", source.get_branch(), id_)
-        return {'status': 200, 'nb_completed': 0}
+        return {'status': 200, 'ignored': True, 'reason': f'Not {source.get_branch()} branch'}
 
     return _refresh(request)
 
 
 def _refresh(request):
-    answers = sources.refresh(id_=request.matchdict['id'], key=request.matchdict['key'])
-    errors = list(filter(lambda i: i is not True, answers))
-    if len(errors) > 0:
-        request.response.status_code = 500
-        return {'status': 500, 'errors': errors, 'nb_completed': len(answers) - len(errors)}
-    else:
-        return {'status': 200, 'nb_completed': len(answers) - len(errors)}
+    sources.refresh(id_=request.matchdict['id'], key=request.matchdict['key'])
+    return {'status': 200}
 
 
 @stats_service.get()

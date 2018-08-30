@@ -25,6 +25,7 @@ def _create_source(id_, config, is_master=False):
 
 def init():
     global master_source
+    _update_flag("LOADING")
     content = yaml.load(os.environ['MASTER_CONFIG'])
     master_source = _create_source(MASTER_ID, content, is_master=True)
     LOG.info("Initial loading of the master config")
@@ -34,33 +35,30 @@ def init():
 
 def reload_master_config():
     global sources, master_source
-    _update_flag("LOADING")
-    try:
-        with open(os.path.join(master_source.get_path(), 'shared_config_manager.yaml')) as config_file:
-            config = yaml.load(config_file)
-            if MASTER_ID in config['sources']:
-                raise HTTPBadRequest(f'A source cannot have the "{MASTER_ID}" id')
-            to_deletes = set(sources.keys()) - set(config['sources'].keys())
-            for to_delete in to_deletes:
-                _delete_source(to_delete)
-            for id_, source_config in config['sources'].items():
-                prev_source = sources.get(id_)
-                if prev_source is None:
-                    LOG.info("New source detected: %s", id_)
-                elif prev_source.get_config() == source_config:
-                    LOG.debug("Source %s didn't change, not reloading it", id_)
-                    continue
-                else:
-                    LOG.info("Change detected in source %s, reloading it", id_)
-                    _delete_source(id_)  # to be sure the old stuff is cleaned
+    with open(os.path.join(master_source.get_path(), 'shared_config_manager.yaml')) as config_file:
+        config = yaml.load(config_file)
+        if MASTER_ID in config['sources']:
+            raise HTTPBadRequest(f'A source cannot have the "{MASTER_ID}" id')
+        to_deletes = set(sources.keys()) - set(config['sources'].keys())
+        for to_delete in to_deletes:
+            _delete_source(to_delete)
+        for id_, source_config in config['sources'].items():
+            prev_source = sources.get(id_)
+            if prev_source is None:
+                LOG.info("New source detected: %s", id_)
+            elif prev_source.get_config() == source_config:
+                LOG.debug("Source %s didn't change, not reloading it", id_)
+                continue
+            else:
+                LOG.info("Change detected in source %s, reloading it", id_)
+                _delete_source(id_)  # to be sure the old stuff is cleaned
 
-                try:
-                    sources[id_] = _create_source(id_, source_config)
-                    sources[id_].refresh()
-                except Exception:
-                    LOG.error("Cannot load the %s config", id_, exc_info=True)
-    finally:
-        _update_flag("READY")
+            try:
+                sources[id_] = _create_source(id_, source_config)
+                sources[id_].refresh()
+            except Exception:
+                LOG.error("Cannot load the %s config", id_, exc_info=True)
+    _update_flag("READY")
 
 
 def _update_flag(value):
@@ -74,7 +72,7 @@ def _delete_source(id_):
     del sources[id_]
 
 
-@broadcast.decorator(expect_answers=True, timeout=120)
+@broadcast.decorator()
 def refresh(id_, key):
     config = _get_source(id_, key)
     LOG.info("Reloading the %s config", id_)

@@ -1,8 +1,7 @@
 def test_ok(app_connection):
     answer = app_connection.get_json('1/refresh/test_git/changeme')
     assert answer == {
-        'status': 200,
-        'nb_completed': 2
+        'status': 200
     }
 
 
@@ -21,8 +20,7 @@ def test_webhook(app_connection):
     }, headers={'X-GitHub-Event': 'push'})
 
     assert answer == {
-        'status': 200,
-        'nb_completed': 2
+        'status': 200
     }
 
 
@@ -34,7 +32,8 @@ def test_webhook_other_branch(app_connection):
 
     assert answer == {
         'status': 200,
-        'nb_completed': 0
+        'ignored': True,
+        'reason': 'Not master branch'
     }
 
 
@@ -46,5 +45,6 @@ def test_webhook_not_push(app_connection):
 
     assert answer == {
         'status': 200,
-        'nb_completed': 0
+        'ignored': True,
+        'reason': 'Not a push'
     }
