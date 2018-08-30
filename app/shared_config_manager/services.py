@@ -45,7 +45,14 @@ def _refresh(request):
 @stats_service.get()
 def stats(request):
     slaves = slave_stats.get_slave_stats()
-    slaves = {slave['hostname']: slave for slave in slaves if slave is not None}
+    slaves = {slave['hostname']: _cleanup_slave_status(slave) for slave in slaves if slave is not None}
     return {
         'slaves': slaves
     }
+
+
+def _cleanup_slave_status(status):
+    result = dict(status)
+    result.pop('hostname', None)
+    result.pop('pid', None)
+    return result
