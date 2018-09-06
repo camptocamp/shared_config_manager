@@ -12,7 +12,7 @@ def _get_hash(dir):
 
 def _wait_sync(app_connection, name, hash):
     def what():
-        status = app_connection.get_json('1/status')
+        status = app_connection.get_json('1/status/changeme')
         for _, slave in status['slaves'].items():
             if hash is None:
                 if name in slave['sources']:

@@ -2,10 +2,11 @@ from c2cwsgiutils import services
 import logging
 from pyramid.httpexceptions import HTTPServerError
 
-from . import sources, slave_stats
+from . import sources, slave_status
 
 refresh_service = services.create('refresh', '/1/refresh/{id}/{key}')
-stats_service = services.create('stats', '/1/status')
+stats_service = services.create('stats', '/1/status/{key}')
+source_stats_service = services.create('service_stats', '/1/status/{id}/{key}')
 LOG = logging.getLogger(__name__)
 
 
@@ -44,7 +45,19 @@ def _refresh(request):
 
 @stats_service.get()
 def stats(request):
-    slaves = slave_stats.get_slave_stats()
+    sources.master_source.validate_key(request.matchdict['key'])
+    slaves = slave_status.get_slaves_status()
+    slaves = {slave['hostname']: _cleanup_slave_status(slave) for slave in slaves if slave is not None}
+    return {
+        'slaves': slaves
+    }
+
+
+@source_stats_service.get()
+def source_stats(request):
+    id_ = request.matchdict['id']
+    sources.check_id_key(id_=id_, key=request.matchdict['key'])
+    slaves = slave_status.get_source_status(id_=id_)
     slaves = {slave['hostname']: _cleanup_slave_status(slave) for slave in slaves if slave is not None}
     return {
         'slaves': slaves

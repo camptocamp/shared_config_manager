@@ -15,17 +15,17 @@ LOG = logging.getLogger(__name__)
 
 def wait_slaves():
     def what() -> bool:
-        r = requests.get(BASE_URL + '1/status')
+        r = requests.get(BASE_URL + '1/status/changeme')
         if r.status_code == 200:
             json = r.json()
             if len(json['slaves']) != 2:
-                return False
+                raise Exception("Not seeing 2 slaves")
             for _, status in json['slaves'].items():
                 if set(status['sources'].keys()) != {'master', 'test_git'}:
-                    return False
+                    raise Exception("Not seeing the 2 sources")
             return True
         else:
-            return False
+            raise Exception(f"Not having a 200 status: {r.status_code}")
 
     utils.retry_timeout(what)
 

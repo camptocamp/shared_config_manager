@@ -1,3 +1,4 @@
+import copy
 import logging
 from pyramid.httpexceptions import HTTPForbidden
 import shutil
@@ -65,7 +66,7 @@ class BaseSource(object):
         return self._is_master
 
     def get_stats(self):
-        stats = dict(self._config)
+        stats = copy.deepcopy(self._config)
         del stats['key']
         return stats
 

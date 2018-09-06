@@ -7,7 +7,7 @@ import time
 def main():
     _setup_logging()
     _init_c2cwsgiutils()
-    from shared_config_manager import sources, slave_stats
+    from shared_config_manager import sources, slave_status
     sources.init()
     while True:
         time.sleep(3600)

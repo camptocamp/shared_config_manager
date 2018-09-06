@@ -4,9 +4,10 @@ import os
 from pyramid.httpexceptions import HTTPNotFound, HTTPBadRequest
 import tempfile
 from threading import Thread
+from typing import Mapping
 import yaml
 
-from . import git, rsync
+from . import git, rsync, base
 
 ENGINES = {
     'git': git.GitSource,
@@ -14,8 +15,8 @@ ENGINES = {
 }
 LOG = logging.getLogger(__name__)
 MASTER_ID = 'master'
-master_source = None
-sources = {}
+master_source: base.BaseSource = None
+sources: Mapping[str, base.BaseSource] = {}
 
 
 def _create_source(id_, config, is_master=False):
@@ -74,7 +75,7 @@ def _delete_source(id_):
 
 @broadcast.decorator()
 def refresh(id_, key):
-    config = _get_source(id_, key)
+    config = check_id_key(id_, key)
     LOG.info("Reloading the %s config", id_)
     if config.is_master():
         config.refresh()
@@ -85,19 +86,19 @@ def refresh(id_, key):
 
 
 def check_id_key(id_, key):
-    return _get_source(id_, key)
+    source = get_source(id_)
+    if source is None:
+        raise HTTPNotFound(f"Unknown id {id_}")
+    source.validate_key(key)
+    return source
 
 
-def _get_source(id_, key):
+def get_source(id_) -> base.BaseSource:
     global master_source, sources
     if master_source.get_id() == id_:
-        config = master_source
+        return master_source
     else:
-        config = sources.get(id_)
-    if config is None:
-        raise HTTPNotFound(f"Unknown id {id_}")
-    config.validate_key(key)
-    return config
+        return sources.get(id_)
 
 
 def get_stats():
