@@ -63,8 +63,8 @@ You can configure more than one source.
 * `type`: can be `mako`  or `shell`
 * `data`: a dictionay of key/value to pass as a parameter to the template engine
 * `environment_variables`: If `true`, take into account the process' environment variables
-  if not found in `data`. A big amount of variables are removed, look at
-  shared_config_manager/template_engines/base.py for a list.
+  if not found in `data`. Only variables starting with a prefix listed in `SCM_ENV_PREFIXES`
+  (list separated by `:`) are allowed.
 
 
 ## Slave only mode

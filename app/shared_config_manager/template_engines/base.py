@@ -3,30 +3,7 @@ import os
 import pathlib
 
 LOG = logging.getLogger(__name__)
-REMOVED_ENV = {
-    'PATH',
-    'HOME',
-    'DEVELOPMENT',
-    'COVERAGE',
-    'HOSTNAME',
-    'MASTER_CONFIG',
-    'PKG_CONFIG_ALLOW_SYSTEM_LIBS',
-    'STATS_VIEW',
-    'TERM',
-    'LANG',
-    'PWD',
-    'SERVER_SOFTWARE',
-    'SHLVL',
-    '_'
-}
-REMOVED_ENV_PREFIX = [
-    'C2C_',
-    'GUNICORN_',
-    'LOG_'
-]
-REMOVED_ENV_SUFFIX = [
-    '_LOG_LEVEL'
-]
+ENV_PREFIXES = os.environ.get('SCM_ENV_PREFIXES', 'MUTUALIZED_').split(':')
 
 
 class BaseEngine(object):
@@ -59,8 +36,6 @@ class BaseEngine(object):
 def _filter_env(env):
     result = {}
     for key, value in env.items():
-        if key not in REMOVED_ENV and \
-                not any(key.startswith(i) for i in REMOVED_ENV_PREFIX) and \
-                not any(key.endswith(i) for i in REMOVED_ENV_SUFFIX):
+        if any(key.startswith(i) for i in ENV_PREFIXES):
             result[key] = value
     return result
