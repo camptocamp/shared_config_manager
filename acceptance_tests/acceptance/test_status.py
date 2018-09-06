@@ -20,3 +20,6 @@ def test_other(app_connection):
     print(f'stats={pprint(stats)}')
     assert len(stats['slaves']) == 2
     assert stats['slaves']['api'] == stats['slaves']['slave']
+    assert len(stats['slaves']['api']['template_engines']) == 1
+    assert 'env' in stats['slaves']['api']['template_engines'][0]
+    assert stats['slaves']['api']['template_engines'][0]['env']['TEST_ENV'] == '42'

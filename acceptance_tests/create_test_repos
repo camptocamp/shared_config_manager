@@ -12,6 +12,9 @@ sources:
     type: git
     repo: /repos/test_git
     key: changeme
+    template_engines:
+      - type: shell
+        environment_variables: true
 END
 git add shared_config_manager.yaml
 git commit -a -m "Initial commit"

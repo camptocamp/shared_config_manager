@@ -19,6 +19,7 @@ services:
         type: git
         key: changeme
         repo: /repos/master
+      TEST_ENV: 42
     volumes:
       - /tmp/test_repos:/repos:rw
       - /tmp/slaves/api:/config:rw

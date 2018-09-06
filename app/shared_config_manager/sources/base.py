@@ -68,6 +68,9 @@ class BaseSource(object):
     def get_stats(self):
         stats = copy.deepcopy(self._config)
         del stats['key']
+        for template_stats, template_engine in zip(stats.get('template_engines', []),
+                                                   self._template_engines):
+            template_engine.get_stats(template_stats)
         return stats
 
     def get_config(self):
