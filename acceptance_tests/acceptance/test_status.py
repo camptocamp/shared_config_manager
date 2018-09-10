@@ -21,5 +21,5 @@ def test_other(app_connection):
     assert len(stats['slaves']) == 2
     assert stats['slaves']['api'] == stats['slaves']['slave']
     assert len(stats['slaves']['api']['template_engines']) == 1
-    assert 'env' in stats['slaves']['api']['template_engines'][0]
-    assert stats['slaves']['api']['template_engines'][0]['env']['TEST_ENV'] == '42'
+    assert 'environment_variables' in stats['slaves']['api']['template_engines'][0]
+    assert stats['slaves']['api']['template_engines'][0]['environment_variables']['TEST_ENV'] == '42'

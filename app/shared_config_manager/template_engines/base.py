@@ -30,7 +30,7 @@ class BaseEngine(object):
 
     def get_stats(self, stats):
         if self._config.get('environment_variables', False):
-            stats['env'] = _filter_env(os.environ)
+            stats['environment_variables'] = _filter_env(os.environ)
 
 
 def _filter_env(env):
