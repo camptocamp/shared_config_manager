@@ -169,6 +169,11 @@ services:
 ```
 
 
+## Example OpenShift chart
+
+Look there: [https://github.com/camptocamp/private-geo-charts/tree/master/mutualized-print]
+
+
 # API
 
 ## Refresh
@@ -186,30 +191,74 @@ Same as the GET API, but to be used with a GutHub webhook for push events. Will 
 
 ## Status
 
-* `GET {ROUTE_PREFIX}/1/status`
+* `GET {ROUTE_PREFIX}/1/status/{key}`
 
-Returns something like that:
+Returns the glable status, looking like that:
 
-```yaml
+```json
 {
-  "slaves":{
-    "scm_api_1":{
-      "hostname":"scm_api_1",
-      "pid":11,
-      "sources":{
-        "master":{
-          "hash":"9845a1f5a6218915592a8689685a3d4179720f13",
-          "id":"master",
-          "repo":"/repos/master",
-          "type":"git"
+  "slaves": {
+    "api": {
+      "sources": {
+        "master": {
+          "hash": "240930ea8580d8392544bc0f42bdd1720b772a46",
+          "repo": "/repos/master",
+          "type": "git"
         },
-        "test_git":{
-          "hash":"0af8f099bbbcf6a0ed41333136658b60627e36bd",
-          "repo":"/repos/test_git",
-          "type":"git"
+        "test_git": {
+          "hash": "4e066840860d77b143cbecbb8d23db3b755980b2",
+          "repo": "/repos/test_git",
+          "template_engines": [
+            {
+              "environment_variables": {"TEST_ENV": "42"},
+              "type": "shell"
+            }
+          ],
+          "type": "git"
+        }
+      }
+    },
+    "slave": {
+      "sources": {
+        "master": {
+          "hash": "240930ea8580d8392544bc0f42bdd1720b772a46",
+          "repo": "/repos/master",
+          "type": "git"
+        },
+        "test_git": {
+          "hash": "4e066840860d77b143cbecbb8d23db3b755980b2",
+          "repo": "/repos/test_git",
+          "template_engines": [
+            {
+              "environment_variables": {"TEST_ENV": "42"},
+              "type": "shell"
+            }
+          ],
+          "type": "git"
         }
       }
     }
   }
+}
+```
+
+* `GET {ROUTE_PREFIX}/1/status/{ID}/{KEY}`
+
+Returns the status for the given source ID, looking like that:
+```json
+{
+  "statuses": [
+    {
+      "hash": "4e066840860d77b143cbecbb8d23db3b755980b2",
+      "repo": "/repos/test_git",
+      "template_engines": [
+        {
+          "environment_variables": {"TEST_ENV": "42"},
+          "type": "shell"
+        }
+      ],
+      "type": "git"
+    }
+  ]
 }
 ```

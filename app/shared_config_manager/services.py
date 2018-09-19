@@ -58,9 +58,16 @@ def source_stats(request):
     id_ = request.matchdict['id']
     sources.check_id_key(id_=id_, key=request.matchdict['key'])
     slaves = slave_status.get_source_status(id_=id_)
-    slaves = {slave['hostname']: _cleanup_slave_status(slave) for slave in slaves if slave is not None}
+    statuses = []
+    for slave in slaves:
+        if slave is None:
+            continue
+        status = _cleanup_slave_status(slave)
+        if status not in statuses:
+            statuses.append(status)
+
     return {
-        'slaves': slaves
+        'statuses': statuses
     }
 
 
