@@ -8,8 +8,8 @@ import os
 from shared_config_manager import template_engines
 
 LOG = logging.getLogger(__name__)
-TARGET = "/config"
-MASTER_TARGET = "/master_config"
+TARGET = os.environ.get("TARGET", "/config")
+MASTER_TARGET = os.environ.get("MASTER_TARGET", "/master_config")
 
 
 class BaseSource(object):

@@ -33,6 +33,12 @@ is a clone of the `git@github.com:camptocamp/test_git.git` repository and is ide
 
 You can configure more than one source.
 
+Some other environment variables:
+
+* `TARGET`: default base directory for the `target_dir` configuration (defaults to `/config`)
+* `MASTER_TARGET`: where to store the master config (defaults to `/master_config`)
+
+
 ### Sources
 
 #### Common source configuration parameters
