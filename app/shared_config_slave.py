@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 import os
+import signal
 import time
 
 
-
 def main():
+    signal.signal(signal.SIGTERM, _sig_term)
     _setup_logging()
     _init_c2cwsgiutils()
     from shared_config_manager import sources, slave_status
@@ -29,6 +30,11 @@ def _init_c2cwsgiutils():
     stats.init_backends({})
     redis_stats.init(None)
 
+
+def _sig_term(signum, frame):
+    import logging
+    logging.getLogger("shared_config_slave").info("Got a SIGTERM, stopping the slave")
+    exit(0)
 
 if __name__ == "__main__":
     main()
