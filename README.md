@@ -33,6 +33,10 @@ is a clone of the `git@github.com:camptocamp/test_git.git` repository and is ide
 
 You can configure more than one source.
 
+There is a standalone mode where you can configure only one source through the `MASTER_CONFIG`
+environment variable. For that, set the `standalone` parameter to `true` and no
+`shared_config_manager.yaml` will be searched.
+
 Some other environment variables:
 
 * `TARGET`: default base directory for the `target_dir` configuration (defaults to `/config`)

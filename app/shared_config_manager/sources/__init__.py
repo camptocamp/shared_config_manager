@@ -31,7 +31,8 @@ def init():
     master_source = _create_source(MASTER_ID, content, is_master=True)
     LOG.info("Initial loading of the master config")
     master_source.refresh()
-    Thread(target=reload_master_config, name="master_config_loader", daemon=True).start()
+    if not master_source.get_config().get('standalone', False):
+        Thread(target=reload_master_config, name="master_config_loader", daemon=True).start()
 
 
 def reload_master_config():
@@ -77,11 +78,9 @@ def _delete_source(id_):
 def refresh(id_, key):
     config = check_id_key(id_, key)
     LOG.info("Reloading the %s config", id_)
-    if config.is_master():
-        config.refresh()
+    config.refresh()
+    if config.is_master() and not master_source.get_config().get('standalone', False):
         reload_master_config()
-    else:
-        config.refresh()
     return True
 
 
