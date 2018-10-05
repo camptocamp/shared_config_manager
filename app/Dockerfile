@@ -9,7 +9,10 @@ WORKDIR /app
 
 EXPOSE 8080
 
-RUN apt update && \
+RUN curl https://downloads.rclone.org/v1.43.1/rclone-v1.43.1-linux-amd64.deb > /tmp/rclone.deb && \
+    dpkg -i /tmp/rclone.deb && \
+    rm /tmp/rclone.deb && \
+    apt update && \
     apt install -y --no-install-recommends ssh rsync gettext-base && \
     apt clean && \
     rm -r /var/lib/apt/lists/* && \

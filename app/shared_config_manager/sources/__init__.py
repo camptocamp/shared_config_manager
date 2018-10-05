@@ -7,11 +7,12 @@ from threading import Thread
 from typing import Mapping
 import yaml
 
-from . import git, rsync, base
+from . import git, rsync, base, rclone
 
 ENGINES = {
     'git': git.GitSource,
-    'rsync': rsync.RsyncSource
+    'rsync': rsync.RsyncSource,
+    'rclone': rclone.RcloneSource
 }
 LOG = logging.getLogger(__name__)
 MASTER_ID = 'master'

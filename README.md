@@ -68,6 +68,12 @@ Some other environment variables:
 * `source`: the source for the rsync command
 * `ssh_key`: the private SSH key to use as identity (optional)
 
+#### Rclone source configuration parameters
+
+* `type`: `rsync`
+* `config`: The content of the rclone configuration section to use.
+* `sub_dir`: An optional sub-directory inside the remote (bucket + path for the S3 remotes)
+
 ### Template engines
 
 * `type`: can be `mako`  or `shell`
