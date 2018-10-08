@@ -12,6 +12,7 @@ sources:
     type: git
     repo: /repos/test_git
     key: changeme
+    tags: ['test']
     template_engines:
       - type: shell
         environment_variables: true

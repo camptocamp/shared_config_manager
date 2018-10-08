@@ -60,7 +60,7 @@ def source_stats(request):
     slaves = slave_status.get_source_status(id_=id_)
     statuses = []
     for slave in slaves:
-        if slave is None:
+        if slave is None or slave.get('filtered', False):
             continue
         status = _cleanup_slave_status(slave)
         if status not in statuses:

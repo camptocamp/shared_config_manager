@@ -4,8 +4,9 @@ from pprint import pformat
 def test_all(app_connection):
     stats = app_connection.get_json('1/status/changeme')
     print(f'stats={pformat(stats)}')
-    assert len(stats['slaves']) == 2
+    assert len(stats['slaves']) == 3
     assert stats['slaves']['api']['sources'] == stats['slaves']['slave']['sources']
+    assert set(stats['slaves']['slave-others']['sources'].keys()) == {'master'}
 
 
 def test_master(app_connection):

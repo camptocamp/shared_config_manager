@@ -4,7 +4,7 @@ import os
 from pyramid.httpexceptions import HTTPNotFound, HTTPBadRequest
 import tempfile
 from threading import Thread
-from typing import Mapping
+from typing import Mapping, Set
 import yaml
 
 from . import git, rsync, base, rclone
@@ -18,6 +18,8 @@ LOG = logging.getLogger(__name__)
 MASTER_ID = 'master'
 master_source: base.BaseSource = None
 sources: Mapping[str, base.BaseSource] = {}
+filtered_sources: Set[str] = set()
+TAG_FILTER = os.environ.get("TAG_FILTER")
 
 
 def _create_source(id_, config, is_master=False):
@@ -37,15 +39,16 @@ def init():
 
 
 def reload_master_config():
-    global sources, master_source
+    global sources, master_source, filtered_sources
     with open(os.path.join(master_source.get_path(), 'shared_config_manager.yaml')) as config_file:
         config = yaml.load(config_file)
         if MASTER_ID in config['sources']:
             raise HTTPBadRequest(f'A source cannot have the "{MASTER_ID}" id')
-        to_deletes = set(sources.keys()) - set(config['sources'].keys())
+        new_sources, filtered_sources = _filter_sources(config['sources'])
+        to_deletes = set(sources.keys()) - set(new_sources.keys())
         for to_delete in to_deletes:
             _delete_source(to_delete)
-        for id_, source_config in config['sources'].items():
+        for id_, source_config in new_sources.items():
             prev_source = sources.get(id_)
             if prev_source is None:
                 LOG.info("New source detected: %s", id_)
@@ -73,6 +76,19 @@ def _delete_source(id_):
     global sources
     sources[id_].delete()
     del sources[id_]
+
+
+def _filter_sources(source_configs):
+    if TAG_FILTER is None:
+        return source_configs, set()
+    result = {}
+    filtered = set()
+    for key, config in source_configs.items():
+        if TAG_FILTER in config.get('tags', []):
+            result[key] = config
+        else:
+            filtered.add(key)
+    return result, filtered
 
 
 @broadcast.decorator()

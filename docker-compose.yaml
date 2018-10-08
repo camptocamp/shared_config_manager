@@ -27,6 +27,7 @@ services:
       - redis
     ports:
       - 8080:8080
+    hostname: master
 
   slave:
     image: camptocamp/shared_config_manager:latest
@@ -37,6 +38,20 @@ services:
       #- /home/pvalsecchi/src/c2cwsgiutils/c2cwsgiutils:/opt/c2cwsgiutils/c2cwsgiutils:ro
     links:
       - redis
+    hostname: slave
+
+  slave-others:
+    image: camptocamp/shared_config_manager:latest
+    environment:
+      <<: *scm_env
+      TAG_FILTER: others
+    command: ['/app/shared_config_slave.py']
+    volumes:
+    - ./test_repos:/repos:rw
+    links:
+    - redis
+    hostname: slave-others
+
 
   redis:
     image: redis:4

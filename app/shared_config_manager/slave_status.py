@@ -11,4 +11,9 @@ def get_slaves_status():
 @broadcast.decorator(expect_answers=True)
 def get_source_status(id_):
     source = sources.get_source(id_)
-    return source.get_stats() if source is not None else {}
+    if source is None:
+        return {
+            'filtered': id_ in sources.filtered_sources
+        }
+    else:
+        return source.get_stats()

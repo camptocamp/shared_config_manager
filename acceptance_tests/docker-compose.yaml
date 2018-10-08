@@ -41,6 +41,19 @@ services:
       - redis
     hostname: slave
 
+  slave-others:
+    image: camptocamp/shared_config_manager:latest
+    environment:
+      <<: *scm_env
+      TAG_FILTER: others
+    command: ['/app/shared_config_slave.py']
+    volumes:
+    - /tmp/test_repos:/repos:rw
+    - /tmp/slaves/slave-others:/config:rw
+    links:
+    - redis
+    hostname: slave-others
+
   redis:
     image: redis:4
     mem_limit: 64m

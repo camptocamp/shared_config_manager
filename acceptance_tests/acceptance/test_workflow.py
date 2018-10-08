@@ -33,6 +33,7 @@ def git_source(app_connection, test_repos):
     type: git
     repo: /repos/other
     key: changeme
+    tags: ['others']
     template_engines:
       - type: mako
         data:
