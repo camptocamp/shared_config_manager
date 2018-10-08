@@ -1,4 +1,4 @@
-FROM camptocamp/c2cwsgiutils:2
+FROM camptocamp/c2cwsgiutils:2-light
 LABEL maintainer "info@camptocamp.org"
 
 # Doing things in two steps to avoid needing to re-install everything when we do a rebuild
@@ -13,7 +13,7 @@ RUN curl https://downloads.rclone.org/v1.43.1/rclone-v1.43.1-linux-amd64.deb > /
     dpkg -i /tmp/rclone.deb && \
     rm /tmp/rclone.deb && \
     apt update && \
-    apt install -y --no-install-recommends ssh rsync gettext-base && \
+    apt install -y --no-install-recommends git ssh rsync gettext-base && \
     apt clean && \
     rm -r /var/lib/apt/lists/* && \
     echo "    VerifyHostKeyDNS yes" >> /etc/ssh/ssh_config && \
