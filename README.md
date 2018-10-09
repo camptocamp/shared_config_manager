@@ -2,6 +2,16 @@
 
 Solves the problem of maintaining configuration volumes in the Docker world.
 
+It allows to have a container (in the same POD for Kubernetes or as a sidekick in
+Rancher) maintaining a few configuration/resource directories from different sources:
+
+* A GIT repository
+* A S3 bucket
+* Another volume or server through rsync
+
+A source can be refreshed through a webhook and the status of all the containers can be
+queried through a simple API.
+
 
 ## Configuration
 
@@ -28,20 +38,29 @@ sources:
     target_dir: /usr/local/tomcat/webapps/ROOT/print-apps
 ```
 
-With this example, the config container will contain a `/config/test_git` directory that
-is a clone of the `git@github.com:camptocamp/test_git.git` repository and is identified as `test_git`.
+With this example, the config container will contain a `/usr/local/tomcat/webapps/ROOT/print-apps`
+directory that is a clone of the `git@github.com:camptocamp/test_git.git` repository and is identified as
+`test_git`.
 
 You can configure more than one source.
 
 There is a standalone mode where you can configure only one source through the `MASTER_CONFIG`
-environment variable. For that, set the `standalone` parameter to `true` and no
+environment variable. For that, set the `standalone` key to `true` in the `MASTER_CONFIG` and no
 `shared_config_manager.yaml` will be searched.
 
-Some other environment variables:
+### Tunnings
 
+A few environment variables can be used to tune the containers:
+
+* `C2C_REDIS_URL`: Must point to a running Redis (typical: `redis://redis:6379`) for being able to
+  broadcast the refresh notifications
+* `MASTER_CONFIG`: The master configuration (string containing the YAML config)
+* `ROUTE_PREFIX`: The prefix to use for the HTTP API (defaults to `/scm`)
+* `TAG_FILTER`: Load only the sources having the given tag (the master config is always loaded)
 * `TARGET`: default base directory for the `target_dir` configuration (defaults to `/config`)
 * `MASTER_TARGET`: where to store the master config (defaults to `/master_config`)
 
+See [https://github.com/camptocamp/c2cwsgiutils] for other parameters.
 
 ### Sources
 
@@ -89,17 +108,6 @@ Some other environment variables:
 By default the image starts a WSGI server listening on port 8080. In big deployments a full WSGI server
 could use a sizeable amount of RAM. So you could have only a couple of such containers and the rest running
 as slaves. For that, change the command run by the container to `/app/shared_config_slave.py`.
-
-
-## Tunnings
-
-A few environment variables can be used to tune the containers:
-
-* C2C_REDIS_URL: Must point to a running Redis (typical: `redis://redis:6379`)
-* MASTER_CONFIG: The master configuration (string containing the YAML config)
-* ROUTE_PREFIX: The prefix to use for the HTTP API (defaults to `/scm`)
-
-See [https://github.com/camptocamp/c2cwsgiutils] for other parameters.
 
 
 ## Example docker-compose for Rancher
