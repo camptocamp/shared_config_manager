@@ -52,6 +52,7 @@ Some other environment variables:
 * `target_dir`: the location where the source will be copied (default to the value of `id` in `/config`)
 * `excludes`: the list of files/directories to exclude
 * `template_engines`: a list of template engine configurations
+* `tags`: an optional list of tags. Slaves having `TAG_FILTER` defined will load only sources having the matching tag.
 
 #### GIT source configuration parameters
 
@@ -116,6 +117,7 @@ services:
         type: git
         key: changeme
         repo: git@github.com:camptocamp/master_config.git
+      TAG_FILTER: master
     links:
       - redis
     labels:
