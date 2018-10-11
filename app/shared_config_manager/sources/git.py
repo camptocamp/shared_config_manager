@@ -44,10 +44,17 @@ class GitSource(SshBaseSource):
     def get_stats(self):
         stats = super().get_stats()
         stats['hash'] = self._get_hash()
+        stats['tags'] = self._get_tags()
         return stats
 
     def _get_hash(self):
         return self._exec('git', 'rev-parse', 'HEAD', cwd=self._clone_dir())
+
+    def _get_tags(self):
+        out = self._exec('git', 'tag', '--points-at', 'HEAD', cwd=self._clone_dir())
+        if out == '':
+            return []
+        return out.split('\n')
 
     def get_branch(self):
         return self._config.get('branch', 'master')

@@ -19,6 +19,8 @@ def test_other(app_connection):
     stats = app_connection.get_json('1/status/test_git/changeme')
     print(f'stats={pformat(stats)}')
     assert len(stats['statuses']) == 1
-    assert len(stats['statuses'][0]['template_engines']) == 1
-    assert 'environment_variables' in stats['statuses'][0]['template_engines'][0]
-    assert stats['statuses'][0]['template_engines'][0]['environment_variables']['TEST_ENV'] == '42'
+    status = stats['statuses'][0]
+    assert len(status['template_engines']) == 1
+    assert 'environment_variables' in status['template_engines'][0]
+    assert status['template_engines'][0]['environment_variables']['TEST_ENV'] == '42'
+    assert set(status['tags']) == {'1.0.0', 'otherTag'}

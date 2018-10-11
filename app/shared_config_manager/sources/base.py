@@ -86,8 +86,8 @@ class BaseSource(object):
         try:
             LOG.debug("Running: " + ' '.join(args))
             output = subprocess.check_output(args, stderr=subprocess.STDOUT, env=dict(os.environ), **kwargs)
+            output = output.decode("utf-8").strip()
             if output:
-                output = output.decode("utf-8").strip()
                 LOG.debug(output)
             return output
         except subprocess.CalledProcessError as e:
