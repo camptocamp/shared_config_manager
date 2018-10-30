@@ -26,7 +26,7 @@ def wait_slaves():
                         raise Exception(f"Not seeing the 1 source on {name}")
                 else:
                     if set(status['sources'].keys()) != {'master', 'test_git'}:
-                        raise Exception(f"Not seeing the 2 sources on {name}")
+                        raise Exception(f"Not seeing the 2 sources on {name}: {status['sources'].keys()}")
             return True
         else:
             raise Exception(f"Not having a 200 status: {r.status_code}")

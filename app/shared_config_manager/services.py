@@ -19,7 +19,7 @@ def refresh(request):
 @refresh_service.post()
 def refresh_webhook(request):
     id_ = request.matchdict['id']
-    source = sources.check_id_key(id_=id_, key=request.matchdict['key'])
+    source, filtered = sources.check_id_key(id_=id_, key=request.matchdict['key'])
 
     if source.get_type() != 'git':
         raise HTTPServerError("Non GIT source %s cannot be refreshed by a webhook", id_)

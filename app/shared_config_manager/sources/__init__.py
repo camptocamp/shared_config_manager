@@ -4,7 +4,7 @@ import os
 from pyramid.httpexceptions import HTTPNotFound, HTTPBadRequest
 import tempfile
 from threading import Thread
-from typing import Mapping, Set
+from typing import Mapping
 import yaml
 
 from . import git, rsync, base, rclone
@@ -18,7 +18,7 @@ LOG = logging.getLogger(__name__)
 MASTER_ID = 'master'
 master_source: base.BaseSource = None
 sources: Mapping[str, base.BaseSource] = {}
-filtered_sources: Set[str] = set()
+filtered_sources: Mapping[str, base.BaseSource] = {}
 TAG_FILTER = os.environ.get("TAG_FILTER")
 
 
@@ -44,7 +44,11 @@ def reload_master_config():
         config = yaml.load(config_file)
         if MASTER_ID in config['sources']:
             raise HTTPBadRequest(f'A source cannot have the "{MASTER_ID}" id')
-        new_sources, filtered_sources = _filter_sources(config['sources'])
+        new_sources, filtered = _filter_sources(config['sources'])
+        filtered_sources = {
+            id_: _create_source(id_, config)
+            for id_, config in filtered.items()
+        }
         to_deletes = set(sources.keys()) - set(new_sources.keys())
         for to_delete in to_deletes:
             _delete_source(to_delete)
@@ -80,33 +84,38 @@ def _delete_source(id_):
 
 def _filter_sources(source_configs):
     if TAG_FILTER is None:
-        return source_configs, set()
+        return source_configs, {}
     result = {}
-    filtered = set()
-    for key, config in source_configs.items():
+    filtered = {}
+    for id_, config in source_configs.items():
         if TAG_FILTER in config.get('tags', []):
-            result[key] = config
+            result[id_] = config
         else:
-            filtered.add(key)
+            filtered[id_] = config
     return result, filtered
 
 
 @broadcast.decorator()
 def refresh(id_, key):
-    config = check_id_key(id_, key)
+    config, filtered = check_id_key(id_, key)
+    if filtered:
+        return
     LOG.info("Reloading the %s config", id_)
     config.refresh()
     if config.is_master() and not master_source.get_config().get('standalone', False):
         reload_master_config()
-    return True
 
 
 def check_id_key(id_, key):
+    filtered = False
     source = get_source(id_)
     if source is None:
-        raise HTTPNotFound(f"Unknown id {id_}")
-    source.validate_key(key)
-    return source
+        source = filtered_sources.get(id_)
+        filtered = True
+    if source is not None:
+        source.validate_key(key)
+        return source, filtered
+    raise HTTPNotFound(f"Unknown id {id_}")
 
 
 def get_source(id_) -> base.BaseSource:
