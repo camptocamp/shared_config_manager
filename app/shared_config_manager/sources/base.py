@@ -84,6 +84,7 @@ class BaseSource(object):
 
     def _exec(self, *args, **kwargs):
         try:
+            args = list(map(str, args))
             LOG.debug("Running: " + ' '.join(args))
             output = subprocess.check_output(args, stderr=subprocess.STDOUT, env=dict(os.environ), **kwargs)
             output = output.decode("utf-8").strip()
