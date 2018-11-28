@@ -57,7 +57,7 @@ class GitSource(SshBaseSource):
         return out.split('\n')
 
     def get_branch(self):
-        return self._config.get('branch', 'master')
+        return str(self._config.get('branch', 'master'))
 
     def delete(self):
         super().delete()
