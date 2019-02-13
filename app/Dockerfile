@@ -1,4 +1,4 @@
-FROM camptocamp/c2cwsgiutils:2-light
+FROM camptocamp/c2cwsgiutils:3
 LABEL maintainer "info@camptocamp.org"
 
 # Doing things in two steps to avoid needing to re-install everything when we do a rebuild
@@ -9,7 +9,7 @@ WORKDIR /app
 
 EXPOSE 8080
 
-RUN curl https://downloads.rclone.org/v1.43.1/rclone-v1.43.1-linux-amd64.deb > /tmp/rclone.deb && \
+RUN curl https://downloads.rclone.org/v1.46/rclone-v1.46-linux-amd64.deb > /tmp/rclone.deb && \
     dpkg -i /tmp/rclone.deb && \
     rm /tmp/rclone.deb && \
     apt update && \

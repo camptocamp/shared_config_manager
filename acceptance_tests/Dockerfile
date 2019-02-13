@@ -1,4 +1,4 @@
-FROM camptocamp/c2cwsgiutils:2
+FROM camptocamp/c2cwsgiutils:3-full
 
 WORKDIR /acceptance_tests
 
