@@ -6,8 +6,11 @@ from .base import BaseSource
 
 def _patch_openshift():
     os.environ['HOME'] = '/var/www'
-    with open('/etc/passwd', 'a') as passwd:
-        passwd.write(f'www-data2:x:{os.getuid()}:0:www-data:/var/www:/usr/sbin/nologin\n')
+    try:
+        with open('/etc/passwd', 'a') as passwd:
+            passwd.write(f'www-data2:x:{os.getuid()}:0:www-data:/var/www:/usr/sbin/nologin\n')
+    except PermissionError:
+        pass  # ignored
 
 
 # hack to work around an OpenShift "security"

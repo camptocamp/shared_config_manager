@@ -90,7 +90,7 @@ See [https://github.com/camptocamp/c2cwsgiutils] for other parameters.
 
 #### Rclone source configuration parameters
 
-* `type`: `rsync`
+* `type`: `rclone`
 * `config`: The content of the rclone configuration section to use.
 * `sub_dir`: An optional sub-directory inside the remote (bucket + path for the S3 remotes)
 
