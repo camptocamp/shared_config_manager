@@ -28,6 +28,9 @@ class BaseEngine(object):
     def _evaluate_file(self, path):
         pass
 
+    def get_type(self):
+        return self._config['type']
+
     def get_stats(self, stats):
         if self._config.get('environment_variables', False):
             stats['environment_variables'] = _filter_env(os.environ)

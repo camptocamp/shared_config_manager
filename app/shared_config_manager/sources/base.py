@@ -1,3 +1,4 @@
+from c2cwsgiutils import stats
 import copy
 import logging
 from pyramid.httpexceptions import HTTPForbidden
@@ -23,9 +24,11 @@ class BaseSource(object):
         ]
 
     def refresh(self):
-        self._do_refresh()
+        with stats.timer_context(['source', self.get_id(), 'refresh']):
+            self._do_refresh()
         for engine in self._template_engines:
-            engine.evaluate(self.get_path())
+            with stats.timer_context(['source', self.get_id(), 'template', engine.get_type()]):
+                engine.evaluate(self.get_path())
 
     def _do_refresh(self):
         pass
@@ -38,7 +41,8 @@ class BaseSource(object):
         if 'excludes' in self._config:
             cmd += ['--exclude=' + exclude for exclude in self._config['excludes']]
         cmd += [source + '/', self.get_path()]
-        self._exec(*cmd)
+        with stats.timer_context(['source', self.get_id(), 'copy']):
+            self._exec(*cmd)
 
     def delete_target_dir(self):
         dest = self.get_path()

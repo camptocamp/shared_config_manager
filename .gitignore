@@ -1,3 +1,5 @@
 /reports
 /test_repos
 /.venv
+__pycache__/
+.pytest_cache/
