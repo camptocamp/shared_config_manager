@@ -8,12 +8,12 @@ def test_rsync():
         'type': 'rclone',
         'config': """\
 type = http
-url = http://ftp.debian.org/debian/pool/main/p/python3-dateutil/
+url = http://ftp.debian.org/debian/pool/main/p/p4est//
 """,
         'source': 'test:',
-        'excludes': ['*.deb', '*.tar.gz'],
+        'excludes': ['*.deb', '*.tar.xz'],
     })
     source.refresh()
-    assert os.path.isfile('/config/test_rclone/python3-dateutil_2.0+dfsg1-1.dsc')
-    assert not os.path.isfile('/config/test_rclone/python3-dateutil_2.0+dfsg1-1_all.deb')
-    assert not os.path.isfile('/config/test_rclone/	python3-dateutil_2.0+dfsg1.orig.tar.gz')
+    assert os.path.isfile('/config/test_rclone/p4est_1.1-5.dsc')
+    assert not os.path.isfile('/config/test_rclone/libp4est-sc-1.1_1.1-4_amd64.deb')
+    assert not os.path.isfile('/config/test_rclone/p4est_1.1.orig.tar.xz')
