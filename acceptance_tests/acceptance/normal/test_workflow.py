@@ -2,27 +2,7 @@ import os
 import pytest
 import subprocess
 
-from c2cwsgiutils.acceptance import utils
-
-
-def _get_hash(dir):
-    return subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=dir). \
-        decode("utf-8").strip()
-
-
-def _wait_sync(app_connection, name, hash):
-    def what():
-        status = app_connection.get_json('1/status/changeme')
-        for _, slave in status['slaves'].items():
-            if hash is None:
-                if name in slave['sources']:
-                    return False
-            else:
-                if slave['sources'][name]['hash'] != hash:
-                    return False
-        return True
-
-    utils.retry_timeout(what)
+from acceptance import wait_sync, get_hash
 
 
 @pytest.yield_fixture()
@@ -55,13 +35,13 @@ def git_source(app_connection, test_repos):
     git commit -a -m "Initial commit"
     """, shell=True)
 
-    master_hash = _get_hash(os.path.join(test_repos, 'master'))
-    other_hash = _get_hash(os.path.join(test_repos, 'other'))
+    master_hash = get_hash(os.path.join(test_repos, 'master'))
+    other_hash = get_hash(os.path.join(test_repos, 'other'))
 
     app_connection.get_json('1/refresh/master/changeme')
 
-    _wait_sync(app_connection, 'master', master_hash)
-    _wait_sync(app_connection, 'other', other_hash)
+    wait_sync(app_connection, 'master', master_hash)
+    wait_sync(app_connection, 'other', other_hash)
 
     yield os.path.join(test_repos, 'other')
 
@@ -75,7 +55,7 @@ def git_source(app_connection, test_repos):
     """, shell=True)
 
     app_connection.get_json('1/refresh/master/changeme')
-    _wait_sync(app_connection, 'other', None)
+    wait_sync(app_connection, 'other', None)
 
     for slave in ('api', 'slave'):
         assert not os.path.exists(os.path.join('/tmp', 'slaves', slave, 'other'))
@@ -93,9 +73,9 @@ def test_ok(app_connection, git_source):
     git commit -a -m "Second commit"
     """, shell=True)
 
-    hash = _get_hash(git_source)
+    hash = get_hash(git_source)
     app_connection.get_json('1/refresh/other/changeme')
-    _wait_sync(app_connection, 'other', hash)
+    wait_sync(app_connection, 'other', hash)
 
     for slave in ('api', 'slave'):
         with open(os.path.join('/tmp', 'slaves', slave, 'other', 'config.txt')) as config:

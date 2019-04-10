@@ -4,7 +4,7 @@ import os
 from pyramid.httpexceptions import HTTPNotFound, HTTPBadRequest
 import tempfile
 from threading import Thread
-from typing import Mapping
+from typing import Mapping, Any
 import yaml
 
 from . import git, rsync, base, rclone
@@ -31,43 +31,55 @@ def init():
     global master_source
     _update_flag("LOADING")
     content = yaml.load(os.environ['MASTER_CONFIG'])
-    master_source = _create_source(MASTER_ID, content, is_master=True)
-    LOG.info("Initial loading of the master config")
-    master_source.refresh()
-    if not master_source.get_config().get('standalone', False):
-        Thread(target=reload_master_config, name="master_config_loader", daemon=True).start()
+    if content.get('sources', False):
+        LOG.info("The master config is inline")
+        # A fake master source to have auth work
+        master_source = base.BaseSource(MASTER_ID, content, is_master=True)
+        Thread(target=_handle_master_config(content), args=[content],
+               name='master_config_loader', daemon=True).start()
+    else:
+        master_source = _create_source(MASTER_ID, content, is_master=True)
+        LOG.info("Initial loading of the master config")
+        master_source.refresh()
+        if not master_source.get_config().get('standalone', False):
+            Thread(target=reload_master_config, name="master_config_loader", daemon=True).start()
 
 
 def reload_master_config():
-    global sources, master_source, filtered_sources
+    global master_source
     with open(os.path.join(master_source.get_path(), 'shared_config_manager.yaml')) as config_file:
         config = yaml.load(config_file)
-        if MASTER_ID in config['sources']:
-            raise HTTPBadRequest(f'A source cannot have the "{MASTER_ID}" id')
-        new_sources, filtered = _filter_sources(config['sources'])
-        filtered_sources = {
-            id_: _create_source(id_, config)
-            for id_, config in filtered.items()
-        }
-        to_deletes = set(sources.keys()) - set(new_sources.keys())
-        for to_delete in to_deletes:
-            _delete_source(to_delete)
-        for id_, source_config in new_sources.items():
-            prev_source = sources.get(id_)
-            if prev_source is None:
-                LOG.info("New source detected: %s", id_)
-            elif prev_source.get_config() == source_config:
-                LOG.debug("Source %s didn't change, not reloading it", id_)
-                continue
-            else:
-                LOG.info("Change detected in source %s, reloading it", id_)
-                _delete_source(id_)  # to be sure the old stuff is cleaned
+        _handle_master_config(config)
 
-            try:
-                sources[id_] = _create_source(id_, source_config)
-                sources[id_].refresh()
-            except Exception:
-                LOG.error("Cannot load the %s config", id_, exc_info=True)
+
+def _handle_master_config(config: Mapping[str, Any]) -> None:
+    global sources, filtered_sources
+    if MASTER_ID in config['sources']:
+        raise HTTPBadRequest(f'A source cannot have the "{MASTER_ID}" id')
+    new_sources, filtered = _filter_sources(config['sources'])
+    filtered_sources = {
+        id_: _create_source(id_, config)
+        for id_, config in filtered.items()
+    }
+    to_deletes = set(sources.keys()) - set(new_sources.keys())
+    for to_delete in to_deletes:
+        _delete_source(to_delete)
+    for id_, source_config in new_sources.items():
+        prev_source = sources.get(id_)
+        if prev_source is None:
+            LOG.info("New source detected: %s", id_)
+        elif prev_source.get_config() == source_config:
+            LOG.debug("Source %s didn't change, not reloading it", id_)
+            continue
+        else:
+            LOG.info("Change detected in source %s, reloading it", id_)
+            _delete_source(id_)  # to be sure the old stuff is cleaned
+
+        try:
+            sources[id_] = _create_source(id_, source_config)
+            sources[id_].refresh()
+        except Exception:
+            LOG.error("Cannot load the %s config", id_, exc_info=True)
     _update_flag("READY")
 
 

@@ -1,0 +1,43 @@
+version: '2'
+services:
+  api:
+    image: camptocamp/shared_config_manager:latest
+    environment: &scm_env
+      C2C_SECRET: toto
+      LOG_LEVEL: DEBUG
+      C2CWSGI_LOG_LEVEL: DEBUG
+      OTHER_LOG_LEVEL: DEBUG
+      C2C_REDIS_URL: redis://redis:6379
+      DEVELOPMENT: 1
+      COVERAGE: 1
+      C2C_PROFILER_PATH: /app_profiler
+      GUNICORN_PARAMS: '-b :8080 --reload'
+      MASTER_CONFIG: |
+        key: changeme
+        sources:
+          test_git:
+            type: git
+            repo: /repos/test_git
+            key: changeme
+            tags: ['test']
+            template_engines:
+              - type: shell
+                environment_variables: true
+      SCM_ENV_PREFIXES: TEST_
+      TEST_ENV: 42
+    volumes:
+      - /tmp/test_repos:/repos:rw
+      - /tmp/slaves/api:/config:rw
+    links:
+      - redis
+    ports:
+      - 8080:8080
+    hostname: api
+
+  redis:
+    image: redis:5
+    mem_limit: 64m
+    ports:
+      - 16379:6379
+    command: redis-server --save "" --appendonly no
+    user: www-data
