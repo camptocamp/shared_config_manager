@@ -28,8 +28,10 @@ def _create_source(id_, config, is_master=False):
 
 
 def get_sources() -> Mapping[str, base.BaseSource]:
-    global sources
-    return sources
+    global sources, filtered_sources
+    copy = dict(sources.items())
+    copy.update(filtered_sources)
+    return copy
 
 
 def init():

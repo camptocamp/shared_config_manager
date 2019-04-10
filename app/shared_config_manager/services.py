@@ -49,7 +49,7 @@ def refresh_all(request):
     key = request.matchdict['key']
     sources.master_source.validate_key(key)
     nb_refresh = 0
-    for id_, source in sources.get_sources().items():
+    for id_ in sources.get_sources().keys():
         sources.refresh(id_=id_, key=key)
         nb_refresh += 1
     return {'status': 200, 'nb_refresh': nb_refresh}
