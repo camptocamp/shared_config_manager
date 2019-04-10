@@ -48,3 +48,25 @@ def test_webhook_not_push(app_connection):
         'ignored': True,
         'reason': 'Not a push'
     }
+
+
+def test_all(app_connection):
+    answer = app_connection.get_json('1/refresh/changeme')
+    assert answer == {
+        'status': 200,
+        'nb_refresh': 1
+    }
+
+
+def test_all_webhook(app_connection):
+    answer = app_connection.post_json('1/refresh/changeme', json={
+        "ref": "refs/heads/master"
+    }, headers={'X-GitHub-Event': 'push'})
+    assert answer == {
+        'status': 200,
+        'nb_refresh': 1
+    }
+
+
+def test_all_bad_key(app_connection):
+    app_connection.get_json('1/refresh/bad', expected_status=403)

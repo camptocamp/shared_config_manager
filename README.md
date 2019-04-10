@@ -218,6 +218,15 @@ To refresh the master configuration (list of sources), use `master` as ID.
 
 Same as the GET API, but to be used with a GutHub/GitLab webhook for push events. Will ignore events for other branches.
 
+* `GET {ROUTE_PREFIX}/1/refresh/{KEY}`
+
+Refresh all sources. Returns 200 in case of success. The actual work is done asynchronously.
+
+The master configuration is not refreshed.
+
+* `POST {ROUTE_PREFIX}/1/refresh/{KEY}`
+
+Same as the GET API, but to be used with a GutHub/GitLab webhook for push events. Will ignore events for other branches.
 
 ## Status
 

@@ -1,7 +1,7 @@
 from c2cwsgiutils import broadcast
 import logging
 import os
-from pyramid.httpexceptions import HTTPNotFound, HTTPBadRequest
+from pyramid.httpexceptions import HTTPNotFound, HTTPBadRequest, HTTPForbidden
 import tempfile
 from threading import Thread
 from typing import Mapping, Any
@@ -25,6 +25,11 @@ TAG_FILTER = os.environ.get("TAG_FILTER")
 def _create_source(id_, config, is_master=False):
     type_ = config['type']
     return ENGINES[type_](id_, config, is_master)
+
+
+def get_sources() -> Mapping[str, base.BaseSource]:
+    global sources
+    return sources
 
 
 def init():
@@ -125,7 +130,10 @@ def check_id_key(id_, key):
         source = filtered_sources.get(id_)
         filtered = True
     if source is not None:
-        source.validate_key(key)
+        try:
+            source.validate_key(key)
+        except HTTPForbidden:
+            master_source.validate_key(key)
         return source, filtered
     raise HTTPNotFound(f"Unknown id {id_}")
 
