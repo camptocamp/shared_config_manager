@@ -35,7 +35,8 @@ class BaseSource(object):
 
     def _copy(self, source, excludes=None):
         os.makedirs(self.get_path(), exist_ok=True)
-        cmd = ['rsync', '--archive', '--delete', '--verbose', '--checksum']
+        cmd = ['rsync', '--recursive', '--links', '--devices', '--specials', '--delete',
+               '--verbose', '--checksum']
         if excludes is not None:
             cmd += ['--exclude=' + exclude for exclude in excludes]
         if 'excludes' in self._config:
