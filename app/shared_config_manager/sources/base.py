@@ -24,11 +24,14 @@ class BaseSource(object):
         ]
 
     def refresh(self):
-        with stats.timer_context(['source', self.get_id(), 'refresh']):
-            self._do_refresh()
-        for engine in self._template_engines:
-            with stats.timer_context(['source', self.get_id(), 'template', engine.get_type()]):
-                engine.evaluate(self.get_path())
+        try:
+            with stats.timer_context(['source', self.get_id(), 'refresh']):
+                self._do_refresh()
+            for engine in self._template_engines:
+                with stats.timer_context(['source', self.get_id(), 'template', engine.get_type()]):
+                    engine.evaluate(self.get_path())
+        except Exception:
+            stats.increment_counter(['source', self._id, 'error'])
 
     def _do_refresh(self):
         pass
