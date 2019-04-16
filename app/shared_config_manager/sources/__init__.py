@@ -1,7 +1,9 @@
 from c2cwsgiutils import broadcast
 import logging
 import os
+import pathlib
 from pyramid.httpexceptions import HTTPNotFound, HTTPBadRequest, HTTPForbidden
+import subprocess
 import tempfile
 from threading import Thread
 from typing import Mapping, Any
@@ -37,6 +39,7 @@ def get_sources() -> Mapping[str, base.BaseSource]:
 def init():
     global master_source
     _update_flag("LOADING")
+    _prepare_ssh()
     content = yaml.load(os.environ['MASTER_CONFIG'])
     if content.get('sources', False):
         LOG.info("The master config is inline")
@@ -95,6 +98,14 @@ def _handle_master_config(config: Mapping[str, Any]) -> None:
 def _update_flag(value):
     with open(os.path.join(tempfile.gettempdir(), 'status'), 'w') as flag:
         flag.write(value)
+
+
+def _prepare_ssh():
+    home = pathlib.Path.home()
+    other_ssh = home.joinpath('.ssh2')
+    if other_ssh.is_dir():
+        ssh = home.joinpath('.ssh')
+        subprocess.check_call(['rsync', '-a', str(other_ssh) + '/', str(ssh) + '/'])
 
 
 def _delete_source(id_):
