@@ -32,6 +32,7 @@ class BaseSource(object):
                     engine.evaluate(self.get_path())
         except Exception:
             stats.increment_counter(['source', self._id, 'error'])
+            raise
 
     def _do_refresh(self):
         pass
