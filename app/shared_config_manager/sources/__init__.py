@@ -105,7 +105,8 @@ def _prepare_ssh():
     other_ssh = home.joinpath('.ssh2')
     if other_ssh.is_dir():
         ssh = home.joinpath('.ssh')
-        subprocess.check_call(['rsync', '-a', str(other_ssh) + '/', str(ssh) + '/'])
+        subprocess.check_call(['rsync', '--recursive', '-D', '--chmod=D0700,F0600',
+                               str(other_ssh) + '/', str(ssh) + '/'])
 
 
 def _delete_source(id_):
