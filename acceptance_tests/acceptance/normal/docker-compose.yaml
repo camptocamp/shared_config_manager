@@ -15,10 +15,11 @@ services:
       COVERAGE: 1
       C2C_PROFILER_PATH: /app_profiler
       GUNICORN_PARAMS: '-b :8080 --reload'
-      MASTER_CONFIG: &master_config |
+      MASTER_CONFIG: |
         type: git
         key: changeme
         repo: /repos/master
+      API_BASE_URL: http://api:8080/scm
       SCM_ENV_PREFIXES: TEST_
       TEST_ENV: 42
     volumes:
@@ -48,10 +49,10 @@ services:
       TAG_FILTER: others
     command: ['/app/shared_config_slave.py']
     volumes:
-    - /tmp/test_repos:/repos:rw
-    - /tmp/slaves/slave-others:/config:rw
+      - /tmp/test_repos:/repos:rw
+      - /tmp/slaves/slave-others:/config:rw
     links:
-    - redis
+      - redis
     hostname: slave-others
 
   redis:

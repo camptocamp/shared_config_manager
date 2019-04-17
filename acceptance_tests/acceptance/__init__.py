@@ -6,16 +6,16 @@ BASE_URL = 'http://' + utils.DOCKER_GATEWAY + ':8080/scm/'
 PROJECT_NAME = 'scm'
 
 
-def wait_sync(app_connection, name, hash):
+def wait_sync(app_connection, name, hash_):
     def what():
         status = app_connection.get_json('1/status/changeme')
         for _, slave in status['slaves'].items():
-            if hash is None:
+            if hash_ is None:
                 if name in slave['sources']:
-                    return False
+                    raise RuntimeError(f'{name} not found in sources')
             else:
-                if slave['sources'][name]['hash'] != hash:
-                    return False
+                if slave['sources'][name]['hash'] != hash_:
+                    raise RuntimeError(f"wrong hash for {name}: {slave['sources'][name]['hash']} != {hash_}")
         return True
 
     utils.retry_timeout(what)

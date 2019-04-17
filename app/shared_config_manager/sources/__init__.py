@@ -6,10 +6,10 @@ from pyramid.httpexceptions import HTTPNotFound, HTTPBadRequest, HTTPForbidden
 import subprocess
 import tempfile
 from threading import Thread
-from typing import Mapping, Any, Tuple
+from typing import Mapping, Any, Tuple, Optional
 import yaml
 
-from . import git, rsync, base, rclone
+from . import git, rsync, base, rclone, mode
 
 ENGINES = {
     'git': git.GitSource,
@@ -18,7 +18,7 @@ ENGINES = {
 }
 LOG = logging.getLogger(__name__)
 MASTER_ID = 'master'
-master_source: base.BaseSource = None
+master_source: Optional[base.BaseSource] = None
 sources: Mapping[str, base.BaseSource] = {}
 filtered_sources: Mapping[str, base.BaseSource] = {}
 TAG_FILTER = os.environ.get("TAG_FILTER")
@@ -36,11 +36,14 @@ def get_sources() -> Mapping[str, base.BaseSource]:
     return copy
 
 
-def init():
+def init(slave: bool) -> None:
     global master_source
+    mode.init(slave)
+    if slave:
+        broadcast.subscribe('slave_fetch', _slave_fetch)
     _update_flag("LOADING")
     _prepare_ssh()
-    content = yaml.load(os.environ['MASTER_CONFIG'])
+    content = yaml.load(os.environ['MASTER_CONFIG'], Loader=yaml.SafeLoader)
     if content.get('sources', False):
         LOG.info("The master config is inline")
         # A fake master source to have auth work
@@ -50,7 +53,8 @@ def init():
     else:
         master_source = _create_source(MASTER_ID, content, is_master=True)
         LOG.info("Initial loading of the master config")
-        master_source.refresh()
+        master_source.refresh_or_fetch()
+        LOG.info("Loading of the master config finished")
         if not master_source.get_config().get('standalone', False):
             Thread(target=reload_master_config, name="master_config_loader", daemon=True).start()
 
@@ -58,12 +62,13 @@ def init():
 def reload_master_config():
     global master_source
     with open(os.path.join(master_source.get_path(), 'shared_config_manager.yaml')) as config_file:
-        config = yaml.load(config_file)
+        config = yaml.load(config_file, Loader=yaml.SafeLoader)
         _handle_master_config(config)
 
 
 def _handle_master_config(config: Mapping[str, Any]) -> None:
     global sources, filtered_sources
+    LOG.info("Reading the master config")
     if MASTER_ID in config['sources']:
         raise HTTPBadRequest(f'A source cannot have the "{MASTER_ID}" id')
     new_sources, filtered = _filter_sources(config['sources'])
@@ -88,7 +93,7 @@ def _handle_master_config(config: Mapping[str, Any]) -> None:
 
         try:
             sources[id_] = _create_source(id_, source_config)
-            sources[id_].refresh()
+            sources[id_].refresh_or_fetch()
         except Exception:
             LOG.error("Cannot load the %s config", id_, exc_info=True)
             errors += 1
@@ -116,7 +121,7 @@ def _delete_source(id_):
 
 
 def _filter_sources(source_configs):
-    if TAG_FILTER is None:
+    if TAG_FILTER is None or mode.is_master():
         return source_configs, {}
     result = {}
     filtered = {}
@@ -128,13 +133,26 @@ def _filter_sources(source_configs):
     return result, filtered
 
 
-@broadcast.decorator()
 def refresh(id_, key):
-    source, filtered = check_id_key(id_, key)
-    if filtered:
-        return
+    """
+    This is called from the web service to start a refresh
+    """
     LOG.info("Reloading the %s config", id_)
+    source, _ = check_id_key(id_, key)
     source.refresh()
+    if source.is_master() and not master_source.get_config().get('standalone', False):
+        reload_master_config()
+    broadcast.broadcast('slave_fetch', params=dict(id_=id_, key=key))
+
+
+def _slave_fetch(id_, key):
+    """
+    This is run on every slave when a source needs a refresh.
+    """
+    source, filtered = check_id_key(id_, key)
+    if filtered and not mode.is_master():
+        return
+    source.fetch()
     if source.is_master() and not master_source.get_config().get('standalone', False):
         reload_master_config()
 

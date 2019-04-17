@@ -1,6 +1,6 @@
 from c2cwsgiutils import services
 import logging
-from pyramid.httpexceptions import HTTPServerError
+from pyramid.httpexceptions import HTTPServerError, HTTPNotFound
 from pyramid.response import Response
 import subprocess
 
@@ -123,6 +123,8 @@ def _cleanup_slave_status(status):
 @tarball_service.get()
 def tarball(request):
     source, filtered = sources.check_id_key(id_=request.matchdict['id'], key=request.matchdict['key'])
+    if not source.is_loaded():
+        raise HTTPNotFound("Not loaded yet")
     assert not filtered
     path = source.get_path()
 

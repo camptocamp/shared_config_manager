@@ -12,13 +12,13 @@ services:
       OTHER_LOG_LEVEL: DEBUG
       C2C_REDIS_URL: redis://redis:6379
       DEVELOPMENT: 1
-      C2C_PROFILER_PATH: /app_profiler
       GUNICORN_PARAMS: '-b :8080 --reload'
-      MASTER_CONFIG: &master_config |
+      MASTER_CONFIG: |
         type: git
         id: master
         key: changeme
         repo: /repos/master
+      API_BASE_URL: http://api:8080/scm
     volumes:
       - ./app/shared_config_manager:/app/shared_config_manager:ro
       #- /home/pvalsecchi/src/c2cwsgiutils/c2cwsgiutils:/opt/c2cwsgiutils/c2cwsgiutils:ro

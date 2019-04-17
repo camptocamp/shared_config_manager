@@ -1,12 +1,15 @@
 from c2cwsgiutils import stats
 import copy
 import logging
+import os
 from pyramid.httpexceptions import HTTPForbidden
+import requests
 import shutil
 import subprocess
-import os
+import time
 
 from shared_config_manager import template_engines
+from . import mode
 
 LOG = logging.getLogger(__name__)
 TARGET = os.environ.get("TARGET", "/config")
@@ -18,24 +21,69 @@ class BaseSource(object):
         self._id = id_
         self._config = config
         self._is_master = is_master
+        self._is_loaded = False
         self._template_engines = [
             template_engines.create_engine(engine_conf)
             for engine_conf in config.get('template_engines', [])
         ]
 
+    def refresh_or_fetch(self):
+        if mode.is_master():
+            self.refresh()
+        else:
+            self.fetch()
+
     def refresh(self):
+        LOG.info("Doing a refresh of %s", self._id)
         try:
+            self._is_loaded = False
             with stats.timer_context(['source', self.get_id(), 'refresh']):
                 self._do_refresh()
-            for engine in self._template_engines:
-                with stats.timer_context(['source', self.get_id(), 'template', engine.get_type()]):
-                    engine.evaluate(self.get_path())
+            self._eval_templates()
         except Exception:
             stats.increment_counter(['source', self._id, 'error'])
             raise
+        finally:
+            self._is_loaded = True
+
+    def _eval_templates(self):
+        for engine in self._template_engines:
+            with stats.timer_context(['source', self.get_id(), 'template', engine.get_type()]):
+                engine.evaluate(self.get_path())
+
+    def fetch(self):
+        try:
+            self._is_loaded = False
+            with stats.timer_context(['source', self.get_id(), 'fetch']):
+                self._do_fetch()
+            self._eval_templates()
+        except Exception:
+            stats.increment_counter(['source', self._id, 'error'])
+            raise
+        finally:
+            self._is_loaded = True
 
     def _do_refresh(self):
         pass
+
+    def _do_fetch(self):
+        path = self.get_path()
+        os.makedirs(path, exist_ok=True)
+        url = mode.get_fetch_url(self._id, self._config['key'])
+        while True:
+            try:
+                LOG.info("Doing a fetch of %s", self._id)
+                r = requests.get(url, stream=True)
+                r.raise_for_status()
+                tar = subprocess.Popen(['tar', '--extract', '--gzip'], cwd=path, stdin=subprocess.PIPE)
+                shutil.copyfileobj(r.raw, tar.stdin)
+                tar.stdin.close()
+                assert tar.wait() == 0
+                return
+            except Exception as e:
+                LOG.info("Error fetching the source %s from the master (will retry in 1s): %s",
+                         self._id, str(e))
+                time.sleep(1)
 
     def _copy(self, source, excludes=None):
         os.makedirs(self.get_path(), exist_ok=True)
@@ -75,12 +123,12 @@ class BaseSource(object):
         return self._is_master
 
     def get_stats(self):
-        stats = copy.deepcopy(self._config)
-        del stats['key']
-        for template_stats, template_engine in zip(stats.get('template_engines', []),
+        stats_ = copy.deepcopy(self._config)
+        del stats_['key']
+        for template_stats, template_engine in zip(stats_.get('template_engines', []),
                                                    self._template_engines):
             template_engine.get_stats(template_stats)
-        return stats
+        return stats_
 
     def get_config(self):
         return self._config
@@ -103,3 +151,6 @@ class BaseSource(object):
         except subprocess.CalledProcessError as e:
             LOG.error(e.output.decode("utf-8").strip())
             raise
+
+    def is_loaded(self):
+        return self._is_loaded

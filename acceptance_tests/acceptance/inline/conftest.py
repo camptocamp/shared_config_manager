@@ -14,7 +14,7 @@ def composition(request, test_repos):
     """
     Fixture that start/stop the Docker composition used for all the tests.
     """
-    for slave in ('api', 'slave'):
+    for slave in ('api', ):
         path = os.path.join('/tmp/slaves', slave)
         os.makedirs(path, exist_ok=True)
         os.chown(path, 33, 0)
