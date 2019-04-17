@@ -1,6 +1,8 @@
 from c2cwsgiutils import services
 import logging
 from pyramid.httpexceptions import HTTPServerError
+from pyramid.response import Response
+import subprocess
 
 from . import sources, slave_status
 
@@ -8,6 +10,7 @@ refresh_service = services.create('refresh', '/1/refresh/{id}/{key}')
 refresh_all_service = services.create('refresh_all', '/1/refresh/{key}')
 stats_service = services.create('stats', '/1/status/{key}')
 source_stats_service = services.create('service_stats', '/1/status/{id}/{key}')
+tarball_service = services.create('tarball', '/1/tarball/{id}/{key}')
 LOG = logging.getLogger(__name__)
 
 
@@ -115,3 +118,27 @@ def _cleanup_slave_status(status):
     result.pop('hostname', None)
     result.pop('pid', None)
     return result
+
+
+@tarball_service.get()
+def tarball(request):
+    source, filtered = sources.check_id_key(id_=request.matchdict['id'], key=request.matchdict['key'])
+    assert not filtered
+    path = source.get_path()
+
+    response: Response = request.response
+    proc = subprocess.Popen(['tar', '--create', '--gzip', '.'], cwd=path, bufsize=4096,
+                            stdout=subprocess.PIPE)
+    response.content_type = 'application/x-gtar'
+    response.app_iter = _proc_iter(proc)
+    return response
+
+
+def _proc_iter(proc: subprocess.Popen):
+    while True:
+        block = proc.stdout.read(4096)
+        if not block:
+            break
+        yield block
+    if proc.wait() != 0:
+        raise HTTPServerError("Error building the tarball")

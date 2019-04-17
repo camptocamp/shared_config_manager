@@ -54,7 +54,7 @@ class BaseSource(object):
         if os.path.isdir(dest):
             shutil.rmtree(dest)
 
-    def get_path(self):
+    def get_path(self) -> str:
         if 'target_dir' in self._config:
             target_dir = self._config['target_dir']
             if target_dir.startswith('/'):

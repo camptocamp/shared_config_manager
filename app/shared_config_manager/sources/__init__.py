@@ -6,7 +6,7 @@ from pyramid.httpexceptions import HTTPNotFound, HTTPBadRequest, HTTPForbidden
 import subprocess
 import tempfile
 from threading import Thread
-from typing import Mapping, Any
+from typing import Mapping, Any, Tuple
 import yaml
 
 from . import git, rsync, base, rclone
@@ -139,7 +139,7 @@ def refresh(id_, key):
         reload_master_config()
 
 
-def check_id_key(id_, key):
+def check_id_key(id_, key) -> Tuple[base.BaseSource, bool]:
     filtered = False
     source = get_source(id_)
     if source is None:

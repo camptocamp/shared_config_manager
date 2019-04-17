@@ -301,3 +301,9 @@ Returns the status for the given source ID, looking like that:
   ]
 }
 ```
+
+## tarball
+
+* `GET {ROUTE_PREFIX}/1/tarball/{ID}/{KEY}`
+
+Returns a `.tar.gz` containing the current content for the given source.
