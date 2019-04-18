@@ -22,6 +22,7 @@ services:
       API_BASE_URL: http://api:8080/scm
       SCM_ENV_PREFIXES: TEST_
       TEST_ENV: 42
+      TEST_KEY: secret
     volumes:
       - /tmp/test_repos:/repos:rw
       - /tmp/slaves/api:/config:rw

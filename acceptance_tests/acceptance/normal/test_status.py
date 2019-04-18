@@ -23,4 +23,5 @@ def test_other(app_connection):
     assert len(status['template_engines']) == 1
     assert 'environment_variables' in status['template_engines'][0]
     assert status['template_engines'][0]['environment_variables']['TEST_ENV'] == '42'
+    assert status['template_engines'][0]['environment_variables']['TEST_KEY'] == 'xxx'
     assert set(status['tags']) == {'1.0.0', 'otherTag'}

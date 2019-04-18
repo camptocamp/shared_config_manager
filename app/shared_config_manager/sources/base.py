@@ -7,6 +7,7 @@ import requests
 import shutil
 import subprocess
 import time
+from typing import Dict
 
 from shared_config_manager import template_engines
 from . import mode
@@ -132,6 +133,8 @@ class BaseSource(object):
         for template_stats, template_engine in zip(stats_.get('template_engines', []),
                                                    self._template_engines):
             template_engine.get_stats(template_stats)
+            BaseSource._hide_sensitive(template_stats.get('data'))
+            BaseSource._hide_sensitive(template_stats.get('environment_variables'))
         return stats_
 
     def get_config(self):
@@ -158,3 +161,12 @@ class BaseSource(object):
 
     def is_loaded(self):
         return self._is_loaded
+
+    @staticmethod
+    def _hide_sensitive(data: Dict[str, str]) -> None:
+        if data is None:
+            return
+        for key in list(data.keys()):
+            k = key.upper()
+            if 'KEY' in k or 'PASSWORD' in k or 'SECRET' in k:
+                data[key] = 'xxx'
