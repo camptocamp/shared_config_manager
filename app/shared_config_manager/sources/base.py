@@ -75,7 +75,9 @@ class BaseSource(object):
                 LOG.info("Doing a fetch of %s", self._id)
                 r = requests.get(url, stream=True)
                 r.raise_for_status()
-                tar = subprocess.Popen(['tar', '--extract', '--gzip'], cwd=path, stdin=subprocess.PIPE)
+                tar = subprocess.Popen(['tar', '--extract', '--gzip', '--no-same-owner',
+                                        '--no-same-permissions', '--touch', '--no-overwrite-dir'],
+                                       cwd=path, stdin=subprocess.PIPE)
                 shutil.copyfileobj(r.raw, tar.stdin)
                 tar.stdin.close()
                 assert tar.wait() == 0
@@ -99,6 +101,7 @@ class BaseSource(object):
 
     def delete_target_dir(self):
         dest = self.get_path()
+        LOG.info("Deleting target dir %s", dest)
         if os.path.isdir(dest):
             shutil.rmtree(dest)
 

@@ -4,6 +4,7 @@ import os
 import tempfile
 
 from .ssh import SshBaseSource
+from . import mode
 
 TEMP_DIR = tempfile.gettempdir()
 LOG = logging.getLogger(__name__)
@@ -67,4 +68,5 @@ class GitSource(SshBaseSource):
 
     def delete(self):
         super().delete()
-        self._exec('rm', '-rf', self._clone_dir())
+        if mode.is_master():
+            self._exec('rm', '-rf', self._clone_dir())
