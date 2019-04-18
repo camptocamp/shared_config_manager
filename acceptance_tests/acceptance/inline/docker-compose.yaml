@@ -2,7 +2,7 @@ version: '2'
 services:
   api:
     image: camptocamp/shared_config_manager:latest
-    environment: &scm_env
+    environment:
       C2C_SECRET: toto
       LOG_LEVEL: DEBUG
       C2CWSGI_LOG_LEVEL: DEBUG
@@ -10,7 +10,6 @@ services:
       C2C_REDIS_URL: redis://redis:6379
       DEVELOPMENT: 1
       COVERAGE: 1
-      C2C_PROFILER_PATH: /app_profiler
       GUNICORN_PARAMS: '-b :8080 --reload'
       MASTER_CONFIG: |
         key: changeme

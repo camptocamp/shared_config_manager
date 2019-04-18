@@ -48,7 +48,7 @@ There is a standalone mode where you can configure only one source through the `
 environment variable. For that, set the `standalone` key to `true` in the `MASTER_CONFIG` and no
 `shared_config_manager.yaml` will be searched.
 
-There is also a standalone mode where you can put directly the sources in the `MASTER_CONFIG`
+There is also a mode where you can put directly the sources in the `MASTER_CONFIG`
 by setting the `sources` section and setting a `key` string both directly at the root of the
 `MASTER_CONFIG`.
 

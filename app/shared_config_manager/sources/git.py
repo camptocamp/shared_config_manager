@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import tempfile
@@ -12,6 +13,9 @@ class GitSource(SshBaseSource):
     def _do_refresh(self):
         self._checkout()
         self._copy(self._copy_dir(), excludes=['.git'])
+        stats = dict(hash=self._get_hash(), tags=self._get_tags())
+        with open(os.path.join(self.get_path(), '.gitstats'), 'w') as gitstats:
+            json.dump(stats, gitstats)
 
     def _checkout(self):
         dir = self._clone_dir()
@@ -43,8 +47,10 @@ class GitSource(SshBaseSource):
 
     def get_stats(self):
         stats = super().get_stats()
-        stats['hash'] = self._get_hash()
-        stats['tags'] = self._get_tags()
+        stats_path = os.path.join(self.get_path(), '.gitstats')
+        if os.path.isfile(stats_path):
+            with open(stats_path, 'r') as gitstats:
+                stats.update(json.load(gitstats))
         return stats
 
     def _get_hash(self):

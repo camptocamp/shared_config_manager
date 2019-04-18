@@ -7,7 +7,7 @@ import time
 def main():
     signal.signal(signal.SIGTERM, _sig_term)
     from shared_config_manager import sources, slave_status
-    sources.init()
+    sources.init(slave=True)
     while True:
         time.sleep(3600)
 
