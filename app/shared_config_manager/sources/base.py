@@ -83,6 +83,7 @@ class BaseSource(object):
                 assert tar.wait() == 0
                 return
             except Exception as e:
+                stats.increment_counter(['source', self._id, 'fetch_error'])
                 LOG.info("Error fetching the source %s from the master (will retry in 1s): %s",
                          self._id, str(e))
                 time.sleep(1)
