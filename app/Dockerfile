@@ -36,7 +36,7 @@ RUN pip3 install --no-cache-dir -e . && \
     python3 -m compileall -q . && \
     rm -rf /tmp/* /master_config/* /config/*
 
-ENV GUNICORN_PARAMS="-b :8080 --workers 1" \
+ENV GUNICORN_PARAMS="-b :8080 --workers 1 --worker-class gthread --threads 10" \
     LOG_LEVEL=DEBUG \
     C2C_BROADCAST_PREFIX=broadcast_scm_
 

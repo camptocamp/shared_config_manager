@@ -14,7 +14,7 @@ services:
       DEVELOPMENT: 1
       COVERAGE: 1
       C2C_PROFILER_PATH: /app_profiler
-      GUNICORN_PARAMS: '-b :8080 --reload'
+      GUNICORN_PARAMS: '-b :8080 --reload --workers 1 --worker-class gthread --threads 10'
       MASTER_CONFIG: |
         type: git
         key: changeme
