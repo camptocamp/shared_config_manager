@@ -1,5 +1,6 @@
 from c2cwsgiutils import services
 import logging
+import os
 from pyramid.httpexceptions import HTTPServerError, HTTPNotFound
 from pyramid.response import Response
 import subprocess
@@ -129,7 +130,14 @@ def tarball(request):
     path = source.get_path()
 
     response: Response = request.response
-    proc = subprocess.Popen(['tar', '--create', '--gzip', '.'], cwd=path, bufsize=4096,
+
+    files = os.listdir(path)
+    if '.gitstats' in files:
+        # put .gitstats at the end, that way, it is updated last at the destination
+        files.remove('.gitstats')
+        files.append('.gitstats')
+
+    proc = subprocess.Popen(['tar', '--create', '--gzip'] + files, cwd=path, bufsize=4096,
                             stdout=subprocess.PIPE)
     response.content_type = 'application/x-gtar'
     response.app_iter = _proc_iter(proc)
