@@ -78,7 +78,8 @@ def refresh_all_webhook(request):
             continue
 
         if ref != 'refs/heads/' + source.get_branch():
-            LOG.info("Ignoring webhook notif for non-matching branch %s on %s", source.get_branch(), id_)
+            LOG.info("Ignoring webhook notif for non-matching branch %s!=refs/heads/%s on %s",
+                     ref, source.get_branch(), id_)
             continue
         sources.refresh(id_=id_, key=key)
         nb_refresh += 1
