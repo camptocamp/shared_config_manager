@@ -24,9 +24,9 @@ filtered_sources: Mapping[str, base.BaseSource] = {}
 TAG_FILTER = os.environ.get("TAG_FILTER")
 
 
-def _create_source(id_, config, is_master=False):
+def _create_source(id_, config, is_master=False, default_key=None):
     type_ = config['type']
-    return ENGINES[type_](id_, config, is_master)
+    return ENGINES[type_](id_, config, is_master, default_key)
 
 
 def get_sources() -> Mapping[str, base.BaseSource]:
@@ -47,7 +47,7 @@ def init(slave: bool) -> None:
     if content.get('sources', False):
         LOG.info("The master config is inline")
         # A fake master source to have auth work
-        master_source = base.BaseSource(MASTER_ID, content, is_master=True)
+        master_source = base.BaseSource(MASTER_ID, content, is_master=True, default_key=content.get('key'))
         Thread(target=_handle_master_config(content), args=[content],
                name='master_config_loader', daemon=True).start()
     else:
@@ -92,7 +92,7 @@ def _handle_master_config(config: Mapping[str, Any]) -> None:
             _delete_source(id_)  # to be sure the old stuff is cleaned
 
         try:
-            sources[id_] = _create_source(id_, source_config)
+            sources[id_] = _create_source(id_, source_config, default_key=config.get('key'))
             sources[id_].refresh_or_fetch()
         except Exception:
             LOG.error("Cannot load the %s config", id_, exc_info=True)

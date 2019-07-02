@@ -18,7 +18,7 @@ MASTER_TARGET = os.environ.get("MASTER_TARGET", "/master_config")
 
 
 class BaseSource(object):
-    def __init__(self, id_, config, is_master):
+    def __init__(self, id_, config, is_master, default_key):
         self._id = id_
         self._config = config
         self._is_master = is_master
@@ -27,6 +27,8 @@ class BaseSource(object):
             template_engines.create_engine(engine_conf)
             for engine_conf in config.get('template_engines', [])
         ]
+        if 'key' not in config:
+            config['key'] = default_key
 
     def refresh_or_fetch(self):
         if mode.is_master():

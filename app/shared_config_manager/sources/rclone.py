@@ -5,8 +5,8 @@ import re
 
 
 class RcloneSource(BaseSource):
-    def __init__(self, id_, config, is_master):
-        super().__init__(id_, config, is_master)
+    def __init__(self, id_, config, is_master, default_key):
+        super().__init__(id_, config, is_master, default_key)
         self._setup_config(config['config'])
 
     def _do_refresh(self):
