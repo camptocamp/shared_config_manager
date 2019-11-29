@@ -1,7 +1,6 @@
 from c2cwsgiutils import stats
 import logging
 import os
-import shutil
 from typing import List
 
 LOG = logging.getLogger(__name__)
@@ -37,7 +36,7 @@ class BaseEngine(object):
                                 self._config['type'], src_path, exc_info=True)
                     stats.increment_counter(['source', self._source_id, self.get_type(), 'error'])
             elif src_path != dest_path and not os.path.isdir(src_path):
-                shutil.copyfile(src_path, dest_path)
+                os.link(src_path, dest_path)
 
     def _get_dest_dir(self, root_dir):
         if 'dest_sub_dir' in self._config:

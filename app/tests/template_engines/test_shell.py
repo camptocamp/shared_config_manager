@@ -39,9 +39,14 @@ def test_dest_sub_dir(temp_dir):
     file_path = os.path.join(temp_dir, 'file1')
     with open(file_path + '.tmpl', 'w') as out:
         out.write("Hello ${param} ${MUTUALIZED_TEST_ENV}\n")
+    with open(os.path.join(temp_dir, 'file2'), 'w') as out:
+        out.write("Hello\n")
 
     files = [os.path.relpath(str(p), temp_dir) for p in pathlib.Path(temp_dir).glob('**/*')]
     engine.evaluate(temp_dir, files)
 
     with open(os.path.join(temp_dir, 'copy', 'file1')) as input:
         assert input.read() == "Hello world yall\n"
+
+    with open(os.path.join(temp_dir, 'copy', 'file2')) as input:
+        assert input.read() == "Hello\n"
