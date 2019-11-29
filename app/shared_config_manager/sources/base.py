@@ -2,6 +2,7 @@ from c2cwsgiutils import stats
 import copy
 import logging
 import os
+import pathlib
 from pyramid.httpexceptions import HTTPForbidden
 import requests
 import shutil
@@ -24,7 +25,7 @@ class BaseSource(object):
         self._is_master = is_master
         self._is_loaded = False
         self._template_engines = [
-            template_engines.create_engine(engine_conf)
+            template_engines.create_engine(self.get_id(), engine_conf)
             for engine_conf in config.get('template_engines', [])
         ]
         if 'key' not in config:
@@ -50,9 +51,16 @@ class BaseSource(object):
             self._is_loaded = True
 
     def _eval_templates(self):
+        # We get the list of files only once to avoid consecutive template engines eating the output of
+        # the previous template engines. This method is always called with a root_dir that is clean from
+        # all the files that are created by template engines (see the --delete rsync flag in
+        # BaseSource._copy).
+        root_dir = self.get_path()
+        files = [os.path.relpath(str(p), root_dir) for p in pathlib.Path(root_dir).glob('**/*')]
+
         for engine in self._template_engines:
             with stats.timer_context(['source', self.get_id(), 'template', engine.get_type()]):
-                engine.evaluate(self.get_path())
+                engine.evaluate(root_dir, files)
 
     def fetch(self):
         try:
