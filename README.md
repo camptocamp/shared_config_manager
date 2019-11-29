@@ -63,6 +63,8 @@ A few environment variables can be used to tune the containers:
 * `TAG_FILTER`: Load only the sources having the given tag (the master config is always loaded)
 * `TARGET`: default base directory for the `target_dir` configuration (defaults to `/config`)
 * `MASTER_TARGET`: where to store the master config (defaults to `/master_config`)
+* `API_BASE_URL`: how to reach the master for slaves.
+* `API_MASTER`: if defined, this is a master with slaves (no template evaluation)
 
 See [https://github.com/camptocamp/c2cwsgiutils] for other parameters.
 

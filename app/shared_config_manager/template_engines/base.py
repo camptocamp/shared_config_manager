@@ -21,6 +21,7 @@ class BaseEngine(object):
     def evaluate(self, root_dir: str, files: List[str]):
         extension_len = len(self._extension) + 1
         dest_dir = self._get_dest_dir(root_dir)
+        LOG.info("Evaluating templates %s -> %s", root_dir, dest_dir)
 
         for sub_path in files:
             src_path = os.path.join(root_dir, sub_path)
@@ -28,7 +29,7 @@ class BaseEngine(object):
             os.makedirs(os.path.dirname(dest_path), exist_ok=True)
             if src_path.endswith("." + self._extension):
                 dest_path = dest_path[:-extension_len]
-                LOG.info("Evaluating template: %s", src_path)
+                LOG.info("Evaluating template: %s -> %s", src_path, dest_path)
                 try:
                     self._evaluate_file(src_path, dest_path)
                 except Exception:

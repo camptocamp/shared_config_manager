@@ -50,3 +50,4 @@ def test_dest_sub_dir(temp_dir):
 
     with open(os.path.join(temp_dir, 'copy', 'file2')) as input:
         assert input.read() == "Hello\n"
+    assert not os.path.exists(os.path.join(temp_dir, 'copy', 'copy'))

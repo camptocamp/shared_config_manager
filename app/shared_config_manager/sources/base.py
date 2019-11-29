@@ -51,6 +51,9 @@ class BaseSource(object):
             self._is_loaded = True
 
     def _eval_templates(self):
+        if mode.is_master_with_slaves():
+            # masters with slaves don't need to evaluate templates
+            return
         # We get the list of files only once to avoid consecutive template engines eating the output of
         # the previous template engines. This method is always called with a root_dir that is clean from
         # all the files that are created by template engines (see the --delete rsync flag in
