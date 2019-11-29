@@ -37,14 +37,14 @@ class BaseSource(object):
             self.fetch()
 
     def refresh(self):
-        LOG.info("Doing a refresh of %s", self._id)
+        LOG.info("Doing a refresh of %s", self.get_id())
         try:
             self._is_loaded = False
             with stats.timer_context(['source', self.get_id(), 'refresh']):
                 self._do_refresh()
             self._eval_templates()
         except Exception:
-            stats.increment_counter(['source', self._id, 'error'])
+            stats.increment_counter(['source', self.get_id(), 'error'])
             raise
         finally:
             self._is_loaded = True
@@ -61,7 +61,7 @@ class BaseSource(object):
                 self._do_fetch()
             self._eval_templates()
         except Exception:
-            stats.increment_counter(['source', self._id, 'error'])
+            stats.increment_counter(['source', self.get_id(), 'error'])
             raise
         finally:
             self._is_loaded = True
@@ -72,10 +72,10 @@ class BaseSource(object):
     def _do_fetch(self):
         path = self.get_path()
         os.makedirs(path, exist_ok=True)
-        url = mode.get_fetch_url(self._id, self._config['key'])
+        url = mode.get_fetch_url(self.get_id(), self._config['key'])
         while True:
             try:
-                LOG.info("Doing a fetch of %s", self._id)
+                LOG.info("Doing a fetch of %s", self.get_id())
                 r = requests.get(url, stream=True)
                 r.raise_for_status()
                 tar = subprocess.Popen(['tar', '--extract', '--gzip', '--no-same-owner',
@@ -86,9 +86,9 @@ class BaseSource(object):
                 assert tar.wait() == 0
                 return
             except Exception as e:
-                stats.increment_counter(['source', self._id, 'fetch_error'])
+                stats.increment_counter(['source', self.get_id(), 'fetch_error'])
                 LOG.info("Error fetching the source %s from the master (will retry in 1s): %s",
-                         self._id, str(e))
+                         self.get_id(), str(e))
                 time.sleep(1)
 
     def _copy(self, source, excludes=None):
