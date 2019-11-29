@@ -16,7 +16,8 @@ def repo():
     subprocess.check_call(['git', 'config', '--global', 'user.name', 'Your Name'],
                           stderr=subprocess.STDOUT)
     subprocess.check_call(['git', 'init', repo_path], stderr=subprocess.STDOUT)
-    file_path = os.path.join(repo_path, 'test')
+    file_path = os.path.join(repo_path, 'toto', 'test')
+    os.makedirs(os.path.dirname(file_path))
     with open(file_path, 'w') as file:
         file.write('Hello world')
     subprocess.check_call(['git', 'add', file_path], cwd=repo_path, stderr=subprocess.STDOUT)
@@ -34,7 +35,38 @@ def test_git(repo):
         'key': 'changeme',
         'repo': repo
     })
+    assert not git._do_sparse()
+    git.refresh()
+    subprocess.check_call(['ls', '/config/test_git'])
+    assert os.path.isfile('/config/test_git/toto/test')
+    assert not os.path.isfile('/config/test_git/.git')
+    with open('/config/test_git/toto/test') as file:
+        assert file.read() == 'Hello world'
 
+    repo_file_path = os.path.join(repo, 'toto', 'test')
+    with open(repo_file_path, 'w') as file:
+        file.write('Good bye')
+    subprocess.check_call(['git', 'add', repo_file_path], cwd=repo, stderr=subprocess.STDOUT)
+    subprocess.check_call(['git', 'commit', '-a', '-m', 'Initial commit'],
+                          cwd=repo, stderr=subprocess.STDOUT)
+
+    git.refresh()
+    try:
+        assert os.path.isfile('/config/test_git/toto/test')
+        with open('/config/test_git/toto/test') as file:
+            assert file.read() == 'Good bye'
+    finally:
+        git.delete()
+
+
+def test_git_sub_dir(repo):
+    git = sources._create_source('test_git', {
+        'type': 'git',
+        'key': 'changeme',
+        'repo': repo,
+        'sub_dir': 'toto'
+    })
+    assert git._do_sparse()
     git.refresh()
     subprocess.check_call(['ls', '/config/test_git'])
     assert os.path.isfile('/config/test_git/test')
@@ -42,7 +74,39 @@ def test_git(repo):
     with open('/config/test_git/test') as file:
         assert file.read() == 'Hello world'
 
-    repo_file_path = os.path.join(repo, 'test')
+    repo_file_path = os.path.join(repo, 'toto', 'test')
+    with open(repo_file_path, 'w') as file:
+        file.write('Good bye')
+    subprocess.check_call(['git', 'add', repo_file_path], cwd=repo, stderr=subprocess.STDOUT)
+    subprocess.check_call(['git', 'commit', '-a', '-m', 'Initial commit'],
+                          cwd=repo, stderr=subprocess.STDOUT)
+
+    git.refresh()
+    try:
+        assert os.path.isfile('/config/test_git/test')
+        with open('/config/test_git/test') as file:
+            assert file.read() == 'Good bye'
+    finally:
+        git.delete()
+
+
+def test_git_sub_dir_no_sparse(repo):
+    git = sources._create_source('test_git', {
+        'type': 'git',
+        'key': 'changeme',
+        'repo': repo,
+        'sub_dir': 'toto',
+        'sparse': False
+    })
+    assert not git._do_sparse()
+    git.refresh()
+    subprocess.check_call(['ls', '/config/test_git'])
+    assert os.path.isfile('/config/test_git/test')
+    assert not os.path.isfile('/config/test_git/.git')
+    with open('/config/test_git/test') as file:
+        assert file.read() == 'Hello world'
+
+    repo_file_path = os.path.join(repo, 'toto', 'test')
     with open(repo_file_path, 'w') as file:
         file.write('Good bye')
     subprocess.check_call(['git', 'add', repo_file_path], cwd=repo, stderr=subprocess.STDOUT)

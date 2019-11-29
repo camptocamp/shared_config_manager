@@ -1,3 +1,4 @@
+import base64
 import json
 import logging
 import os
@@ -20,24 +21,37 @@ class GitSource(SshBaseSource):
 
     def _checkout(self):
         dir = self._clone_dir()
-        repo = self._config['repo']
+        repo = self._get_repo()
         branch = self.get_branch()
         if os.path.isdir(os.path.join(dir, '.git')):
             LOG.info("Fetching a new version of %s", repo)
             self._exec('git', 'fetch', '--depth', '1', 'origin', branch, cwd=dir)
             self._exec('git', 'checkout', branch, cwd=dir)
             self._exec('git', 'reset', '--hard', f'origin/{branch}', cwd=dir)
-        elif 'sub_dir' in self._config:
+        elif self._do_sparse():
             LOG.info("Cloning %s (sparse)", repo)
-            self._exec('/app/git_sparse_clone', repo, branch, self.get_id(), self._config['sub_dir'],
+            self._exec('/app/git_sparse_clone', repo, branch, dir, self._config['sub_dir'],
                        cwd=TEMP_DIR)
         else:
             LOG.info("Cloning %s", repo)
-            command = ['git', 'clone', '-b', branch, '--depth', '1', repo, self.get_id()]
+            os.makedirs(os.path.dirname(dir), exist_ok=True)
+            command = ['git', 'clone', '-b', branch, '--depth', '1', repo, os.path.basename(dir)]
             self._exec(*command, cwd=TEMP_DIR)
 
+    def _get_repo(self):
+        return self._config['repo']
+
     def _clone_dir(self):
-        return os.path.join(TEMP_DIR, self.get_id())
+        if self._do_sparse():
+            return os.path.join(TEMP_DIR, self.get_id())
+        else:
+            # The directory we clone into is not fct(id), but in function of the repository and the
+            # branch. That way, if two sources are other sub-dirs of the same repo, we clone it only once.
+            encoded_repo = base64.urlsafe_b64encode(self._get_repo().encode("utf-8")).decode("utf-8")
+            return os.path.join(TEMP_DIR, encoded_repo)
+
+    def _do_sparse(self):
+        return 'sub_dir' in self._config and self._config.get('sparse', True)
 
     def _copy_dir(self):
         sub_dir = self._config.get('sub_dir')

@@ -6,7 +6,7 @@ ENGINES = {
 }
 
 
-def create_engine(config) -> base.BaseEngine:
+def create_engine(source_id, config) -> base.BaseEngine:
     global ENGINES
     type_ = config['type']
-    return ENGINES[type_](config)
+    return ENGINES[type_](source_id, config)

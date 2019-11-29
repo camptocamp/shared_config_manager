@@ -48,7 +48,7 @@ def init(slave: bool) -> None:
         LOG.info("The master config is inline")
         # A fake master source to have auth work
         master_source = base.BaseSource(MASTER_ID, content, is_master=True, default_key=content.get('key'))
-        Thread(target=_handle_master_config(content), args=[content],
+        Thread(target=_handle_master_config, args=[content],
                name='master_config_loader', daemon=True).start()
     else:
         master_source = _create_source(MASTER_ID, content, is_master=True)

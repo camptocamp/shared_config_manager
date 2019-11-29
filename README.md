@@ -86,6 +86,8 @@ See [https://github.com/camptocamp/c2cwsgiutils] for other parameters.
 * `branch`: the GIT branch to use (defaults to `master`)
 * `sub_dir`: if only a sub_directory of the repository needs to be copied (defaults to the root of the
   repository)
+* `sparse`: if true (the default) and `sub_dir` is defined, will use a sparse clone. Disable that if you have multiple
+            sources using the same repository (will avoid cloning it for each sources).  
 
 #### Rsync source configuration parameters
 
@@ -106,6 +108,8 @@ See [https://github.com/camptocamp/c2cwsgiutils] for other parameters.
 * `environment_variables`: If `true`, take into account the process' environment variables
   if not found in `data`. Only variables starting with a prefix listed in `SCM_ENV_PREFIXES`
   (list separated by `:`) are allowed.
+* `dest_sub_dir`: If specified, all the files, including the ones not evaluated as templates
+  will be copied into the given sub directory.
 
 
 ## Slave only mode
