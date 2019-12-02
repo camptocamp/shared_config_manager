@@ -82,13 +82,15 @@ class BaseSource(object):
 
     def _do_fetch(self):
         path = self.get_path()
-        os.makedirs(path, exist_ok=True)
         url = mode.get_fetch_url(self.get_id(), self._config['key'])
         while True:
             try:
                 LOG.info("Doing a fetch of %s", self.get_id())
                 r = requests.get(url, stream=True)
                 r.raise_for_status()
+                if os.path.exists(path):
+                    shutil.rmtree(path)
+                os.makedirs(path, exist_ok=True)
                 tar = subprocess.Popen(['tar', '--extract', '--gzip', '--no-same-owner',
                                         '--no-same-permissions', '--touch', '--no-overwrite-dir'],
                                        cwd=path, stdin=subprocess.PIPE)
