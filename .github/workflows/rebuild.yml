@@ -1,0 +1,59 @@
+name: Rebuild
+
+on:
+  schedule:
+    - cron: "45 3 * * *"
+
+env:
+  IN_CI: '1'
+  SUMMON_PROVIDER: /usr/local/bin/gopass
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-18.04
+    timeout-minutes: 15
+
+    strategy:
+      matrix:
+        branch:
+          - master
+
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          ref: ${{ matrix.branch }}
+
+      - uses: camptocamp/initialise-gopass-summon-action@v1
+        with:
+          ci-gpg-private-key: ${{secrets.CI_GPG_PRIVATE_KEY}}
+          github-gopass-ci-token: ${{secrets.GITHUB_GOPASS_CI_TOKEN}}
+
+      - name: Pull
+        run: make pull
+
+      - name: Build
+        run: make build
+
+      - name: Acceptance
+        run: make acceptance
+
+      - name: Release
+        run: |
+          summon --yaml '
+            USER: !var gs/ci/dockerhub/username
+            PASS: !var gs/ci/dockerhub/password
+          ' bash -c 'docker login -u $USER -p $PASS'
+
+          tag=${{matrix.branch}}
+          if [[ "$tag" == "master" ]]
+          then
+            tag=latest
+          fi
+
+          if [[ "$tag" != "latest" ]]
+          then
+            docker tag camptocamp/shared_config_manager:latest camptocamp/shared_config_manager:${tag}
+          fi
+          docker push camptocamp/shared_config_manager:${{matrix.branch}}
+
+          rm -rf ~/.docker*  # docker logout

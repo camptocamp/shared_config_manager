@@ -1,0 +1,67 @@
+name: Build
+
+on:
+  push:
+
+env:
+  IN_CI: '1'
+  SUMMON_PROVIDER: /usr/local/bin/gopass
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - uses: camptocamp/initialise-gopass-summon-action@v1
+        with:
+          ci-gpg-private-key: ${{secrets.CI_GPG_PRIVATE_KEY}}
+          github-gopass-ci-token: ${{secrets.GITHUB_GOPASS_CI_TOKEN}}
+
+      - name: Pull
+        run: make pull
+
+      - name: Build
+        run: make build
+
+      - name: Acceptance
+        run: make acceptance
+
+      - name: Release
+        run: |
+          if [[ ${{github.ref}} =~ ^refs/tags/([0-9]+(\.[0-9]+)*)$ ]]
+          then
+            tag="${BASH_REMATCH[1]}"
+            echo "Release tag ${tag}"
+
+          elif [[ ${{github.ref}} =~ ^refs/heads/(release_[0-9]+)$ ]]
+          then
+            tag="${BASH_REMATCH[1]}"
+            echo "Release major ${tag}"
+
+          elif [[ ${{github.ref}} == refs/heads/master ]]
+          then
+            tag=latest
+            echo "Release latest"
+
+          else
+            echo "No release to do for ${{github.ref}}"
+          fi
+
+          if [[ -n "$tag" ]]
+          then
+            summon --yaml '
+              USER: !var gs/ci/dockerhub/username
+              PASS: !var gs/ci/dockerhub/password
+            ' bash -c 'docker login -u $USER -p $PASS'
+
+            if [[ "$tag" != "latest" ]]
+            then
+              docker tag camptocamp/shared_config_manager:latest camptocamp/shared_config_manager:${tag}
+            fi
+            docker push camptocamp/shared_config_manager:${tag}
+
+            rm -rf ~/.docker*  # docker logout
+          fi
