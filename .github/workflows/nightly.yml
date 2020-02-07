@@ -1,4 +1,4 @@
-name: Rebuild
+name: Nightly
 
 on:
   schedule:
@@ -54,6 +54,6 @@ jobs:
           then
             docker tag camptocamp/shared_config_manager:latest camptocamp/shared_config_manager:${tag}
           fi
-          docker push camptocamp/shared_config_manager:${{matrix.branch}}
+          docker push camptocamp/shared_config_manager:${tag}
 
           rm -rf ~/.docker*  # docker logout
