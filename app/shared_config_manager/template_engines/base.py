@@ -4,7 +4,7 @@ import os
 from typing import List
 
 LOG = logging.getLogger(__name__)
-ENV_PREFIXES = os.environ.get('SCM_ENV_PREFIXES', 'MUTUALIZED_').split(':')
+ENV_PREFIXES = os.environ.get("SCM_ENV_PREFIXES", "MUTUALIZED_").split(":")
 
 
 class BaseEngine(object):
@@ -12,11 +12,11 @@ class BaseEngine(object):
         self._source_id = source_id
         self._config = config
         self._extension = extension
-        if self._config.get('environment_variables', False):
+        if self._config.get("environment_variables", False):
             self._data = _filter_env(os.environ)
-            self._data.update(config.get('data', {}))
+            self._data.update(config.get("data", {}))
         else:
-            self._data = config.get('data', {})
+            self._data = config.get("data", {})
 
     def evaluate(self, root_dir: str, files: List[str]):
         extension_len = len(self._extension) + 1
@@ -33,15 +33,16 @@ class BaseEngine(object):
                 try:
                     self._evaluate_file(src_path, dest_path)
                 except Exception:
-                    LOG.warning("Failed applying the %s template: %s",
-                                self._config['type'], src_path, exc_info=True)
-                    stats.increment_counter(['source', self._source_id, self.get_type(), 'error'])
+                    LOG.warning(
+                        "Failed applying the %s template: %s", self._config["type"], src_path, exc_info=True
+                    )
+                    stats.increment_counter(["source", self._source_id, self.get_type(), "error"])
             elif src_path != dest_path and not os.path.isdir(src_path) and not os.path.exists(dest_path):
                 os.link(src_path, dest_path)
 
     def _get_dest_dir(self, root_dir):
-        if 'dest_sub_dir' in self._config:
-            return os.path.join(root_dir, self._config['dest_sub_dir'])
+        if "dest_sub_dir" in self._config:
+            return os.path.join(root_dir, self._config["dest_sub_dir"])
         else:
             return root_dir
 
@@ -49,11 +50,11 @@ class BaseEngine(object):
         pass
 
     def get_type(self):
-        return self._config['type']
+        return self._config["type"]
 
     def get_stats(self, stats):
-        if self._config.get('environment_variables', False):
-            stats['environment_variables'] = _filter_env(os.environ)
+        if self._config.get("environment_variables", False):
+            stats["environment_variables"] = _filter_env(os.environ)
 
 
 def _filter_env(env):

@@ -14,13 +14,17 @@ def composition(request, test_repos):
     """
     Fixture that start/stop the Docker composition used for all the tests.
     """
-    for slave in ('api', ):
-        path = os.path.join('/tmp/slaves', slave)
+    for slave in ("api",):
+        path = os.path.join("/tmp/slaves", slave)
         os.makedirs(path, exist_ok=True)
         os.chown(path, 33, 0)
-    result = Composition(request, PROJECT_NAME, '/acceptance_tests/acceptance/inline/docker-compose.yaml',
-                         coverage_paths=[PROJECT_NAME + "_api_1:/tmp/coverage"])
-    utils.wait_url(BASE_URL + 'c2c/health_check?max_level=2')
+    result = Composition(
+        request,
+        PROJECT_NAME,
+        "/acceptance_tests/acceptance/inline/docker-compose.yaml",
+        coverage_paths=[PROJECT_NAME + "_api_1:/tmp/coverage"],
+    )
+    utils.wait_url(BASE_URL + "c2c/health_check?max_level=2")
 
     yield result
 
@@ -32,4 +36,4 @@ def app_connection(composition):
     """
     Fixture that returns a connection to a running batch container.
     """
-    return Connection(base_url=BASE_URL, origin='http://example.com/')
+    return Connection(base_url=BASE_URL, origin="http://example.com/")

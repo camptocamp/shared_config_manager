@@ -7,6 +7,7 @@ import time
 def main():
     signal.signal(signal.SIGTERM, _sig_term)
     from shared_config_manager import sources, slave_status
+
     sources.init(slave=True)
     while True:
         time.sleep(3600)
@@ -14,6 +15,7 @@ def main():
 
 def _sig_term(signum, frame):
     import logging
+
     logging.getLogger("shared_config_slave").info("Got a SIGTERM, stopping the slave")
     exit(0)
 

@@ -11,13 +11,9 @@ import yaml
 
 from . import git, rsync, base, rclone, mode
 
-ENGINES = {
-    'git': git.GitSource,
-    'rsync': rsync.RsyncSource,
-    'rclone': rclone.RcloneSource
-}
+ENGINES = {"git": git.GitSource, "rsync": rsync.RsyncSource, "rclone": rclone.RcloneSource}
 LOG = logging.getLogger(__name__)
-MASTER_ID = 'master'
+MASTER_ID = "master"
 master_source: Optional[base.BaseSource] = None
 sources: Mapping[str, base.BaseSource] = {}
 filtered_sources: Mapping[str, base.BaseSource] = {}
@@ -25,7 +21,7 @@ TAG_FILTER = os.environ.get("TAG_FILTER")
 
 
 def _create_source(id_, config, is_master=False, default_key=None):
-    type_ = config['type']
+    type_ = config["type"]
     return ENGINES[type_](id_, config, is_master, default_key)
 
 
@@ -40,28 +36,27 @@ def init(slave: bool) -> None:
     global master_source
     mode.init(slave)
     if slave:
-        broadcast.subscribe('slave_fetch', _slave_fetch)
+        broadcast.subscribe("slave_fetch", _slave_fetch)
     _update_flag("LOADING")
     _prepare_ssh()
-    content = yaml.load(os.environ['MASTER_CONFIG'], Loader=yaml.SafeLoader)
-    if content.get('sources', False):
+    content = yaml.load(os.environ["MASTER_CONFIG"], Loader=yaml.SafeLoader)
+    if content.get("sources", False):
         LOG.info("The master config is inline")
         # A fake master source to have auth work
-        master_source = base.BaseSource(MASTER_ID, content, is_master=True, default_key=content.get('key'))
-        Thread(target=_handle_master_config, args=[content],
-               name='master_config_loader', daemon=True).start()
+        master_source = base.BaseSource(MASTER_ID, content, is_master=True, default_key=content.get("key"))
+        Thread(target=_handle_master_config, args=[content], name="master_config_loader", daemon=True).start()
     else:
         master_source = _create_source(MASTER_ID, content, is_master=True)
         LOG.info("Initial loading of the master config")
         master_source.refresh_or_fetch()
         LOG.info("Loading of the master config finished")
-        if not master_source.get_config().get('standalone', False):
+        if not master_source.get_config().get("standalone", False):
             Thread(target=reload_master_config, name="master_config_loader", daemon=True).start()
 
 
 def reload_master_config():
     global master_source
-    with open(os.path.join(master_source.get_path(), 'shared_config_manager.yaml')) as config_file:
+    with open(os.path.join(master_source.get_path(), "shared_config_manager.yaml")) as config_file:
         config = yaml.load(config_file, Loader=yaml.SafeLoader)
         _handle_master_config(config)
 
@@ -69,13 +64,10 @@ def reload_master_config():
 def _handle_master_config(config: Mapping[str, Any]) -> None:
     global sources, filtered_sources
     LOG.info("Reading the master config")
-    if MASTER_ID in config['sources']:
+    if MASTER_ID in config["sources"]:
         raise HTTPBadRequest(f'A source cannot have the "{MASTER_ID}" id')
-    new_sources, filtered = _filter_sources(config['sources'])
-    filtered_sources = {
-        id_: _create_source(id_, config)
-        for id_, config in filtered.items()
-    }
+    new_sources, filtered = _filter_sources(config["sources"])
+    filtered_sources = {id_: _create_source(id_, config) for id_, config in filtered.items()}
     to_deletes = set(sources.keys()) - set(new_sources.keys())
     for to_delete in to_deletes:
         _delete_source(to_delete)
@@ -92,7 +84,7 @@ def _handle_master_config(config: Mapping[str, Any]) -> None:
             _delete_source(id_)  # to be sure the old stuff is cleaned
 
         try:
-            sources[id_] = _create_source(id_, source_config, default_key=config.get('key'))
+            sources[id_] = _create_source(id_, source_config, default_key=config.get("key"))
             sources[id_].refresh_or_fetch()
         except Exception:
             LOG.error("Cannot load the %s config", id_, exc_info=True)
@@ -101,17 +93,25 @@ def _handle_master_config(config: Mapping[str, Any]) -> None:
 
 
 def _update_flag(value):
-    with open(os.path.join(tempfile.gettempdir(), 'status'), 'w') as flag:
+    with open(os.path.join(tempfile.gettempdir(), "status"), "w") as flag:
         flag.write(value)
 
 
 def _prepare_ssh():
     home = pathlib.Path.home()
-    other_ssh = home.joinpath('.ssh2')
+    other_ssh = home.joinpath(".ssh2")
     if other_ssh.is_dir():
-        ssh = home.joinpath('.ssh')
-        subprocess.check_call(['rsync', '--recursive', '--copy-links', '--chmod=D0700,F0600',
-                               str(other_ssh) + '/', str(ssh) + '/'])
+        ssh = home.joinpath(".ssh")
+        subprocess.check_call(
+            [
+                "rsync",
+                "--recursive",
+                "--copy-links",
+                "--chmod=D0700,F0600",
+                str(other_ssh) + "/",
+                str(ssh) + "/",
+            ]
+        )
 
 
 def _delete_source(id_):
@@ -126,7 +126,7 @@ def _filter_sources(source_configs):
     result = {}
     filtered = {}
     for id_, config in source_configs.items():
-        if TAG_FILTER in config.get('tags', []):
+        if TAG_FILTER in config.get("tags", []):
             result[id_] = config
         else:
             filtered[id_] = config
@@ -140,9 +140,9 @@ def refresh(id_, key):
     LOG.info("Reloading the %s config", id_)
     source, _ = check_id_key(id_, key)
     source.refresh()
-    if source.is_master() and not master_source.get_config().get('standalone', False):
+    if source.is_master() and not master_source.get_config().get("standalone", False):
         reload_master_config()
-    broadcast.broadcast('slave_fetch', params=dict(id_=id_, key=key))
+    broadcast.broadcast("slave_fetch", params=dict(id_=id_, key=key))
 
 
 def _slave_fetch(id_, key):
@@ -153,7 +153,7 @@ def _slave_fetch(id_, key):
     if filtered and not mode.is_master():
         return
     source.fetch()
-    if source.is_master() and not master_source.get_config().get('standalone', False):
+    if source.is_master() and not master_source.get_config().get("standalone", False):
         reload_master_config()
 
 
@@ -182,6 +182,5 @@ def get_source(id_) -> base.BaseSource:
 
 def get_stats():
     return {
-        id_: source.get_stats()
-        for id_, source in {**sources, master_source.get_id(): master_source}.items()
+        id_: source.get_stats() for id_, source in {**sources, master_source.get_id(): master_source}.items()
     }

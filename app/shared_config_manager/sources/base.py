@@ -26,10 +26,10 @@ class BaseSource(object):
         self._is_loaded = False
         self._template_engines = [
             template_engines.create_engine(self.get_id(), engine_conf)
-            for engine_conf in config.get('template_engines', [])
+            for engine_conf in config.get("template_engines", [])
         ]
-        if 'key' not in config:
-            config['key'] = default_key
+        if "key" not in config:
+            config["key"] = default_key
 
     def refresh_or_fetch(self):
         if mode.is_master():
@@ -41,11 +41,11 @@ class BaseSource(object):
         LOG.info("Doing a refresh of %s", self.get_id())
         try:
             self._is_loaded = False
-            with stats.timer_context(['source', self.get_id(), 'refresh']):
+            with stats.timer_context(["source", self.get_id(), "refresh"]):
                 self._do_refresh()
             self._eval_templates()
         except Exception:
-            stats.increment_counter(['source', self.get_id(), 'error'])
+            stats.increment_counter(["source", self.get_id(), "error"])
             raise
         finally:
             self._is_loaded = True
@@ -59,20 +59,20 @@ class BaseSource(object):
         # all the files that are created by template engines (see the --delete rsync flag in
         # BaseSource._copy).
         root_dir = self.get_path()
-        files = [os.path.relpath(str(p), root_dir) for p in pathlib.Path(root_dir).glob('**/*')]
+        files = [os.path.relpath(str(p), root_dir) for p in pathlib.Path(root_dir).glob("**/*")]
 
         for engine in self._template_engines:
-            with stats.timer_context(['source', self.get_id(), 'template', engine.get_type()]):
+            with stats.timer_context(["source", self.get_id(), "template", engine.get_type()]):
                 engine.evaluate(root_dir, files)
 
     def fetch(self):
         try:
             self._is_loaded = False
-            with stats.timer_context(['source', self.get_id(), 'fetch']):
+            with stats.timer_context(["source", self.get_id(), "fetch"]):
                 self._do_fetch()
             self._eval_templates()
         except Exception:
-            stats.increment_counter(['source', self.get_id(), 'error'])
+            stats.increment_counter(["source", self.get_id(), "error"])
             raise
         finally:
             self._is_loaded = True
@@ -82,7 +82,7 @@ class BaseSource(object):
 
     def _do_fetch(self):
         path = self.get_path()
-        url = mode.get_fetch_url(self.get_id(), self._config['key'])
+        url = mode.get_fetch_url(self.get_id(), self._config["key"])
         while True:
             try:
                 LOG.info("Doing a fetch of %s", self.get_id())
@@ -91,29 +91,50 @@ class BaseSource(object):
                 if os.path.exists(path):
                     shutil.rmtree(path)
                 os.makedirs(path, exist_ok=True)
-                tar = subprocess.Popen(['tar', '--extract', '--gzip', '--no-same-owner',
-                                        '--no-same-permissions', '--touch', '--no-overwrite-dir'],
-                                       cwd=path, stdin=subprocess.PIPE)
+                tar = subprocess.Popen(
+                    [
+                        "tar",
+                        "--extract",
+                        "--gzip",
+                        "--no-same-owner",
+                        "--no-same-permissions",
+                        "--touch",
+                        "--no-overwrite-dir",
+                    ],
+                    cwd=path,
+                    stdin=subprocess.PIPE,
+                )
                 shutil.copyfileobj(r.raw, tar.stdin)
                 tar.stdin.close()
                 assert tar.wait() == 0
                 return
             except Exception as e:
-                stats.increment_counter(['source', self.get_id(), 'fetch_error'])
-                LOG.info("Error fetching the source %s from the master (will retry in 1s): %s",
-                         self.get_id(), str(e))
+                stats.increment_counter(["source", self.get_id(), "fetch_error"])
+                LOG.info(
+                    "Error fetching the source %s from the master (will retry in 1s): %s",
+                    self.get_id(),
+                    str(e),
+                )
                 time.sleep(1)
 
     def _copy(self, source, excludes=None):
         os.makedirs(self.get_path(), exist_ok=True)
-        cmd = ['rsync', '--recursive', '--links', '--devices', '--specials', '--delete',
-               '--verbose', '--checksum']
+        cmd = [
+            "rsync",
+            "--recursive",
+            "--links",
+            "--devices",
+            "--specials",
+            "--delete",
+            "--verbose",
+            "--checksum",
+        ]
         if excludes is not None:
-            cmd += ['--exclude=' + exclude for exclude in excludes]
-        if 'excludes' in self._config:
-            cmd += ['--exclude=' + exclude for exclude in self._config['excludes']]
-        cmd += [source + '/', self.get_path()]
-        with stats.timer_context(['source', self.get_id(), 'copy']):
+            cmd += ["--exclude=" + exclude for exclude in excludes]
+        if "excludes" in self._config:
+            cmd += ["--exclude=" + exclude for exclude in self._config["excludes"]]
+        cmd += [source + "/", self.get_path()]
+        with stats.timer_context(["source", self.get_id(), "copy"]):
             self._exec(*cmd)
 
     def delete_target_dir(self):
@@ -123,9 +144,9 @@ class BaseSource(object):
             shutil.rmtree(dest)
 
     def get_path(self) -> str:
-        if 'target_dir' in self._config:
-            target_dir = self._config['target_dir']
-            if target_dir.startswith('/'):
+        if "target_dir" in self._config:
+            target_dir = self._config["target_dir"]
+            if target_dir.startswith("/"):
                 return target_dir
             else:
                 return os.path.join(MASTER_TARGET if self._is_master else TARGET, target_dir)
@@ -136,7 +157,7 @@ class BaseSource(object):
         return self._id
 
     def validate_key(self, key):
-        if key != self._config['key']:
+        if key != self._config["key"]:
             raise HTTPForbidden("Invalid key")
 
     def is_master(self):
@@ -144,19 +165,20 @@ class BaseSource(object):
 
     def get_stats(self):
         stats_ = copy.deepcopy(self._config)
-        del stats_['key']
-        for template_stats, template_engine in zip(stats_.get('template_engines', []),
-                                                   self._template_engines):
+        del stats_["key"]
+        for template_stats, template_engine in zip(
+            stats_.get("template_engines", []), self._template_engines
+        ):
             template_engine.get_stats(template_stats)
-            BaseSource._hide_sensitive(template_stats.get('data'))
-            BaseSource._hide_sensitive(template_stats.get('environment_variables'))
+            BaseSource._hide_sensitive(template_stats.get("data"))
+            BaseSource._hide_sensitive(template_stats.get("environment_variables"))
         return stats_
 
     def get_config(self):
         return self._config
 
     def get_type(self):
-        return self._config['type']
+        return self._config["type"]
 
     def delete(self):
         self.delete_target_dir()
@@ -164,7 +186,7 @@ class BaseSource(object):
     def _exec(self, *args, **kwargs):
         try:
             args = list(map(str, args))
-            LOG.debug("Running: " + ' '.join(args))
+            LOG.debug("Running: " + " ".join(args))
             output = subprocess.check_output(args, stderr=subprocess.STDOUT, env=dict(os.environ), **kwargs)
             output = output.decode("utf-8").strip()
             if output:
@@ -183,5 +205,5 @@ class BaseSource(object):
             return
         for key in list(data.keys()):
             k = key.upper()
-            if 'KEY' in k or 'PASSWORD' in k or 'SECRET' in k:
-                data[key] = 'xxx'
+            if "KEY" in k or "PASSWORD" in k or "SECRET" in k:
+                data[key] = "xxx"
