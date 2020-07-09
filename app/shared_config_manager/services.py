@@ -1,11 +1,14 @@
-from c2cwsgiutils import services
 import logging
 import os
-from pyramid.httpexceptions import HTTPServerError, HTTPNotFound
-from pyramid.response import Response
 import subprocess
+from typing import Dict, List, cast
 
-from . import sources, slave_status
+from pyramid.httpexceptions import HTTPNotFound, HTTPServerError
+from pyramid.response import Response
+
+from c2cwsgiutils import services
+
+from . import slave_status, sources
 
 refresh_service = services.create("refresh", "/1/refresh/{id}/{key}")
 refresh_all_service = services.create("refresh_all", "/1/refresh/{key}")
@@ -24,10 +27,12 @@ def refresh(request):
 @refresh_service.post()
 def refresh_webhook(request):
     id_ = request.matchdict["id"]
-    source, filtered = sources.check_id_key(id_=id_, key=request.matchdict["key"])
+    source, _ = sources.check_id_key(id_=id_, key=request.matchdict["key"])
 
     if source.get_type() != "git":
         raise HTTPServerError("Non GIT source %s cannot be refreshed by a webhook", id_)
+
+    source_git = cast(sources.git.GitSource, source)
 
     if request.headers.get("X-GitHub-Event") != "push":
         LOG.info("Ignoring webhook notif for a non-push event on %s", id_)
@@ -36,9 +41,9 @@ def refresh_webhook(request):
     ref = request.json.get("ref")
     if ref is None:
         raise HTTPServerError("Webhook for %s is missing the ref", id_)
-    if ref != "refs/heads/" + source.get_branch():
-        LOG.info("Ignoring webhook notif for non-matching branch %s on %s", source.get_branch(), id_)
-        return {"status": 200, "ignored": True, "reason": f"Not {source.get_branch()} branch"}
+    if ref != "refs/heads/" + source_git.get_branch():
+        LOG.info("Ignoring webhook notif for non-matching branch %s on %s", source_git.get_branch(), id_)
+        return {"status": 200, "ignored": True, "reason": f"Not {source_git.get_branch()} branch"}
 
     return _refresh(request)
 
@@ -50,8 +55,10 @@ def _refresh(request):
 
 @refresh_all_service.get()
 def refresh_all(request):
+    if not sources.MASTER_SOURCE:
+        raise HTTPServerError("Master source not initialized")
     key = request.matchdict["key"]
-    sources.master_source.validate_key(key)
+    sources.MASTER_SOURCE.validate_key(key)
     nb_refresh = 0
     for id_ in sources.get_sources().keys():
         sources.refresh(id_=id_, key=key)
@@ -61,8 +68,10 @@ def refresh_all(request):
 
 @refresh_all_service.post()
 def refresh_all_webhook(request):
+    if not sources.MASTER_SOURCE:
+        raise HTTPServerError("Master source not initialized")
     key = request.matchdict["key"]
-    sources.master_source.validate_key(key)
+    sources.MASTER_SOURCE.validate_key(key)
 
     if request.headers.get("X-GitHub-Event") != "push":
         LOG.info("Ignoring webhook notif for a non-push event on %s")
@@ -74,14 +83,16 @@ def refresh_all_webhook(request):
 
     nb_refresh = 0
     for id_, source in sources.get_sources().items():
-        if source.get_type() != "git":
+        if not source or source.get_type() != "git":
             continue
 
-        if ref != "refs/heads/" + source.get_branch():
+        source_git = cast(sources.git.GitSource, source)
+
+        if ref != "refs/heads/" + source_git.get_branch():
             LOG.info(
                 "Ignoring webhook notif for non-matching branch %s!=refs/heads/%s on %s",
                 ref,
-                source.get_branch(),
+                source_git.get_branch(),
                 id_,
             )
             continue
@@ -93,7 +104,9 @@ def refresh_all_webhook(request):
 
 @stats_service.get()
 def stats(request):
-    sources.master_source.validate_key(request.matchdict["key"])
+    if not sources.MASTER_SOURCE:
+        return {"slaves": {}}
+    sources.MASTER_SOURCE.validate_key(request.matchdict["key"])
     slaves = slave_status.get_slaves_status()
     slaves = {slave["hostname"]: _cleanup_slave_status(slave) for slave in slaves if slave is not None}
     return {"slaves": slaves}
@@ -104,7 +117,7 @@ def source_stats(request):
     id_ = request.matchdict["id"]
     sources.check_id_key(id_=id_, key=request.matchdict["key"])
     slaves = slave_status.get_source_status(id_=id_)
-    statuses = []
+    statuses: List[Dict] = []
     for slave in slaves:
         if slave is None or slave.get("filtered", False):
             continue

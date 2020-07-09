@@ -1,14 +1,23 @@
-FROM camptocamp/c2cwsgiutils:3-full
+FROM camptocamp/c2cwsgiutils:release_4
 
 WORKDIR /acceptance_tests
 
-ARG DOCKER_VERSION=1.12.0
-ARG DOCKER_COMPOSE_VERSION=1.10.0
-RUN /opt/c2cwsgiutils/install_docker.sh
+RUN apt update
+RUN apt install --assume-yes git
+
+COPY requirements.txt ./
+RUN python3 -m pip install --disable-pip-version-check --no-cache-dir --requirement=requirements.txt && \
+  rm --recursive --force /tmp/*
+
+COPY Pipfile Pipfile.lock ./
+RUN pipenv install --system --clear && \
+  rm --recursive --force /usr/local/lib/python3.8/dist-packages/tests/ /tmp/* /root/.cache/*
 
 COPY . ./
 
-RUN flake8 acceptance
+RUN ./create-test-repos
+RUN prospector
 
-ENV DOCKER_RUN 1
+VOLUME [ "/repos", "/config", "/config_master", "/config_others" ]
+
 CMD py.test -vv --color=yes --junitxml /reports/acceptance.xml acceptance

@@ -1,4 +1,6 @@
+---
 version: '2'
+
 services:
   api:
     image: camptocamp/shared_config_manager:latest
@@ -7,35 +9,69 @@ services:
       # STATSD_ADDRESS: 172.17.0.1:8125
       # STATSD_PREFIX: shared_config_manager.dev.app
       C2C_SECRET: toto
+      LOG_TYPE: console
       LOG_LEVEL: DEBUG
-      C2CWSGI_LOG_LEVEL: DEBUG
       OTHER_LOG_LEVEL: DEBUG
       C2C_REDIS_URL: redis://redis:6379
       DEVELOPMENT: 1
       GUNICORN_PARAMS: '-b :8080 --reload'
       MASTER_CONFIG: |
         type: git
-        id: master
         key: changeme
         repo: /repos/master
       API_BASE_URL: http://api:8080/scm
+      TARGET: /config/api
+      SCM_ENV_PREFIXES: TEST_
+      TEST_ENV: 42
+      TEST_KEY: secret
     volumes:
       - ./app/shared_config_manager:/app/shared_config_manager:ro
-      #- /home/pvalsecchi/src/c2cwsgiutils/c2cwsgiutils:/opt/c2cwsgiutils/c2cwsgiutils:ro
-      - ./test_repos:/repos:rw
+      #- ../c2cwsgiutils/c2cwsgiutils:/opt/c2cwsgiutils/c2cwsgiutils:ro
+    volumes_from:
+      - tests:rw
     links:
       - redis
-    ports:
-      - 8080:8080
-    hostname: master
+    hostname: api
+
+  api_inline:
+    image: camptocamp/shared_config_manager:latest
+    environment:
+      <<: *scm_env
+      MASTER_CONFIG: |
+        key: changeme
+        sources:
+          test_git:
+            type: git
+            repo: /repos/test_git
+            key: changeme
+            tags: ['test']
+            template_engines:
+              - type: shell
+                environment_variables: true
+      API_BASE_URL: http://api_inline:8080/scm
+      TARGET: /config/api-inline
+      SCM_ENV_PREFIXES: TEST_
+      TEST_ENV: 42
+      C2C_BROADCAST_PREFIX: broadcast_scm_inline_
+    volumes:
+      - ./app/shared_config_manager:/app/shared_config_manager:ro
+      #- ../c2cwsgiutils/c2cwsgiutils:/opt/c2cwsgiutils/c2cwsgiutils:ro
+    volumes_from:
+      - tests:rw
+    links:
+      - redis
+    hostname: api
 
   slave:
     image: camptocamp/shared_config_manager:latest
-    environment: *scm_env
-    command: ['/app/shared_config_slave.py']
-    volumes:
-      - ./test_repos:/repos:rw
-      #- /home/pvalsecchi/src/c2cwsgiutils/c2cwsgiutils:/opt/c2cwsgiutils/c2cwsgiutils:ro
+    environment:
+      <<: *scm_env
+      TARGET: /config/slave
+    command: ['shared-config-slave']
+    #volumes:
+    #- ../c2cwsgiutils/c2cwsgiutils:/opt/c2cwsgiutils/c2cwsgiutils:ro
+    volumes_from:
+      - tests:rw
     links:
       - redis
     hostname: slave
@@ -45,18 +81,22 @@ services:
     environment:
       <<: *scm_env
       TAG_FILTER: others
-    command: ['/app/shared_config_slave.py']
-    volumes:
-    - ./test_repos:/repos:rw
+      TARGET: /config/slave-other
+      TEST_ENV: 42
+    command: ['shared-config-slave']
+    volumes_from:
+      - tests:rw
     links:
-    - redis
+      - redis
     hostname: slave-others
-
 
   redis:
     image: redis:5
     mem_limit: 64m
-    ports:
-      - 16379:6379
     command: redis-server --save "" --appendonly no
-    user: www-data
+
+  tests:
+    image: camptocamp/shared_config_manager_acceptance:latest
+    #volumes:
+    #  - ../c2cwsgiutils/c2cwsgiutils:/opt/c2cwsgiutils/c2cwsgiutils:ro
+    command: sleep infinity

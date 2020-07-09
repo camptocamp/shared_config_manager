@@ -1,8 +1,10 @@
-#!/bin/bash -e
+#!/bin/bash -eux
 
-mkdir -p test_repos
-rm -rf test_repos/*
-cd test_repos
+git config --global user.email "ci@camptocamp.com"
+git config --global user.name "CI"
+
+mkdir /repos
+cd /repos
 
 git init master
 cd master
@@ -28,4 +30,3 @@ git add test
 git commit -a -m "Initial commit"
 git tag 1.0.0
 git tag otherTag
-cd ..

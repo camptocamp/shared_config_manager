@@ -4,8 +4,8 @@ import logging
 import os
 import tempfile
 
-from .ssh import SshBaseSource
 from . import mode
+from .ssh import SshBaseSource
 
 TEMP_DIR = tempfile.gettempdir()
 LOG = logging.getLogger(__name__)
@@ -20,21 +20,21 @@ class GitSource(SshBaseSource):
             json.dump(stats, gitstats)
 
     def _checkout(self):
-        dir = self._clone_dir()
+        cwd = self._clone_dir()
         repo = self._get_repo()
         branch = self.get_branch()
-        if os.path.isdir(os.path.join(dir, ".git")):
+        if os.path.isdir(os.path.join(cwd, ".git")):
             LOG.info("Fetching a new version of %s", repo)
-            self._exec("git", "fetch", "--depth", "1", "origin", branch, cwd=dir)
-            self._exec("git", "checkout", branch, cwd=dir)
-            self._exec("git", "reset", "--hard", f"origin/{branch}", cwd=dir)
+            self._exec("git", "fetch", "--depth", "1", "origin", branch, cwd=cwd)
+            self._exec("git", "checkout", branch, cwd=cwd)
+            self._exec("git", "reset", "--hard", f"origin/{branch}", cwd=cwd)
         elif self._do_sparse():
             LOG.info("Cloning %s (sparse)", repo)
-            self._exec("/app/git_sparse_clone", repo, branch, dir, self._config["sub_dir"], cwd=TEMP_DIR)
+            self._exec("git-sparse-clone", repo, branch, cwd, self._config["sub_dir"], cwd=TEMP_DIR)
         else:
             LOG.info("Cloning %s", repo)
-            os.makedirs(os.path.dirname(dir), exist_ok=True)
-            command = ["git", "clone", "-b", branch, "--depth", "1", repo, os.path.basename(dir)]
+            os.makedirs(os.path.dirname(cwd), exist_ok=True)
+            command = ["git", "clone", "-b", branch, "--depth", "1", repo, os.path.basename(cwd)]
             self._exec(*command, cwd=TEMP_DIR)
 
     def _get_repo(self):

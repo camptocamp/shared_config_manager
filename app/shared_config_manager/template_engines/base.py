@@ -1,13 +1,14 @@
-from c2cwsgiutils import stats
 import logging
 import os
 from typing import List
+
+from c2cwsgiutils import stats
 
 LOG = logging.getLogger(__name__)
 ENV_PREFIXES = os.environ.get("SCM_ENV_PREFIXES", "MUTUALIZED_").split(":")
 
 
-class BaseEngine(object):
+class BaseEngine:
     def __init__(self, source_id, config, extension):
         self._source_id = source_id
         self._config = config
@@ -52,7 +53,7 @@ class BaseEngine(object):
     def get_type(self):
         return self._config["type"]
 
-    def get_stats(self, stats):
+    def get_stats(self, stats):  # pylint: disable=redefined-outer-name
         if self._config.get("environment_variables", False):
             stats["environment_variables"] = _filter_env(os.environ)
 

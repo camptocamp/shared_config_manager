@@ -1,7 +1,7 @@
 import subprocess
 import tempfile
 
-from c2cwsgiutils.acceptance.connection import Connection
+from c2cwsgiutils.acceptance.connection import CacheExpected, Connection
 
 
 def test_ok(app_connection: Connection) -> None:
@@ -14,8 +14,10 @@ def test_ok(app_connection: Connection) -> None:
 
 
 def test_bad_key(app_connection):
-    app_connection.get_json("1/tarball/test_git/bad", expected_status=403)
+    app_connection.get("1/tarball/test_git/bad", expected_status=403, cache_expected=CacheExpected.DONT_CARE)
 
 
 def test_bad_id(app_connection):
-    app_connection.get_json("1/tarball/unknown/changeme", expected_status=404)
+    app_connection.get(
+        "1/tarball/unknown/changeme", expected_status=404, cache_expected=CacheExpected.DONT_CARE
+    )

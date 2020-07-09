@@ -1,16 +1,18 @@
-from c2cwsgiutils import stats
 import copy
 import logging
 import os
 import pathlib
-from pyramid.httpexceptions import HTTPForbidden
-import requests
 import shutil
 import subprocess
 import time
 from typing import Dict
 
+import requests
+from pyramid.httpexceptions import HTTPForbidden
+
+from c2cwsgiutils import stats
 from shared_config_manager import template_engines
+
 from . import mode
 
 LOG = logging.getLogger(__name__)
@@ -18,7 +20,7 @@ TARGET = os.environ.get("TARGET", "/config")
 MASTER_TARGET = os.environ.get("MASTER_TARGET", "/master_config")
 
 
-class BaseSource(object):
+class BaseSource:
     def __init__(self, id_, config, is_master, default_key):
         self._id = id_
         self._config = config
@@ -86,8 +88,8 @@ class BaseSource(object):
         while True:
             try:
                 LOG.info("Doing a fetch of %s", self.get_id())
-                r = requests.get(url, stream=True)
-                r.raise_for_status()
+                responce = requests.get(url, stream=True)
+                responce.raise_for_status()
                 if os.path.exists(path):
                     shutil.rmtree(path)
                 os.makedirs(path, exist_ok=True)
@@ -104,16 +106,16 @@ class BaseSource(object):
                     cwd=path,
                     stdin=subprocess.PIPE,
                 )
-                shutil.copyfileobj(r.raw, tar.stdin)
+                shutil.copyfileobj(responce.raw, tar.stdin)
                 tar.stdin.close()
                 assert tar.wait() == 0
                 return
-            except Exception as e:
+            except Exception as exception:
                 stats.increment_counter(["source", self.get_id(), "fetch_error"])
                 LOG.info(
                     "Error fetching the source %s from the master (will retry in 1s): %s",
                     self.get_id(),
-                    str(e),
+                    str(exception),
                 )
                 time.sleep(1)
 
@@ -183,17 +185,18 @@ class BaseSource(object):
     def delete(self):
         self.delete_target_dir()
 
-    def _exec(self, *args, **kwargs):
+    @staticmethod
+    def _exec(*args, **kwargs):
         try:
-            args = list(map(str, args))
-            LOG.debug("Running: " + " ".join(args))
-            output = subprocess.check_output(args, stderr=subprocess.STDOUT, env=dict(os.environ), **kwargs)
+            args_ = list(map(str, args))
+            LOG.debug("Running: %s", " ".join(args_))
+            output = subprocess.check_output(args_, stderr=subprocess.STDOUT, env=dict(os.environ), **kwargs)
             output = output.decode("utf-8").strip()
             if output:
                 LOG.debug(output)
             return output
-        except subprocess.CalledProcessError as e:
-            LOG.error(e.output.decode("utf-8").strip())
+        except subprocess.CalledProcessError as exception:
+            LOG.error(exception.output.decode("utf-8").strip())
             raise
 
     def is_loaded(self):

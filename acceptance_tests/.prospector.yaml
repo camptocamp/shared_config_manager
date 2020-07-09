@@ -1,0 +1,12 @@
+---
+max-line-length: 110
+
+pylint:
+  disable:
+    - wrong-import-order
+    - no-else-return
+    - broad-except
+    - unused-argument
+
+mccabe:
+  run: false

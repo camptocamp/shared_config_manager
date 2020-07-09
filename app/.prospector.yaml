@@ -1,0 +1,17 @@
+---
+strictness: veryhigh
+
+max-line-length: 110
+
+pylint:
+  disable:
+    - wrong-import-order
+    - no-else-return
+    - broad-except
+    - raising-format-tuple
+
+mccabe:
+  run: false
+
+mypy:
+  run: true

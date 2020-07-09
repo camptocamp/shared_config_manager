@@ -1,14 +1,19 @@
+from c2cwsgiutils.acceptance.connection import CacheExpected
+
+
 def test_ok(app_connection):
     answer = app_connection.get_json("1/refresh/test_git/changeme")
     assert answer == {"status": 200}
 
 
 def test_bad_key(app_connection):
-    app_connection.get_json("1/refresh/test_git/bad", expected_status=403)
+    app_connection.get("1/refresh/test_git/bad", expected_status=403, cache_expected=CacheExpected.DONT_CARE)
 
 
 def test_bad_id(app_connection):
-    app_connection.get_json("1/refresh/unknown/changeme", expected_status=404)
+    app_connection.get(
+        "1/refresh/unknown/changeme", expected_status=404, cache_expected=CacheExpected.DONT_CARE
+    )
 
 
 def test_webhook(app_connection):
@@ -63,4 +68,4 @@ def test_all_webhook(app_connection):
 
 
 def test_all_bad_key(app_connection):
-    app_connection.get_json("1/refresh/bad", expected_status=403)
+    app_connection.get("1/refresh/bad", expected_status=403, cache_expected=CacheExpected.DONT_CARE)

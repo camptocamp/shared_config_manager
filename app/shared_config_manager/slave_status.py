@@ -12,6 +12,6 @@ def get_slaves_status():
 def get_source_status(id_):
     source = sources.get_source(id_)
     if source is None:
-        return {"filtered": id_ in sources.filtered_sources}
+        return {"filtered": id_ in sources.FILTERED_SOURCES}
     else:
         return source.get_stats()

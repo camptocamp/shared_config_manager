@@ -1,13 +1,14 @@
 import os
-import pytest
 import subprocess
 
-from acceptance import wait_sync, get_hash
+import pytest
+
+from acceptance import get_hash, wait_sync
 
 
 @pytest.yield_fixture()
-def git_source(app_connection, test_repos):
-    with open(os.path.join(test_repos, "master", "shared_config_manager.yaml"), "a") as config:
+def git_source(app_connection):
+    with open("/repos/master/shared_config_manager.yaml", "a") as config:
         config.write(
             """\
   other:
@@ -25,7 +26,7 @@ def git_source(app_connection, test_repos):
     subprocess.check_call(
         f"""
     set -e
-    cd {test_repos}
+    cd /repos
 
     cd master
     git commit -a -m "Added other"
@@ -40,20 +41,20 @@ def git_source(app_connection, test_repos):
         shell=True,
     )
 
-    master_hash = get_hash(os.path.join(test_repos, "master"))
-    other_hash = get_hash(os.path.join(test_repos, "other"))
+    master_hash = get_hash("/repos/master")
+    other_hash = get_hash("/repos/other")
 
     app_connection.get_json("1/refresh/master/changeme")
 
     wait_sync(app_connection, "master", master_hash)
     wait_sync(app_connection, "other", other_hash)
 
-    yield os.path.join(test_repos, "other")
+    yield "/repos/other"
 
     subprocess.check_call(
         f"""
     set -e
-    cd {test_repos}
+    cd /repos
     rm -rf other
 
     cd master
@@ -66,12 +67,15 @@ def git_source(app_connection, test_repos):
     wait_sync(app_connection, "other", None)
 
     for slave in ("api", "slave"):
-        assert not os.path.exists(os.path.join("/tmp", "slaves", slave, "other"))
+        assert not os.path.exists(os.path.join("/config", slave, "other"))
 
 
 def test_ok(app_connection, git_source):
     for slave in ("api", "slave"):
-        with open(os.path.join("/tmp", "slaves", slave, "other", "config.txt")) as config:
+        assert slave in os.listdir("/config")
+        assert "other" in os.listdir(os.path.join("/config", slave))
+        assert "config.txt" in os.listdir(os.path.join("/config", slave, "other"))
+        with open(os.path.join("/config", slave, "other", "config.txt")) as config:
             assert config.read() == "content world"
 
     subprocess.check_call(
@@ -84,10 +88,10 @@ def test_ok(app_connection, git_source):
         shell=True,
     )
 
-    hash = get_hash(git_source)
+    hash_ = get_hash(git_source)
     app_connection.get_json("1/refresh/other/changeme")
-    wait_sync(app_connection, "other", hash)
+    wait_sync(app_connection, "other", hash_)
 
     for slave in ("api", "slave"):
-        with open(os.path.join("/tmp", "slaves", slave, "other", "config.txt")) as config:
+        with open(os.path.join("/config", slave, "other", "config.txt")) as config:
             assert config.read() == "content modified"

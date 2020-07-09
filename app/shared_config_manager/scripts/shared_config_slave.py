@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
-from c2cwsgiutils import setup_process  # noqa  # pylint: disable=unused-import
+import logging
 import signal
+import sys
 import time
+
+from c2cwsgiutils import setup_process
+
+from shared_config_manager import slave_status  # noqa: F401, pylint: disable=unused-import
+from shared_config_manager import sources
+
+setup_process.init()
 
 
 def main():
     signal.signal(signal.SIGTERM, _sig_term)
-    from shared_config_manager import sources, slave_status
 
     sources.init(slave=True)
     while True:
@@ -14,10 +21,8 @@ def main():
 
 
 def _sig_term(signum, frame):
-    import logging
-
     logging.getLogger("shared_config_slave").info("Got a SIGTERM, stopping the slave")
-    exit(0)
+    sys.exit(0)
 
 
 if __name__ == "__main__":

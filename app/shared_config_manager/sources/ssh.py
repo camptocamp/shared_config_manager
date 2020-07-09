@@ -38,7 +38,8 @@ class SshBaseSource(BaseSource):
             with open(os.path.join(ssh_path, "config"), "a") as config:
                 config.write(f"IdentityFile {key_path}\n")
 
-    def _ssh_path(self):
+    @staticmethod
+    def _ssh_path():
         return os.path.join(os.environ["HOME"], ".ssh")
 
     def get_stats(self):

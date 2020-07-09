@@ -89,7 +89,7 @@ See [https://github.com/camptocamp/c2cwsgiutils] for other parameters.
 * `sub_dir`: if only a sub_directory of the repository needs to be copied (defaults to the root of the
   repository)
 * `sparse`: if true (the default) and `sub_dir` is defined, will use a sparse clone. Disable that if you have multiple
-            sources using the same repository (will avoid cloning it for each sources).  
+            sources using the same repository (will avoid cloning it for each sources).
 
 #### Rsync source configuration parameters
 
@@ -118,7 +118,7 @@ See [https://github.com/camptocamp/c2cwsgiutils] for other parameters.
 
 By default the image starts a WSGI server listening on port 8080. In big deployments a full WSGI server
 could use a sizeable amount of RAM. So you could have only a couple of such containers and the rest running
-as slaves. For that, change the command run by the container to `/app/shared_config_slave.py`.
+as slaves. For that, change the command run by the container to `shared-config-slave`.
 
 
 ## Example docker-compose for Rancher
@@ -148,7 +148,7 @@ services:
   scm_slave:
     image: camptocamp/shared_config_manager:latest
     environment: *scm_env
-    command: ['/app/shared_config_slave.py']
+    command: ['shared-config-slave']
     volumes:
       - /usr/local/tomcat/webapps/ROOT/print-apps
     links:

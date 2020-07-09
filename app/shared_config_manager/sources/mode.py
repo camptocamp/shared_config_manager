@@ -4,7 +4,7 @@ API_BASE_URL = None
 
 
 def init(slave: bool) -> None:
-    global API_BASE_URL
+    global API_BASE_URL  # pylint: disable=global-statement
     if slave:
         API_BASE_URL = os.environ["API_BASE_URL"]
         if API_BASE_URL is not None and not API_BASE_URL.endswith("/"):
@@ -12,7 +12,7 @@ def init(slave: bool) -> None:
 
 
 def is_master() -> bool:
-    global API_BASE_URL
+    global API_BASE_URL  # pylint: disable=global-statement
     return API_BASE_URL is None
 
 

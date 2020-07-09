@@ -1,6 +1,4 @@
-from setuptools import setup, find_packages
-
-requires = []
+from setuptools import find_packages, setup
 
 
 def long_description():
@@ -12,7 +10,7 @@ def long_description():
 
 setup(
     name="shared_config_manager",
-    version="0.0",
+    version="1.0",
     description="Shared Config Manager",
     long_description=long_description(),
     classifiers=[
@@ -28,10 +26,11 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    install_requires=requires,
-    tests_require=requires,
-    entry_points="""\
-      [paste.app_factory]
-      main = shared_config_manager:main
-      """,
+    install_requires=[],
+    tests_require=[],
+    entry_points={
+        "console_scripts": ["shared-config-slave = shared_config_manager.scripts.shared_config_slave:main"],
+        "paste.app_factory": ["main = shared_config_manager:main"],
+    },
+    scripts=["scripts/scm-is-ready", "scripts/git-sparse-clone"],
 )
