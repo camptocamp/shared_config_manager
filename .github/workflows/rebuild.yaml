@@ -47,9 +47,13 @@ jobs:
           ' bash -c 'docker login -u $USER -p $PASS'
 
           tag=${{matrix.branch}}
-          if [[ "$tag" == "master" ]]
+          if [[ "${tag}" == "master" ]]
           then
             tag=latest
+          fi
+          if [[ "${tag}" =~ ^release_([0-9]+)$ ]]
+          then
+            tag="${BASH_REMATCH[1]}"
           fi
 
           if [[ "$tag" != "latest" ]]
