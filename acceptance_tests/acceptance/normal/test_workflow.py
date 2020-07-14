@@ -1,5 +1,6 @@
 import os
 import subprocess
+import time
 
 import pytest
 
@@ -25,7 +26,7 @@ def git_source(app_connection):
 
     subprocess.check_call(
         f"""
-    set -e
+    set -eaux
     cd /repos
 
     cd master
@@ -49,11 +50,13 @@ def git_source(app_connection):
     wait_sync(app_connection, "master", master_hash)
     wait_sync(app_connection, "other", other_hash)
 
+    time.sleep(0.1)
+
     yield "/repos/other"
 
     subprocess.check_call(
         f"""
-    set -e
+    set -eaux
     cd /repos
     rm -rf other
 
@@ -80,10 +83,10 @@ def test_ok(app_connection, git_source):
 
     subprocess.check_call(
         f"""
-    set -e
+    set -eaux
     cd {git_source}
     echo -n "content modified" > config.txt.mako
-    git commit -a -m "Second commit"
+    git commit --all --message="Second commit"
     """,
         shell=True,
     )
@@ -91,6 +94,8 @@ def test_ok(app_connection, git_source):
     hash_ = get_hash(git_source)
     app_connection.get_json("1/refresh/other/changeme")
     wait_sync(app_connection, "other", hash_)
+
+    time.sleep(0.1)
 
     for slave in ("api", "slave"):
         with open(os.path.join("/config", slave, "other", "config.txt")) as config:

@@ -8,9 +8,9 @@ import time
 from typing import Dict
 
 import requests
+from c2cwsgiutils import stats
 from pyramid.httpexceptions import HTTPForbidden
 
-from c2cwsgiutils import stats
 from shared_config_manager import template_engines
 
 from . import mode
@@ -106,8 +106,8 @@ class BaseSource:
                     cwd=path,
                     stdin=subprocess.PIPE,
                 )
-                shutil.copyfileobj(responce.raw, tar.stdin)
-                tar.stdin.close()
+                shutil.copyfileobj(responce.raw, tar.stdin)  # type: ignore
+                tar.stdin.close()  # type: ignore
                 assert tar.wait() == 0
                 return
             except Exception as exception:

@@ -3,10 +3,9 @@ import os
 import subprocess
 from typing import Dict, List, cast
 
+from c2cwsgiutils import services
 from pyramid.httpexceptions import HTTPNotFound, HTTPServerError
 from pyramid.response import Response
-
-from c2cwsgiutils import services
 
 from . import slave_status, sources
 
@@ -161,7 +160,7 @@ def tarball(request):
 
 def _proc_iter(proc: subprocess.Popen):
     while True:
-        block = proc.stdout.read(4096)
+        block = proc.stdout.read(4096)  # type: ignore
         if not block:
             break
         yield block
