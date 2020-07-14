@@ -1,5 +1,6 @@
 import os
 import subprocess
+import time
 
 import pytest
 
@@ -49,6 +50,8 @@ def git_source(app_connection):
     wait_sync(app_connection, "master", master_hash)
     wait_sync(app_connection, "other", other_hash)
 
+    time.sleep(0.1)
+
     yield "/repos/other"
 
     subprocess.check_call(
@@ -91,6 +94,8 @@ def test_ok(app_connection, git_source):
     hash_ = get_hash(git_source)
     app_connection.get_json("1/refresh/other/changeme")
     wait_sync(app_connection, "other", hash_)
+
+    time.sleep(0.1)
 
     for slave in ("api", "slave"):
         with open(os.path.join("/config", slave, "other", "config.txt")) as config:
