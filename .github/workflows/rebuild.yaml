@@ -39,6 +39,9 @@ jobs:
       - name: Acceptance
         run: make acceptance
 
+      - run: docker-compose logs
+        if: failure()
+
       - name: Release
         run: |
           summon --yaml '
