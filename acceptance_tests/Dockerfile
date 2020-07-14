@@ -18,6 +18,6 @@ COPY . ./
 RUN ./create-test-repos
 RUN prospector
 
-VOLUME [ "/repos", "/config", "/config_master", "/config_others" ]
+VOLUME [ "/repos", "/config" ]
 
 CMD py.test -vv --color=yes --junitxml /reports/acceptance.xml acceptance
