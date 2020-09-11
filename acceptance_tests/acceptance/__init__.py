@@ -10,7 +10,7 @@ def wait_sync(app_connection, name, hash_):
             if hash_ is None:
                 if name in slave["sources"]:
                     raise RuntimeError(f"{name} still found in sources")
-                print("Name '{}' found in sources".format(name))
+                print("Name '{}' still found in sources".format(name))
             else:
                 if name not in slave["sources"]:
                     raise RuntimeError(f"{name} not in {slave['sources'].keys()}")
