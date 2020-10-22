@@ -6,18 +6,18 @@ updates:
     schedule:
       interval: weekly
       time: '02:00'
-- package-ecosystem: pip
-  directory: "/"
-  schedule:
-    interval: daily
-    time: '02:00'
-- package-ecosystem: pip
-  directory: "/app"
-  schedule:
-    interval: daily
-    time: '02:00'
-- package-ecosystem: pip
-  directory: "/acceptance_tests"
-  schedule:
-    interval: daily
-    time: '02:00'
+  - package-ecosystem: pip
+    directory: "/"
+    schedule:
+      interval: daily
+      time: '02:00'
+  - package-ecosystem: pip
+    directory: "/app"
+    schedule:
+      interval: daily
+      time: '02:00'
+  - package-ecosystem: pip
+    directory: "/acceptance_tests"
+    schedule:
+      interval: daily
+      time: '02:00'
