@@ -30,8 +30,8 @@ push: build
 
 .PHONY: build_app
 build_app:
-	docker build --target=tests --tag=$(DOCKER_BASE):tests --build-arg="GIT_HASH=$(GIT_HASH)" app
-	docker build --tag=$(DOCKER_BASE):$(DOCKER_TAG) --build-arg="GIT_HASH=$(GIT_HASH)" app
+	docker build --tag=$(DOCKER_BASE):$(DOCKER_TAG) --build-arg="GIT_HASH=$(GIT_HASH)" \
+		--build-arg="PRIVATE_SSH_KEY=$(shell echo ${PRIVATE_SSH_KEY})" app
 
 .PHONY: build_acceptance
 build_acceptance:
