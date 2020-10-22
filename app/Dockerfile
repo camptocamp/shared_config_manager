@@ -24,6 +24,9 @@ COPY . /app
 
 ARG GIT_HASH
 
+ARG PRIVATE_SSH_KEY
+ENV PRIVATE_SSH_KEY=${PRIVATE_SSH_KEY}
+
 RUN pip3 install --no-cache-dir -e . && \
     c2cwsgiutils_genversion.py $GIT_HASH && \
     flake8 shared_config_manager tests && \
