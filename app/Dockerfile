@@ -51,7 +51,11 @@ ENV GUNICORN_PARAMS="-b :8080 --workers 1 --worker-class gthread --threads 10" \
     LOG_TYPE=json \
     C2C_BROADCAST_PREFIX=broadcast_scm_
 
+
 FROM base AS tests
+
+ARG PRIVATE_SSH_KEY
+ENV PRIVATE_SSH_KEY=${PRIVATE_SSH_KEY}
 
 RUN pipenv install --system --clear --dev
 COPY .prospector.yaml ./
@@ -59,5 +63,6 @@ COPY setup.cfg ./
 COPY tests/ ./tests/
 RUN prospector
 RUN pytest -vv --cov=shared_config_manager --color=yes tests
+
 
 FROM base AS runner
