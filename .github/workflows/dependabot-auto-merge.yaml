@@ -1,5 +1,4 @@
 ---
-
 name: Auto merge Dependabot updates
 
 on:
@@ -18,4 +17,4 @@ jobs:
       - uses: ridedott/merge-me-action@master
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MERGE_METHOD: dependabot-preview
+          MERGE_METHOD: dependabot
