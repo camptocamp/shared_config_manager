@@ -33,9 +33,13 @@ jobs:
 
       - name: Build
         run: make build
+        env:
+          PRIVATE_SSH_KEY: ${{secrets.PRIVATE_SSH_KEY}}
 
       - name: Acceptance
         run: make acceptance
+        env:
+          PRIVATE_SSH_KEY: ${{secrets.PRIVATE_SSH_KEY}}
 
       - name: Release
         run: |
