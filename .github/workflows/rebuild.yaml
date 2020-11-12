@@ -11,6 +11,7 @@ env:
 
 jobs:
   rebuild:
+    name: Nightly
     runs-on: ubuntu-20.04
     timeout-minutes: 15
 
