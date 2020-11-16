@@ -21,6 +21,7 @@ jobs:
         branch:
           - release_1
           - release_2
+          - master
 
     steps:
       - uses: actions/checkout@v1
