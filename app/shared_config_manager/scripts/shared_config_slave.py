@@ -5,8 +5,6 @@ import sys
 import time
 
 from c2cwsgiutils import setup_process
-
-from shared_config_manager import slave_status  # noqa: F401, pylint: disable=unused-import
 from shared_config_manager import sources
 
 setup_process.init()
