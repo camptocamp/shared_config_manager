@@ -7,7 +7,7 @@ from c2cwsgiutils import services
 from pyramid.httpexceptions import HTTPNotFound, HTTPServerError
 from pyramid.response import Response
 
-from . import slave_status, sources
+from shared_config_manager import slave_status, sources
 
 refresh_service = services.create("refresh", "/1/refresh/{id}/{key}")
 refresh_all_service = services.create("refresh_all", "/1/refresh/{key}")

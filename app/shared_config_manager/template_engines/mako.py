@@ -1,5 +1,6 @@
-from .base import BaseEngine
 import mako.template
+
+from .base import BaseEngine
 
 
 class MakoEngine(BaseEngine):

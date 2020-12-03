@@ -7,9 +7,8 @@ from threading import Thread
 from typing import Any, Dict, Mapping, Optional, Tuple
 
 import yaml
-from pyramid.httpexceptions import HTTPBadRequest, HTTPForbidden, HTTPNotFound
-
 from c2cwsgiutils import broadcast
+from pyramid.httpexceptions import HTTPBadRequest, HTTPForbidden, HTTPNotFound
 
 from . import base, git, mode, rclone, rsync
 

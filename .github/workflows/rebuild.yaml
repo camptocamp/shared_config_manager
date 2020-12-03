@@ -32,7 +32,7 @@ jobs:
         with:
           ci-gpg-private-key: ${{secrets.CI_GPG_PRIVATE_KEY}}
           github-gopass-ci-token: ${{secrets.GOPASS_CI_GITHUB_TOKEN}}
-          patterns: pypi docker
+          patterns: docker
 
       - run: |
           sudo rm /etc/apt/sources.list.d/*.list
@@ -58,4 +58,4 @@ jobs:
           PRIVATE_SSH_KEY: ${{secrets.PRIVATE_SSH_KEY}}
 
       - name: Publish
-        run: c2cciutils-publish --version=${{github.ref}}
+        run: c2cciutils-publish --branch=${{ matrix.branch }}

@@ -1,7 +1,8 @@
 import os
-import pytest
 import subprocess
 import tempfile
+
+import pytest
 
 from shared_config_manager import sources
 

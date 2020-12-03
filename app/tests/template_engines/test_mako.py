@@ -1,5 +1,5 @@
-import pathlib
 import os
+import pathlib
 
 from shared_config_manager import template_engines
 

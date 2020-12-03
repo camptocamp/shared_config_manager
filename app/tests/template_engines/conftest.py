@@ -1,6 +1,7 @@
-import pytest
 import shutil
 from tempfile import mkdtemp
+
+import pytest
 
 
 @pytest.yield_fixture()
