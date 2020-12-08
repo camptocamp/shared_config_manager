@@ -58,4 +58,4 @@ jobs:
           PRIVATE_SSH_KEY: ${{secrets.PRIVATE_SSH_KEY}}
 
       - name: Publish
-        run: c2cciutils-publish --branch=${{ matrix.branch }}
+        run: c2cciutils-publish --type=rebuild --branch=${{ matrix.branch }}
