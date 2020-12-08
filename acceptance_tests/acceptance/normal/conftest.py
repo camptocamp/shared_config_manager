@@ -16,7 +16,9 @@ def wait_slaves():
         if r.status_code == 200:
             json = r.json()
             if len(json["slaves"]) != 3:
-                raise Exception(f"Not seeing 3 slaves but {len(json['slaves'])}.",)
+                raise Exception(
+                    f"Not seeing 3 slaves but {len(json['slaves'])}.",
+                )
             for name, status in json["slaves"].items():
                 if name == "slave-others":
                     if set(status["sources"].keys()) != {"master"}:

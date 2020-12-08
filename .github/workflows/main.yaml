@@ -1,32 +1,20 @@
 ---
-name: Nightly
+name: Build
 
 on:
-  schedule:
-    - cron: '45 3 * * *'
+  push:
 
 env:
   IN_CI: '1'
-  SUMMON_PROVIDER: /usr/local/bin/gopass
 
 jobs:
-  rebuild:
-    name: Nightly
+  build:
+    name: Build
     runs-on: ubuntu-20.04
     timeout-minutes: 15
 
-    strategy:
-      fail-fast: false
-      matrix:
-        branch:
-          - release_1
-          - release_2
-          - master
-
     steps:
       - uses: actions/checkout@v2
-        with:
-          ref: ${{ matrix.branch }}
 
       - uses: camptocamp/initialise-gopass-summon-action@v2
         with:
@@ -38,7 +26,6 @@ jobs:
           sudo rm /etc/apt/sources.list.d/*.list
           sudo apt update
           sudo apt install --yes python3-wheel
-
       - run: sudo python3 -m pip install --requirement=ci/requirements.txt
 
       - name: Checks
@@ -57,5 +44,8 @@ jobs:
         env:
           PRIVATE_SSH_KEY: ${{secrets.PRIVATE_SSH_KEY}}
 
+      - run: docker-compose logs
+        if: failure()
+
       - name: Publish
-        run: c2cciutils-publish --branch=${{ matrix.branch }}
+        run: c2cciutils-publish

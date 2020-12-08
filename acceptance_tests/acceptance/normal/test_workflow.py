@@ -3,7 +3,6 @@ import subprocess
 import time
 
 import pytest
-
 from acceptance import get_hash, wait_sync
 
 

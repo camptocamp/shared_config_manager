@@ -1,7 +1,7 @@
-from .base import BaseSource
-
 import os
 import re
+
+from .base import BaseSource
 
 
 class RcloneSource(BaseSource):

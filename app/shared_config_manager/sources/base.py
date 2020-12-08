@@ -88,8 +88,8 @@ class BaseSource:
         while True:
             try:
                 LOG.info("Doing a fetch of %s", self.get_id())
-                responce = requests.get(url, stream=True)
-                responce.raise_for_status()
+                response = requests.get(url, stream=True)
+                response.raise_for_status()
                 if os.path.exists(path):
                     shutil.rmtree(path)
                 os.makedirs(path, exist_ok=True)
@@ -106,7 +106,7 @@ class BaseSource:
                     cwd=path,
                     stdin=subprocess.PIPE,
                 )
-                shutil.copyfileobj(responce.raw, tar.stdin)  # type: ignore
+                shutil.copyfileobj(response.raw, tar.stdin)  # type: ignore
                 tar.stdin.close()  # type: ignore
                 assert tar.wait() == 0
                 return
