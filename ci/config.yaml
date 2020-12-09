@@ -11,4 +11,5 @@ checks:
       - '3'
 
 publish:
-  pypi: False
+  pypi:
+    packages: []
