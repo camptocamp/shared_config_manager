@@ -9,3 +9,6 @@ checks:
   versions:
     extra_versions:
       - '3'
+
+publish:
+  pypi: False
