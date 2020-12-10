@@ -8,6 +8,13 @@ on:
       - ready_for_review
       - reopened
       - unlocked
+  workflow_run:
+    workflows:
+      - Continuous integration
+      - CodeQL scanning
+    types:
+      - completed
+
 jobs:
   auto-merge:
     name: Auto merge Dependabot updates
