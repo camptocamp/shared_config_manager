@@ -6,9 +6,10 @@ version:
       to: '3'
 
 checks:
-  versions:
-    extra_versions:
-      - '3'
+  versions: False
+  codespell: False
+  isort: False
+  black: False
 
 publish:
   pypi:

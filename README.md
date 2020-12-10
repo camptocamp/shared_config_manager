@@ -89,7 +89,7 @@ See [https://github.com/camptocamp/c2cwsgiutils] for other parameters.
 * `sub_dir`: if only a sub_directory of the repository needs to be copied (defaults to the root of the
   repository)
 * `sparse`: if true (the default) and `sub_dir` is defined, will use a sparse clone. Disable that if you have multiple
-            sources using the same repository (will avoid cloning it for each sources).  
+            sources using the same repository (will avoid cloning it for each sources).
 
 #### Rsync source configuration parameters
 
