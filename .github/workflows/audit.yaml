@@ -38,3 +38,5 @@ jobs:
 
       - name: Audit
         run: c2cciutils-audit --branch=${{ matrix.branch }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
