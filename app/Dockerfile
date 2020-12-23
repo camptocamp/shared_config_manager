@@ -25,9 +25,9 @@ RUN python3 -m pip install --disable-pip-version-check --no-cache-dir --requirem
 
 COPY Pipfile Pipfile.lock ./
 RUN pipenv install --system --clear && \
-    rm --recursive --force /usr/local/lib/python3.8/dist-packages/tests/ /tmp/* /root/.cache/* && \
-    python3 -m compileall -q /usr/local/lib/python3.8 \
-    -x '/usr/local/lib/python3.8/dist-packages/pipenv/'
+    rm --recursive --force /usr/local/lib/python3.*/dist-packages/tests/ /tmp/* /root/.cache/* && \
+    python3 -m compileall -q /usr/local/lib/python3.* \
+    -x /usr/local/lib/python3.*/dist-packages/pipenv/
 
 # Copy the rest of the files (watch for the .dockerignore)
 COPY setup.py production.ini ./
@@ -46,7 +46,7 @@ RUN python3 -m pip install --no-cache-dir --editable=. && \
     python3 -m compileall -q . && \
     rm -rf /tmp/* /master_config/* /config/*
 
-ENV GUNICORN_PARAMS="-b :8080 --workers 1 --worker-class gthread --threads 10" \
+ENV GUNICORN_PARAMS="--bind=:8080 --workers=1 --worker-class=gthread --threads=10" \
     LOG_LEVEL=WARN \
     LOG_TYPE=json \
     C2C_BROADCAST_PREFIX=broadcast_scm_
