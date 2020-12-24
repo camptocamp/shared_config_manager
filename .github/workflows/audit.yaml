@@ -30,7 +30,7 @@ jobs:
         if: always()
 
       - run: echo "${HOME}/.local/bin" >> ${GITHUB_PATH}
-      - run: python3 -m pip install --user --editable=.
+      - run: python3 -m pip install --user --requirement=ci/requirements.txt
 
       - name: Audit
         run: c2cciutils-audit --branch=${{ matrix.branch }}
