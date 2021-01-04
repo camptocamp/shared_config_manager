@@ -15,7 +15,6 @@ jobs:
       fail-fast: false
       matrix:
         branch:
-          - release_1
           - release_2
           - master
 
