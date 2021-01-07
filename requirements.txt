@@ -1,2 +1,2 @@
-c2cwsgiutils==4.1.0
+c2cwsgiutils==4.1.1
 yamllint==1.25.0
