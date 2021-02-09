@@ -1,5 +1,5 @@
 import logging
-import os
+import os.path
 import subprocess
 from typing import Dict, List, cast
 
@@ -19,7 +19,10 @@ LOG = logging.getLogger(__name__)
 
 @refresh_service.get()
 def refresh(request):
-    sources.check_id_key(id_=request.matchdict["id"], key=request.matchdict["key"])
+    id_ = request.matchdict["id"]
+    source, _ = sources.check_id_key(id_=id_, key=request.matchdict["key"])
+    if source is None:
+        raise HTTPNotFound(f"Unknown id {id_}")
     return _refresh(request)
 
 
@@ -27,9 +30,11 @@ def refresh(request):
 def refresh_webhook(request):
     id_ = request.matchdict["id"]
     source, _ = sources.check_id_key(id_=id_, key=request.matchdict["key"])
+    if source is None:
+        raise HTTPNotFound(f"Unknown id {id_}")
 
     if source.get_type() != "git":
-        raise HTTPServerError("Non GIT source %s cannot be refreshed by a webhook", id_)
+        raise HTTPServerError(f"Non GIT source {id_} cannot be refreshed by a webhook")
 
     source_git = cast(sources.git.GitSource, source)
 
@@ -39,7 +44,7 @@ def refresh_webhook(request):
 
     ref = request.json.get("ref")
     if ref is None:
-        raise HTTPServerError("Webhook for %s is missing the ref", id_)
+        raise HTTPServerError(f"Webhook for {id_} is missing the ref")
     if ref != "refs/heads/" + source_git.get_branch():
         LOG.info("Ignoring webhook notif for non-matching branch %s on %s", source_git.get_branch(), id_)
         return {"status": 200, "ignored": True, "reason": f"Not {source_git.get_branch()} branch"}
@@ -114,7 +119,9 @@ def stats(request):
 @source_stats_service.get()
 def source_stats(request):
     id_ = request.matchdict["id"]
-    sources.check_id_key(id_=id_, key=request.matchdict["key"])
+    source, _ = sources.check_id_key(id_=id_, key=request.matchdict["key"])
+    if source is None:
+        raise HTTPNotFound(f"Unknown id {id_}")
     slaves = slave_status.get_source_status(id_=id_)
     statuses: List[Dict] = []
     for slave in slaves:
@@ -136,11 +143,18 @@ def _cleanup_slave_status(status):
 
 @tarball_service.get()
 def tarball(request):
-    source, filtered = sources.check_id_key(id_=request.matchdict["id"], key=request.matchdict["key"])
+    id_ = request.matchdict["id"]
+    source, filtered = sources.check_id_key(id_=id_, key=request.matchdict["key"])
+    if source is None:
+        raise HTTPNotFound(f"Unknown id {id_}")
     if not source.is_loaded():
         raise HTTPNotFound("Not loaded yet")
     assert not filtered
     path = source.get_path()
+
+    if not os.path.isdir(path):
+        LOG.error("The path %s does not exists or is not a path, for the source %s.", path, source.get_id())
+        raise HTTPNotFound("Not loaded yet: path didn't exists")
 
     response: Response = request.response
 
