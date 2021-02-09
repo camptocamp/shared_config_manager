@@ -4,9 +4,6 @@ name: Continuous integration
 on:
   push:
 
-env:
-  IN_CI: '1'
-
 jobs:
   build:
     name: Continuous integration
