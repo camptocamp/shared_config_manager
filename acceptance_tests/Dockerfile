@@ -2,8 +2,8 @@ FROM camptocamp/c2cwsgiutils:release_4
 
 WORKDIR /acceptance_tests
 
-RUN apt update
-RUN apt install --assume-yes git
+RUN apt-get update
+RUN apt-get install --assume-yes git
 
 COPY requirements.txt ./
 RUN python3 -m pip install --disable-pip-version-check --no-cache-dir --requirement=requirements.txt && \

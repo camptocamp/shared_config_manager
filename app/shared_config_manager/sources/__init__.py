@@ -44,6 +44,7 @@ def init(slave: bool) -> None:
     if content.get("sources", False):
         LOG.info("The master config is inline")
         # A fake master source to have auth work
+        content["standalone"] = True
         MASTER_SOURCE = base.BaseSource(MASTER_ID, content, is_master=True, default_key=content.get("key"))
         Thread(target=_handle_master_config, args=[content], name="master_config_loader", daemon=True).start()
     else:
@@ -153,7 +154,9 @@ def _slave_fetch(id_, key):
     """
     source, filtered = check_id_key(id_, key)
     if filtered and not mode.is_master():
+        LOG.info("The reloading the %s config is filtred", id_)
         return
+    LOG.info("Reloading the %s config from event", id_)
     source.fetch()
     if source.is_master() and (not MASTER_SOURCE or not MASTER_SOURCE.get_config().get("standalone", False)):
         reload_master_config()

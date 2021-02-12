@@ -1,5 +1,5 @@
 import logging
-import os
+import os.path
 import subprocess
 from typing import Dict, List, cast
 
@@ -29,7 +29,7 @@ def refresh_webhook(request):
     source, _ = sources.check_id_key(id_=id_, key=request.matchdict["key"])
 
     if source.get_type() != "git":
-        raise HTTPServerError("Non GIT source %s cannot be refreshed by a webhook", id_)
+        raise HTTPServerError(f"Non GIT source {id_} cannot be refreshed by a webhook")
 
     source_git = cast(sources.git.GitSource, source)
 
@@ -39,7 +39,7 @@ def refresh_webhook(request):
 
     ref = request.json.get("ref")
     if ref is None:
-        raise HTTPServerError("Webhook for %s is missing the ref", id_)
+        raise HTTPServerError(f"Webhook for {id_} is missing the ref")
     if ref != "refs/heads/" + source_git.get_branch():
         LOG.info("Ignoring webhook notif for non-matching branch %s on %s", source_git.get_branch(), id_)
         return {"status": 200, "ignored": True, "reason": f"Not {source_git.get_branch()} branch"}
@@ -141,6 +141,10 @@ def tarball(request):
         raise HTTPNotFound("Not loaded yet")
     assert not filtered
     path = source.get_path()
+
+    if not os.path.isdir(path):
+        LOG.error("The path %s does not exists or is not a path, for the source %s.", path, source.get_id())
+        raise HTTPNotFound("Not loaded yet: path didn't exists")
 
     response: Response = request.response
 

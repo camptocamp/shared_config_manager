@@ -12,9 +12,9 @@ EXPOSE 8080
 RUN curl https://downloads.rclone.org/v1.52.2/rclone-v1.52.2-linux-amd64.deb > /tmp/rclone.deb && \
     dpkg -i /tmp/rclone.deb && \
     rm /tmp/rclone.deb && \
-    apt update && \
-    apt install --assume-yes --no-install-recommends git ssh rsync gettext-base && \
-    apt clean && \
+    apt-get update && \
+    apt-get install --assume-yes --no-install-recommends git ssh rsync gettext-base && \
+    apt-get clean && \
     rm -r /var/lib/apt/lists/* && \
     echo "    VerifyHostKeyDNS yes" >> /etc/ssh/ssh_config && \
     echo "    StrictHostKeyChecking no" >> /etc/ssh/ssh_config  # TODO: find better
@@ -47,7 +47,10 @@ RUN python3 -m pip install --no-cache-dir --editable=. && \
     rm -rf /tmp/* /master_config/* /config/*
 
 ENV GUNICORN_PARAMS="--bind=:8080 --workers=1 --worker-class=gthread --threads=10" \
-    LOG_LEVEL=WARN \
+    OTHER_LOG_LEVEL=WARN \
+    GUNICORN_LOG_LEVEL=WARN \
+    C2CWSGIUTILS_LOG_LEVEL=WARN \
+    LOG_LEVEL=INFO \
     LOG_TYPE=json \
     C2C_BROADCAST_PREFIX=broadcast_scm_
 

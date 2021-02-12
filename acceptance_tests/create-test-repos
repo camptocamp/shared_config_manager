@@ -8,7 +8,7 @@ cd /repos
 
 git init master
 cd master
-cat > shared_config_manager.yaml <<END
+cat >shared_config_manager.yaml <<END
 sources:
   test_git:
     type: git
@@ -20,13 +20,13 @@ sources:
         environment_variables: true
 END
 git add shared_config_manager.yaml
-git commit -a -m "Initial commit"
+git commit --message="Initial commit"
 cd ..
 
 git init test_git
 cd test_git
-echo "Hello world" > test
+echo "Hello world" >test
 git add test
-git commit -a -m "Initial commit"
+git commit --message="Initial commit"
 git tag 1.0.0
 git tag otherTag

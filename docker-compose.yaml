@@ -11,6 +11,7 @@ services:
       C2C_SECRET: toto
       LOG_TYPE: console
       LOG_LEVEL: DEBUG
+      C2CWSGIUTILS_LOG_LEVEL: INFO
       OTHER_LOG_LEVEL: DEBUG
       C2C_REDIS_URL: redis://redis:6379
       DEVELOPMENT: 1
@@ -52,7 +53,7 @@ services:
       TARGET: /config/api-inline
       SCM_ENV_PREFIXES: TEST_
       TEST_ENV: 42
-      C2C_BROADCAST_PREFIX: broadcast_scm_inline_
+      #C2C_BROADCAST_PREFIX: broadcast_scm_inline_
     volumes:
       - ./app/shared_config_manager:/app/shared_config_manager:ro
       #- ../c2cwsgiutils/c2cwsgiutils:/opt/c2cwsgiutils/c2cwsgiutils:ro
@@ -68,8 +69,9 @@ services:
       <<: *scm_env
       TARGET: /config/slave
     command: ['shared-config-slave']
-    #volumes:
-    #- ../c2cwsgiutils/c2cwsgiutils:/opt/c2cwsgiutils/c2cwsgiutils:ro
+    volumes:
+      - ./app/shared_config_manager:/app/shared_config_manager:ro
+      #- ../c2cwsgiutils/c2cwsgiutils:/opt/c2cwsgiutils/c2cwsgiutils:ro
     volumes_from:
       - tests:rw
     links:
@@ -84,6 +86,9 @@ services:
       TARGET: /config/slave-other
       TEST_ENV: 42
     command: ['shared-config-slave']
+    volumes:
+      - ./app/shared_config_manager:/app/shared_config_manager:ro
+      #- ../c2cwsgiutils/c2cwsgiutils:/opt/c2cwsgiutils/c2cwsgiutils:ro
     volumes_from:
       - tests:rw
     links:

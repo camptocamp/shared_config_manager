@@ -12,8 +12,7 @@ from c2cwsgiutils import stats
 from pyramid.httpexceptions import HTTPForbidden
 
 from shared_config_manager import template_engines
-
-from . import mode
+from shared_config_manager.sources import mode
 
 LOG = logging.getLogger(__name__)
 TARGET = os.environ.get("TARGET", "/config")
@@ -47,6 +46,7 @@ class BaseSource:
                 self._do_refresh()
             self._eval_templates()
         except Exception:
+            LOG.exception("Error with source %s", self.get_id())
             stats.increment_counter(["source", self.get_id(), "error"])
             raise
         finally:
@@ -74,6 +74,7 @@ class BaseSource:
                 self._do_fetch()
             self._eval_templates()
         except Exception:
+            LOG.exception("Error with source %s", self.get_id())
             stats.increment_counter(["source", self.get_id(), "error"])
             raise
         finally:
@@ -112,7 +113,7 @@ class BaseSource:
                 return
             except Exception as exception:
                 stats.increment_counter(["source", self.get_id(), "fetch_error"])
-                LOG.info(
+                LOG.warning(
                     "Error fetching the source %s from the master (will retry in 1s): %s",
                     self.get_id(),
                     str(exception),
