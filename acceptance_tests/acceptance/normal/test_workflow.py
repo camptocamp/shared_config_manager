@@ -41,19 +41,16 @@ def git_source(app_connection):
     """,
         shell=True,
     )
+    time.sleep(0.1)
 
     master_hash = get_hash("/repos/master")
     other_hash = get_hash("/repos/other")
-
-    time.sleep(0.1)
 
     response = requests.get("http://api:8080/scm/1/refresh/master/changeme")
     assert response.ok
 
     wait_sync(app_connection, "master", master_hash)
     wait_sync(app_connection, "other", other_hash)
-
-    time.sleep(0.1)
 
     yield "/repos/other"
 
@@ -94,12 +91,11 @@ def test_ok(app_connection, git_source):
     """,
         shell=True,
     )
+    time.sleep(0.1)
 
     hash_ = get_hash(git_source)
     app_connection.get_json("1/refresh/other/changeme")
     wait_sync(app_connection, "other", hash_)
-
-    time.sleep(0.1)
 
     for slave in ("api", "slave"):
         with open(os.path.join("/config", slave, "other", "config.txt")) as config:
