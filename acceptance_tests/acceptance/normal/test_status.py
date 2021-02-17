@@ -5,23 +5,6 @@ from c2cwsgiutils.acceptance import utils
 
 
 def test_all(app_connection):
-    def what():
-        subprocess.check_call(
-            """
-        set -eux
-        cd /repos/master
-        git show
-        cd /config/
-        ls -al
-        find / -name master
-        """,
-            shell=True,
-        )
-        stats = app_connection.get_json("1/status/changeme")
-        assert len(stats["slaves"]) == 3, stats["slaves"].keys()
-
-    utils.retry_timeout(what, timeout=2, interval=0.1)
-
     stats = app_connection.get_json("1/status/changeme")
     print(f"stats={pformat(stats)}")
     assert len(stats["slaves"]) == 3, stats["slaves"].keys()

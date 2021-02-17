@@ -13,15 +13,12 @@ def wait_sync(app_connection, name, hash_):
                 print("Name '{}' still found in sources".format(name))
             else:
                 if name not in slave["sources"]:
-                    print(f"In salve {slave_name}, {name} not in {slave['sources'].keys()}")
                     raise RuntimeError(f"In salve {slave_name}, {name} not in {slave['sources'].keys()}")
                 if "hash" not in slave["sources"][name]:
-                    print(f"Hash not in slave {slave_name}, source {name}: {slave['sources'][name]}")
                     raise RuntimeError(
                         f"Hash not in slave {slave_name}, source {name}: {slave['sources'][name]}"
                     )
                 if slave["sources"][name]["hash"] != hash_:
-                    print(f"Wrong hash for {name}: {slave['sources'][name]['hash']} != {hash_}")
                     raise RuntimeError(
                         f"Wrong hash for slave {slave_name}, source {name}: "
                         f"{slave['sources'][name]['hash']} != {hash_}"
@@ -29,7 +26,7 @@ def wait_sync(app_connection, name, hash_):
                 print("Name '{}' and hash found in sources".format(name))
         return True
 
-    utils.retry_timeout(what, interval=5)
+    utils.retry_timeout(what, timeout=10, interval=1)
 
 
 def get_hash(cwd):

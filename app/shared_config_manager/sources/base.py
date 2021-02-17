@@ -113,7 +113,7 @@ class BaseSource:
                 return
             except Exception as exception:
                 stats.increment_counter(["source", self.get_id(), "fetch_error"])
-                LOG.warning(
+                LOG.info(
                     "Error fetching the source %s from the master (will retry in 1s): %s",
                     self.get_id(),
                     str(exception),
