@@ -142,6 +142,8 @@ def refresh(id_, key):
     """
     LOG.info("Reloading the %s config", id_)
     source, _ = check_id_key(id_, key)
+    if source is None:
+        raise HTTPNotFound(f"Unknown id {id_}")
     source.refresh()
     if source.is_master() and (not MASTER_SOURCE or not MASTER_SOURCE.get_config().get("standalone", False)):
         reload_master_config()
@@ -153,6 +155,9 @@ def _slave_fetch(id_, key):
     This is run on every slave when a source needs a refresh.
     """
     source, filtered = check_id_key(id_, key)
+    if source is None:
+        LOG.error("Unknown id %d", id_)
+        return
     if filtered and not mode.is_master():
         LOG.info("The reloading the %s config is filtred", id_)
         return
@@ -162,7 +167,7 @@ def _slave_fetch(id_, key):
         reload_master_config()
 
 
-def check_id_key(id_, key) -> Tuple[base.BaseSource, bool]:
+def check_id_key(id_, key) -> Tuple[Optional[base.BaseSource], bool]:
     filtered = False
     source = get_source(id_)
     if source is None:
@@ -174,7 +179,7 @@ def check_id_key(id_, key) -> Tuple[base.BaseSource, bool]:
         except HTTPForbidden:
             MASTER_SOURCE.validate_key(key)
         return source, filtered
-    raise HTTPNotFound(f"Unknown id {id_}")
+    return None, filtered
 
 
 def get_source(id_) -> Optional[base.BaseSource]:
