@@ -69,6 +69,7 @@ def git_source(app_connection):
 
     app_connection.get_json("1/refresh/master/changeme")
     wait_sync(app_connection, "other", None)
+    time.sleep(0.1)
 
     for slave in ("api", "slave"):
         assert not os.path.exists(os.path.join("/config", slave, "other"))
