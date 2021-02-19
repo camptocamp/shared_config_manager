@@ -6,7 +6,6 @@ on:
     - cron: '45 3 * * *'
 
 env:
-  IN_CI: '1'
   SUMMON_PROVIDER: /usr/local/bin/gopass
 
 jobs:
@@ -23,6 +22,10 @@ jobs:
           - master
 
     steps:
+      - uses: docker-practice/actions-setup-docker@master
+        with:
+          docker_version: 19.03
+
       - uses: actions/checkout@v2
         with:
           ref: ${{ matrix.branch }}

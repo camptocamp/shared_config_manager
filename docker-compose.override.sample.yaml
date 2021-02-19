@@ -1,0 +1,34 @@
+---
+version: '2'
+
+services:
+  api:
+    environment: &scm_env
+      LOG_LEVEL: DEBUG
+      C2CWSGIUTILS_LOG_LEVEL: INFO
+      OTHER_LOG_LEVEL: INFO
+    volumes:
+      - ./app/shared_config_manager:/app/shared_config_manager:ro
+      # - ../c2cwsgiutils/c2cwsgiutils:/opt/c2cwsgiutils/c2cwsgiutils:ro
+
+  api_inline:
+    environment: *scm_env
+    volumes:
+      - ./app/shared_config_manager:/app/shared_config_manager:ro
+      # - ../c2cwsgiutils/c2cwsgiutils:/opt/c2cwsgiutils/c2cwsgiutils:ro
+
+  slave:
+    environment: *scm_env
+    volumes:
+      - ./app/shared_config_manager:/app/shared_config_manager:ro
+      # - ../c2cwsgiutils/c2cwsgiutils:/opt/c2cwsgiutils/c2cwsgiutils:ro
+
+  slave-others:
+    environment: *scm_env
+    volumes:
+      - ./app/shared_config_manager:/app/shared_config_manager:ro
+      # - ../c2cwsgiutils/c2cwsgiutils:/opt/c2cwsgiutils/c2cwsgiutils:ro
+
+  # tests:
+  #   volumes:
+  #     - ../c2cwsgiutils/c2cwsgiutils:/opt/c2cwsgiutils/c2cwsgiutils:ro

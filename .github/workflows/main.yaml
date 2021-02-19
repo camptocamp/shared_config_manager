@@ -4,9 +4,6 @@ name: Continuous integration
 on:
   push:
 
-env:
-  IN_CI: '1'
-
 jobs:
   build:
     name: Continuous integration
@@ -15,6 +12,11 @@ jobs:
     if: "!startsWith(github.event.head_commit.message, '[skip ci] ')"
 
     steps:
+      - uses: docker-practice/actions-setup-docker@master
+        with:
+          docker_version: 19.03
+      - run: sudo python3 -m pip install docker-compose==1.28.4
+
       - uses: actions/checkout@v2
 
       - uses: camptocamp/initialise-gopass-summon-action@v2
