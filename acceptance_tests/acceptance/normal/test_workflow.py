@@ -75,6 +75,8 @@ def git_source(app_connection):
 
 
 def test_ok(app_connection, git_source):
+    time.sleep(0.1)
+
     for slave in ("api", "slave"):
         assert slave in os.listdir("/config")
         assert "other" in os.listdir(os.path.join("/config", slave))
