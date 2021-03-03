@@ -24,7 +24,7 @@ RUN python3 -m pip install --disable-pip-version-check --no-cache-dir --requirem
     rm --recursive --force /tmp/*
 
 COPY Pipfile Pipfile.lock ./
-RUN pipenv install --system --clear && \
+RUN pipenv sync --system --clear && \
     rm --recursive --force /usr/local/lib/python3.*/dist-packages/tests/ /tmp/* /root/.cache/* && \
     python3 -m compileall -q /usr/local/lib/python3.* \
     -x /usr/local/lib/python3.*/dist-packages/pipenv/
@@ -60,7 +60,7 @@ FROM base AS tests
 ARG PRIVATE_SSH_KEY
 ENV PRIVATE_SSH_KEY=${PRIVATE_SSH_KEY}
 
-RUN pipenv install --system --clear --dev
+RUN pipenv sync --system --clear --dev
 COPY .prospector.yaml ./
 COPY setup.cfg ./
 COPY tests/ ./tests/
