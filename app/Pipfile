@@ -10,7 +10,7 @@ mypy = "==0.812"
 flake8 = "==3.8.4"
 
 [packages]
-PyYAML = "==5.3.1"
+PyYAML = "==5.4"
 
 [requires]
 python_version = "3.8"
