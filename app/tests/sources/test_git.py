@@ -110,6 +110,7 @@ def test_git_sub_dir_no_sparse(repo):
         git.delete()
 
 
+@pytest.mark.skipif(os.environ.get("PRIVATE_SSH_KEY") is not None, reason="We needs to kave the key")
 def test_git_with_key():
     ssh_key = os.environ["PRIVATE_SSH_KEY"].split(" ")
     ssh_key = ["-----BEGIN RSA PRIVATE KEY-----"]
