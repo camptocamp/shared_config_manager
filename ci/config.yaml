@@ -12,6 +12,7 @@ checks:
   black: False
   required_workflows:
     audit.yaml: False
+  dependabot_config: False
 
 publish:
   pypi:
