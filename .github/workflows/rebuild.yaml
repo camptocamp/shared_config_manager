@@ -19,6 +19,7 @@ jobs:
       matrix:
         branch:
           - release_2
+          - release_3
           - master
 
     steps:
