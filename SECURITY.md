@@ -6,3 +6,4 @@
 | ------- | --------------- |
 | 1       | Unsupported     |
 | 2       | Best effort     |
+| 3       | Best effort     |

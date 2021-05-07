@@ -3,12 +3,7 @@ version:
     - from: release_([0-9]+)
       to: \1
     - from: master
-      to: '3'
-
-checks:
-  versions:
-    extra_versions:
-      - '3'
+      to: master
 
 publish:
   pypi:
