@@ -111,8 +111,9 @@ def stats(request):
     if not sources.MASTER_SOURCE:
         return {"slaves": {}}
     sources.MASTER_SOURCE.validate_key(request.matchdict["key"])
-    slaves = slave_status.get_slaves_status()
-    slaves = {slave["hostname"]: _cleanup_slave_status(slave) for slave in slaves if slave is not None}
+    slaves_status = slave_status.get_slaves_status()
+    assert slaves_status is not None
+    slaves = {slave["hostname"]: _cleanup_slave_status(slave) for slave in slaves_status if slave is not None}
     return {"slaves": slaves}
 
 
@@ -123,6 +124,7 @@ def source_stats(request):
     if source is None:
         raise HTTPNotFound(f"Unknown id {id_}")
     slaves = slave_status.get_source_status(id_=id_)
+    assert slaves is not None
     statuses: List[Dict] = []
     for slave in slaves:
         if slave is None or slave.get("filtered", False):
