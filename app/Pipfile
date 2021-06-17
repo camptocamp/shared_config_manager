@@ -13,6 +13,7 @@ types-requests = "==0.1.11"
 
 [packages]
 PyYAML = "==5.4"
+inotify = "==0.2.10"
 
 [requires]
 python_version = "3.8"

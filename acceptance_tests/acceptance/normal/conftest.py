@@ -1,6 +1,5 @@
 import logging
 import os
-import subprocess
 
 import pytest
 import requests
@@ -31,13 +30,13 @@ def wait_slaves():
             LOG.warning("%i, %s: %s", r.status_code, r.status, r.text)
             raise Exception(f"Not having a 200 status: {r.status_code}")
 
-    utils.retry_timeout(what)
+    utils.retry_timeout(what, timeout=10, interval=1)
 
 
-@pytest.yield_fixture(scope="package")
+@pytest.fixture(scope="package")
 def composition(request):
     """
-    Fixture that start/stop the Docker composition used for all the tests.
+    Fixture that will wait that the composition is started, used for all the tests.
     """
     for slave in ("api", "slave", "slave-others"):
         path = os.path.join("/config", slave)
@@ -47,8 +46,6 @@ def composition(request):
     wait_slaves()
 
     yield None
-
-    subprocess.check_call("rm -rf /config/*", shell=True)
 
 
 @pytest.fixture

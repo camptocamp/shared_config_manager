@@ -15,9 +15,10 @@ RUN pipenv sync --system --clear && \
 
 COPY . ./
 
+RUN mv ./master_config/ /etc/shared_config_manager/
 RUN ./create-test-repos
 RUN prospector
 
-VOLUME [ "/repos", "/config" ]
+VOLUME [ "/repos", "/config", "/etc/shared_config_manager" ]
 
 CMD py.test -vv --color=yes --junitxml /reports/acceptance.xml acceptance

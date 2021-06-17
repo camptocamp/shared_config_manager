@@ -9,7 +9,7 @@ from shared_config_manager import sources
 TEMP_DIR = tempfile.gettempdir()
 
 
-@pytest.yield_fixture()
+@pytest.fixture()
 def repo():
     repo_path = os.path.join(TEMP_DIR, "repo")
     subprocess.check_call(

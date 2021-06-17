@@ -6,6 +6,7 @@ import tempfile
 from threading import Thread
 from typing import Any, Dict, Mapping, Optional, Tuple
 
+import inotify.adapters
 import yaml
 from c2cwsgiutils import broadcast
 from pyramid.httpexceptions import HTTPBadRequest, HTTPForbidden, HTTPNotFound
@@ -40,8 +41,29 @@ def init(slave: bool) -> None:
         broadcast.subscribe("slave_fetch", _slave_fetch)
     _update_flag("LOADING")
     _prepare_ssh()
-    content = yaml.load(os.environ["MASTER_CONFIG"], Loader=yaml.SafeLoader)
-    if content.get("sources", False):
+    if os.environ.get("MASTER_CONFIG"):
+        LOG.info("Load the master config from environment variable")
+        content = yaml.load(os.environ["MASTER_CONFIG"], Loader=yaml.SafeLoader)
+    else:
+        LOG.info("Load the master config from config file")
+        with open("/etc/shared_config_manager/config.yaml") as scm_file:
+            content = yaml.load(scm_file, Loader=yaml.SafeLoader)
+
+        def thread() -> None:
+            inotify_ = inotify.adapters.Inotify()
+            inotify_.add_watch("/etc/shared_config_manager/config.yaml")
+            for _, type_names, path, filename in inotify_.event_gen(yield_nones=False):
+                LOG.debug("Inotify envent: %s / %s: [%s]", path, filename, ",".join(type_names))
+                if "IN_CLOSE_WRITE" in type_names:
+                    LOG.info("Reload the master config from config file")
+                    with open("/etc/shared_config_manager/config.yaml") as scm_file:
+                        config = yaml.load(scm_file, Loader=yaml.SafeLoader)
+                    _handle_master_config(config)
+
+        thread_instance = Thread(target=thread, daemon=True)
+        thread_instance.start()
+
+    if content.get("sources", False) is not False:
         LOG.info("The master config is inline")
         content["standalone"] = True
         # A fake master source to have auth work

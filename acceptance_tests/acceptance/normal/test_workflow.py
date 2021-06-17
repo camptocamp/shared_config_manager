@@ -7,7 +7,7 @@ import requests
 from acceptance import get_hash, wait_sync
 
 
-@pytest.yield_fixture()
+@pytest.fixture()
 def git_source(app_connection):
     with open("/repos/master/shared_config_manager.yaml", "a") as config:
         config.write(
