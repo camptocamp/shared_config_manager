@@ -13,7 +13,7 @@ services:
       LOG_LEVEL: DEBUG
       C2CWSGIUTILS_LOG_LEVEL: INFO
       OTHER_LOG_LEVEL: DEBUG
-      C2C_REDIS_URL: redis://redis:6379
+      C2C_REDIS_URL: redis://redis:6379/1
       DEVELOPMENT: 1
       GUNICORN_PARAMS: '-b :8080 --reload'
       MASTER_CONFIG: |
@@ -48,14 +48,28 @@ services:
                 environment_variables: true
       API_BASE_URL: http://api_inline:8080/scm
       TARGET: /config/api-inline
-      SCM_ENV_PREFIXES: TEST_
-      TEST_ENV: 42
+      C2C_REDIS_URL: redis://redis:6379/2
       C2C_BROADCAST_PREFIX: broadcast_scm_inline_
     volumes_from:
       - tests:rw
     links:
       - redis
-    hostname: api
+    hostname: api_inline
+
+  api_file:
+    image: camptocamp/shared_config_manager:latest
+    environment: &scm_file_env
+      <<: *scm_env
+      MASTER_CONFIG: ''
+      API_BASE_URL: http://api_file:8080/scm
+      TARGET: /config/api-file
+      C2C_REDIS_URL: redis://redis:6379/3
+      C2C_BROADCAST_PREFIX: broadcast_scm_file_
+    volumes_from:
+      - tests:rw
+    links:
+      - redis
+    hostname: api_file
 
   slave:
     image: camptocamp/shared_config_manager:latest
@@ -82,6 +96,18 @@ services:
     links:
       - redis
     hostname: slave-others
+
+  slave-file:
+    image: camptocamp/shared_config_manager:latest
+    environment:
+      <<: *scm_file_env
+      TARGET: /config/slave-file
+    command: ['shared-config-slave']
+    volumes_from:
+      - tests:rw
+    links:
+      - redis
+    hostname: slave-file
 
   redis:
     image: redis:5
