@@ -160,7 +160,7 @@ def _filter_sources(source_configs):
 
 def refresh(id_, key):
     """
-    This is called from the web service to start a refresh
+    This is called from the web service to start a refresh.
     """
     LOG.info("Reloading the %s config", id_)
     source, _ = check_id_key(id_, key)

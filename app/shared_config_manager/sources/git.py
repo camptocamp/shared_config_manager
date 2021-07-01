@@ -63,7 +63,7 @@ class GitSource(SshBaseSource):
         stats = super().get_stats()
         stats_path = os.path.join(self.get_path(), ".gitstats")
         if os.path.isfile(stats_path):
-            with open(stats_path, "r") as gitstats:
+            with open(stats_path) as gitstats:
                 stats.update(json.load(gitstats))
         return stats
 
