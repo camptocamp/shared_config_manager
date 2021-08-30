@@ -1,13 +1,13 @@
 import fileinput
 import os
 
-from .base import BaseSource
+from shared_config_manager.sources.base import BaseSource
 
 
 def _patch_openshift():
     os.environ["HOME"] = "/var/www"
     try:
-        with open("/etc/passwd", "a") as passwd:
+        with open("/etc/passwd", "a", encoding="utf-8") as passwd:
             passwd.write(f"www-data2:x:{os.getuid()}:0:www-data:/var/www:/usr/sbin/nologin\n")
     except PermissionError:
         pass  # ignored
@@ -30,12 +30,12 @@ class SshBaseSource(BaseSource):
         os.makedirs(ssh_path, exist_ok=True)
         key_path = os.path.join(ssh_path, self.get_id()) + ".key"
         was_here = os.path.isfile(key_path)
-        with open(key_path, "w") as ssh_key_file:
+        with open(key_path, "w", encoding="utf-8") as ssh_key_file:
             ssh_key_file.write(ssh_key)
         os.chmod(key_path, 0o700)
 
         if not was_here:
-            with open(os.path.join(ssh_path, "config"), "a") as config:
+            with open(os.path.join(ssh_path, "config"), "a", encoding="utf-8") as config:
                 config.write(f"IdentityFile {key_path}\n")
 
     @staticmethod

@@ -64,7 +64,7 @@ RUN pipenv sync --system --clear --dev
 COPY .prospector.yaml ./
 COPY setup.cfg ./
 COPY tests/ ./tests/
-RUN prospector
+RUN prospector -X --output=pylint
 RUN pytest -vv --cov=shared_config_manager --color=yes tests
 
 

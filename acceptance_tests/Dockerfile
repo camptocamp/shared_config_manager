@@ -17,7 +17,7 @@ COPY . ./
 
 RUN mv ./master_config/ /etc/shared_config_manager/
 RUN ./create-test-repos
-RUN prospector
+RUN prospector -X --output=pylint
 
 VOLUME [ "/repos", "/config", "/etc/shared_config_manager" ]
 

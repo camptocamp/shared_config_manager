@@ -11,7 +11,7 @@ import yaml
 from c2cwsgiutils import broadcast
 from pyramid.httpexceptions import HTTPBadRequest, HTTPForbidden, HTTPNotFound
 
-from . import base, git, mode, rclone, rsync
+from shared_config_manager.sources import base, git, mode, rclone, rsync
 
 ENGINES = {"git": git.GitSource, "rsync": rsync.RsyncSource, "rclone": rclone.RcloneSource}
 LOG = logging.getLogger(__name__)
@@ -46,7 +46,7 @@ def init(slave: bool) -> None:
         content = yaml.load(os.environ["MASTER_CONFIG"], Loader=yaml.SafeLoader)
     else:
         LOG.info("Load the master config from config file")
-        with open("/etc/shared_config_manager/config.yaml") as scm_file:
+        with open("/etc/shared_config_manager/config.yaml", encoding="utf-8") as scm_file:
             content = yaml.load(scm_file, Loader=yaml.SafeLoader)
 
         def thread() -> None:
@@ -56,7 +56,7 @@ def init(slave: bool) -> None:
                 LOG.debug("Inotify envent: %s / %s: [%s]", path, filename, ",".join(type_names))
                 if "IN_CLOSE_WRITE" in type_names:
                     LOG.info("Reload the master config from config file")
-                    with open("/etc/shared_config_manager/config.yaml") as scm_file:
+                    with open("/etc/shared_config_manager/config.yaml", encoding="utf-8") as scm_file:
                         config = yaml.load(scm_file, Loader=yaml.SafeLoader)
                     _handle_master_config(config)
 
@@ -81,7 +81,9 @@ def init(slave: bool) -> None:
 def reload_master_config():
     global MASTER_SOURCE  # pylint: disable=global-statement
     if MASTER_SOURCE:
-        with open(os.path.join(MASTER_SOURCE.get_path(), "shared_config_manager.yaml")) as config_file:
+        with open(
+            os.path.join(MASTER_SOURCE.get_path(), "shared_config_manager.yaml"), encoding="utf-8"
+        ) as config_file:
             config = yaml.load(config_file, Loader=yaml.SafeLoader)
             _handle_master_config(config)
 
@@ -118,7 +120,7 @@ def _handle_master_config(config: Mapping[str, Any]) -> None:
 
 
 def _update_flag(value):
-    with open(os.path.join(tempfile.gettempdir(), "status"), "w") as flag:
+    with open(os.path.join(tempfile.gettempdir(), "status"), "w", encoding="utf-8") as flag:
         flag.write(value)
 
 

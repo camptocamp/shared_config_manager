@@ -4,8 +4,8 @@ import logging
 import os
 import tempfile
 
-from . import mode
-from .ssh import SshBaseSource
+from shared_config_manager.sources import mode
+from shared_config_manager.sources.ssh import SshBaseSource
 
 TEMP_DIR = tempfile.gettempdir()
 LOG = logging.getLogger(__name__)
@@ -16,7 +16,7 @@ class GitSource(SshBaseSource):
         self._checkout()
         self._copy(self._copy_dir(), excludes=[".git"])
         stats = dict(hash=self._get_hash(), tags=self._get_tags())
-        with open(os.path.join(self.get_path(), ".gitstats"), "w") as gitstats:
+        with open(os.path.join(self.get_path(), ".gitstats"), "w", encoding="utf-8") as gitstats:
             json.dump(stats, gitstats)
 
     def _checkout(self):
@@ -63,7 +63,7 @@ class GitSource(SshBaseSource):
         stats = super().get_stats()
         stats_path = os.path.join(self.get_path(), ".gitstats")
         if os.path.isfile(stats_path):
-            with open(stats_path) as gitstats:
+            with open(stats_path, encoding="utf-8") as gitstats:
                 stats.update(json.load(gitstats))
         return stats
 

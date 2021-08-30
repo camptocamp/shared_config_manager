@@ -1,7 +1,7 @@
 import os
 import re
 
-from .base import BaseSource
+from shared_config_manager.sources.base import BaseSource
 
 
 class RcloneSource(BaseSource):
@@ -28,7 +28,7 @@ class RcloneSource(BaseSource):
     def _setup_config(self, config):
         path = self._config_path()
         os.makedirs(os.path.dirname(path), exist_ok=True)
-        with open(path, "w") as file_:
+        with open(path, "w", encoding="utf-8") as file_:
             file_.write("[remote]\n")
             file_.write(config)
 
