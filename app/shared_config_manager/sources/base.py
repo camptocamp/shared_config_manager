@@ -94,7 +94,7 @@ class BaseSource:
                 if os.path.exists(path):
                     shutil.rmtree(path)
                 os.makedirs(path, exist_ok=True)
-                tar = subprocess.Popen(
+                with subprocess.Popen(
                     [
                         "tar",
                         "--extract",
@@ -106,10 +106,10 @@ class BaseSource:
                     ],
                     cwd=path,
                     stdin=subprocess.PIPE,
-                )
-                shutil.copyfileobj(response.raw, tar.stdin)  # type: ignore
-                tar.stdin.close()  # type: ignore
-                assert tar.wait() == 0
+                ) as tar:
+                    shutil.copyfileobj(response.raw, tar.stdin)  # type: ignore
+                    tar.stdin.close()  # type: ignore
+                    assert tar.wait() == 0
                 return
             except Exception as exception:
                 stats.increment_counter(["source", self.get_id(), "fetch_error"])

@@ -166,7 +166,7 @@ def tarball(request):
         files.remove(".gitstats")
         files.append(".gitstats")
 
-    proc = subprocess.Popen(
+    proc = subprocess.Popen(  # pylint: disable=consider-using-with
         ["tar", "--create", "--gzip"] + files, cwd=path, bufsize=4096, stdout=subprocess.PIPE
     )
     response.content_type = "application/x-gtar"

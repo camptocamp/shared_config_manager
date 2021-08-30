@@ -3,7 +3,8 @@ from setuptools import find_packages, setup
 
 def long_description():
     try:
-        return open("README.md").read()
+        with open("README.md", encoding="utf-8") as readme:
+            return readme.read()
     except FileNotFoundError:
         return ""
 

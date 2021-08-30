@@ -1,4 +1,4 @@
-from . import base, mako, shell
+from shared_config_manager.template_engines import base, mako, shell
 
 ENGINES = {"mako": mako.MakoEngine, "shell": shell.ShellEngine}
 

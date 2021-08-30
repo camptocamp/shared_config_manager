@@ -1,4 +1,4 @@
-from .ssh import SshBaseSource
+from shared_config_manager.sources.ssh import SshBaseSource
 
 
 class RsyncSource(SshBaseSource):

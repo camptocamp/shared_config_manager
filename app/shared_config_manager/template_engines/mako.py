@@ -1,6 +1,6 @@
 import mako.template
 
-from .base import BaseEngine
+from shared_config_manager.template_engines.base import BaseEngine
 
 
 class MakoEngine(BaseEngine):
@@ -9,5 +9,5 @@ class MakoEngine(BaseEngine):
 
     def _evaluate_file(self, src_path, dst_path):
         template = mako.template.Template(filename=src_path)
-        with open(dst_path, "w") as output:
+        with open(dst_path, "w", encoding="utf-8") as output:
             output.write(template.render(**self._data))

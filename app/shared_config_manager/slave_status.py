@@ -1,6 +1,6 @@
 from c2cwsgiutils import broadcast
 
-from . import sources
+from shared_config_manager import sources
 
 
 @broadcast.decorator(expect_answers=True)
