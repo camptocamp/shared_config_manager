@@ -12,7 +12,6 @@ def init(slave: bool) -> None:
 
 
 def is_master() -> bool:
-    global API_BASE_URL  # pylint: disable=global-statement
     return API_BASE_URL is None
 
 
