@@ -7,7 +7,7 @@ verify_ssl = true
 pytest-cov = "==2.12.1"
 prospector = {extras = ["with_mypy", "with_bandit", "with_pyroma"],version = "==1.5.1"}
 types-pyyaml = "==5.4.10"
-types-requests = "==2.25.6"
+types-requests = "==2.25.7"
 
 [packages]
 PyYAML = "==5.4"
