@@ -28,7 +28,6 @@ def _create_source(id_, config, is_master=False, default_key=None) -> base.BaseS
 
 
 def get_sources() -> Mapping[str, base.BaseSource]:
-    global SOURCES, FILTERED_SOURCES  # pylint: disable=global-statement
     copy = dict(SOURCES.items())
     copy.update(FILTERED_SOURCES)
     return copy
@@ -79,7 +78,6 @@ def init(slave: bool) -> None:
 
 
 def reload_master_config():
-    global MASTER_SOURCE  # pylint: disable=global-statement
     if MASTER_SOURCE:
         with open(
             os.path.join(MASTER_SOURCE.get_path(), "shared_config_manager.yaml"), encoding="utf-8"
@@ -89,7 +87,7 @@ def reload_master_config():
 
 
 def _handle_master_config(config: Mapping[str, Any]) -> None:
-    global SOURCES, FILTERED_SOURCES  # pylint: disable=global-statement
+    global FILTERED_SOURCES  # pylint: disable=global-statement
     LOG.info("Reading the master config")
     if MASTER_ID in config["sources"]:
         raise HTTPBadRequest(f'A source cannot have the "{MASTER_ID}" id')
@@ -142,7 +140,6 @@ def _prepare_ssh():
 
 
 def _delete_source(id_):
-    global SOURCES  # pylint: disable=global-statement
     SOURCES[id_].delete()
     del SOURCES[id_]
 
@@ -207,7 +204,6 @@ def check_id_key(id_, key) -> Tuple[Optional[base.BaseSource], bool]:
 
 
 def get_source(id_) -> Optional[base.BaseSource]:
-    global MASTER_SOURCE, SOURCES  # pylint: disable=global-statement
     if MASTER_SOURCE and MASTER_SOURCE.get_id() == id_:
         return MASTER_SOURCE
     else:
