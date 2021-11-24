@@ -10,7 +10,7 @@ types-pyyaml = "==5.4.10"
 types-requests = "==2.25.9"
 
 [packages]
-PyYAML = "==5.4"
+PyYAML = "==6.0"
 inotify = "==0.2.10"
 
 [requires]
