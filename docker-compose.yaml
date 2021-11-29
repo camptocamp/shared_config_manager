@@ -71,12 +71,32 @@ services:
       - redis
     hostname: api_file
 
+  api_infile:
+    image: camptocamp/shared_config_manager:latest
+    environment:
+      <<: *scm_env
+      MASTER_CONFIG: |
+        type: file
+      API_BASE_URL: http://api_infile:8080/scm
+      TARGET: /config/api-infile
+      SCM_ENV_PREFIXES: TEST_
+      TEST_ENV: 42
+      C2C_BROADCAST_PREFIX: broadcast_scm_infile_
+    volumes_from:
+      - tests:rw
+    volumes:
+      - ./api-infile/:/master_config/
+    links:
+      - redis
+    hostname: api
+
   slave:
     image: camptocamp/shared_config_manager:latest
     environment:
       <<: *scm_env
+      MASTER_CONFIG: null
       TARGET: /config/slave
-    command: ['shared-config-slave']
+    command: [ 'shared-config-slave' ]
     volumes_from:
       - tests:rw
     links:
@@ -87,10 +107,11 @@ services:
     image: camptocamp/shared_config_manager:latest
     environment:
       <<: *scm_env
+      MASTER_CONFIG: null
       TAG_FILTER: others
       TARGET: /config/slave-other
       TEST_ENV: 42
-    command: ['shared-config-slave']
+    command: [ 'shared-config-slave' ]
     volumes_from:
       - tests:rw
     links:

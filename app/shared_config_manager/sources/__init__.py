@@ -11,9 +11,14 @@ import yaml
 from c2cwsgiutils import broadcast
 from pyramid.httpexceptions import HTTPBadRequest, HTTPForbidden, HTTPNotFound
 
-from shared_config_manager.sources import base, git, mode, rclone, rsync
+from shared_config_manager.sources import base, file, git, mode, rclone, rsync
 
-ENGINES = {"git": git.GitSource, "rsync": rsync.RsyncSource, "rclone": rclone.RcloneSource}
+ENGINES = {
+    "git": git.GitSource,
+    "rsync": rsync.RsyncSource,
+    "rclone": rclone.RcloneSource,
+    "file": file.FileSource,
+}
 LOG = logging.getLogger(__name__)
 MASTER_ID = "master"
 MASTER_SOURCE: Optional[base.BaseSource] = None
