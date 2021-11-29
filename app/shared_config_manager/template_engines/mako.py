@@ -8,6 +8,6 @@ class MakoEngine(BaseEngine):
         super().__init__(source_id, config, "mako")
 
     def _evaluate_file(self, src_path, dst_path):
-        template = mako.template.Template(filename=src_path)
+        template = mako.template.Template(filename=src_path)  # nosec
         with open(dst_path, "w", encoding="utf-8") as output:
             output.write(template.render(**self._data))

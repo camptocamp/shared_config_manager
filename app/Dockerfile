@@ -61,7 +61,7 @@ ARG PRIVATE_SSH_KEY
 ENV PRIVATE_SSH_KEY=${PRIVATE_SSH_KEY}
 
 RUN pipenv sync --system --clear --dev
-COPY .prospector.yaml ./
+COPY .prospector.yaml .bandit.yaml ./
 COPY setup.cfg ./
 COPY tests/ ./tests/
 RUN prospector -X --output=pylint
