@@ -96,7 +96,7 @@ services:
       <<: *scm_env
       MASTER_CONFIG: null
       TARGET: /config/slave
-    command: [ 'shared-config-slave' ]
+    command: ['shared-config-slave']
     volumes_from:
       - tests:rw
     links:
@@ -111,7 +111,7 @@ services:
       TAG_FILTER: others
       TARGET: /config/slave-other
       TEST_ENV: 42
-    command: [ 'shared-config-slave' ]
+    command: ['shared-config-slave']
     volumes_from:
       - tests:rw
     links:

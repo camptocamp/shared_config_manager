@@ -3,8 +3,7 @@ version: '2'
 
 services:
   api:
-    environment:
-      &scm_env
+    environment: &scm_env
       LOG_LEVEL: DEBUG
       C2CWSGIUTILS_LOG_LEVEL: INFO
       OTHER_LOG_LEVEL: INFO

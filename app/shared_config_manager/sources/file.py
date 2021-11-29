@@ -4,10 +4,10 @@ import logging
 import os
 import tempfile
 
-
-from shared_config_manager.sources.base import BaseSource
-from shared_config_manager.sources import reload_master_config
 from inotify_simple import INotify, flags
+
+from shared_config_manager.sources import reload_master_config
+from shared_config_manager.sources.base import BaseSource
 
 TEMP_DIR = tempfile.gettempdir()
 LOG = logging.getLogger(__name__)
