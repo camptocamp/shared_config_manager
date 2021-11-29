@@ -4,18 +4,20 @@ import logging
 import os
 import tempfile
 
-from . import mode
-from .base import BaseSource
+
+from shared_config_manager.sources.base import BaseSource
+from shared_config_manager.sources import reload_master_config
+from inotify_simple import INotify, flags
 
 TEMP_DIR = tempfile.gettempdir()
 LOG = logging.getLogger(__name__)
 
 
 class FileSource(BaseSource):
-    def get_stats(self):
-        stats = super().get_stats()
-        stats_path = os.path.join(self.get_path(), ".gitstats")
-        if os.path.isfile(stats_path):
-            with open(stats_path, "r") as gitstats:
-                stats.update(json.load(gitstats))
-        return stats
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        inotify = INotify()
+        inotify.add_watch(self.get_path(), flags.CREATE | flags.DELETE | flags.MODIFY)
+        for _ in inotify.read():
+            reload_master_config()
