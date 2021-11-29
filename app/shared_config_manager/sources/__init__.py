@@ -57,7 +57,7 @@ def init(slave: bool) -> None:
             inotify_ = inotify.adapters.Inotify()
             inotify_.add_watch("/etc/shared_config_manager/config.yaml")
             for _, type_names, path, filename in inotify_.event_gen(yield_nones=False):
-                LOG.debug("Inotify envent: %s / %s: [%s]", path, filename, ",".join(type_names))
+                LOG.debug("Inotify event: %s / %s: [%s]", path, filename, ",".join(type_names))
                 if "IN_CLOSE_WRITE" in type_names:
                     LOG.info("Reload the master config from config file")
                     with open("/etc/shared_config_manager/config.yaml", encoding="utf-8") as scm_file:

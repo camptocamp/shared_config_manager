@@ -1,12 +1,8 @@
-import base64
-import json
 import logging
-import os
 import tempfile
 
-from inotify_simple import INotify, flags
+import inotify.adapters
 
-from shared_config_manager.sources import reload_master_config
 from shared_config_manager.sources.base import BaseSource
 
 TEMP_DIR = tempfile.gettempdir()
@@ -15,9 +11,12 @@ LOG = logging.getLogger(__name__)
 
 class FileSource(BaseSource):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        # To avoid circular import
+        from shared_config_manager.sources import reload_master_config
 
-        inotify = INotify()
-        inotify.add_watch(self.get_path(), flags.CREATE | flags.DELETE | flags.MODIFY)
-        for _ in inotify.read():
+        super().__init__(*args, **kwargs)
+        inotify_ = inotify.adapters.Inotify()
+        inotify_.add_watch(self.get_path())
+        for _, type_names, path, filename in inotify_.event_gen(yield_nones=False):
+            LOG.debug("Inotify event: %s / %s: [%s]", path, filename, ",".join(type_names))
             reload_master_config()
