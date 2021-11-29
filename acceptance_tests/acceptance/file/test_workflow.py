@@ -1,8 +1,8 @@
 import os
 import time
 
-import yaml
 from acceptance import get_hash, wait_sync
+import yaml
 
 
 def test_ok(app_connection):

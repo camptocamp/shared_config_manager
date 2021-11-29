@@ -7,9 +7,9 @@ import subprocess
 import time
 from typing import Dict
 
-import requests
 from c2cwsgiutils import stats
 from pyramid.httpexceptions import HTTPForbidden
+import requests
 
 from shared_config_manager import template_engines
 from shared_config_manager.sources import mode

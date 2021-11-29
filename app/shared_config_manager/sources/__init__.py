@@ -6,10 +6,10 @@ import tempfile
 from threading import Thread
 from typing import Any, Dict, Mapping, Optional, Tuple
 
-import inotify.adapters
-import yaml
 from c2cwsgiutils import broadcast
+import inotify.adapters
 from pyramid.httpexceptions import HTTPBadRequest, HTTPForbidden, HTTPNotFound
+import yaml
 
 from shared_config_manager.sources import base, file, git, mode, rclone, rsync
 

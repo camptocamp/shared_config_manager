@@ -1,9 +1,9 @@
 import os
 import subprocess
 
-import pytest
 from c2cwsgiutils.acceptance import utils
 from c2cwsgiutils.acceptance.connection import Connection
+import pytest
 
 
 @pytest.yield_fixture(scope="package")

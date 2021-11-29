@@ -1,7 +1,7 @@
 import os
 
-import c2cwsgiutils.pyramid
 from c2cwsgiutils.health_check import HealthCheck
+import c2cwsgiutils.pyramid
 from pyramid.config import Configurator
 
 from shared_config_manager import sources

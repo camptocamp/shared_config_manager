@@ -2,9 +2,9 @@ import os
 import subprocess
 import time
 
+from acceptance import get_hash, wait_sync
 import pytest
 import requests
-from acceptance import get_hash, wait_sync
 
 
 @pytest.fixture()
