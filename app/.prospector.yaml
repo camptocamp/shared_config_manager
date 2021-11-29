@@ -9,9 +9,13 @@ pylint:
     - no-else-return
     - broad-except
     - raising-format-tuple
+    - cyclic-import # check don't looks to work...
 
 mccabe:
   run: false
 
 mypy:
+  run: true
+
+bandit:
   run: true
