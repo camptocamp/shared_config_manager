@@ -85,7 +85,7 @@ services:
     volumes_from:
       - tests:rw
     volumes:
-      - ./api-infile/:/master_config/
+      - ./api-infile/:/master_config/master/
     links:
       - redis
     hostname: api
