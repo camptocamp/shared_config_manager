@@ -61,15 +61,15 @@ services:
     environment: &scm_file_env
       <<: *scm_env
       MASTER_CONFIG: ''
-      API_BASE_URL: http://api_file:8080/scm
-      TARGET: /config/api-file
+      API_BASE_URL: http://api_infile:8080/scm
+      TARGET: /config/api-infile
       C2C_REDIS_URL: redis://redis:6379/3
-      C2C_BROADCAST_PREFIX: broadcast_scm_file_
+      C2C_BROADCAST_PREFIX: broadcast_scm_infile_
     volumes_from:
       - tests:rw
     links:
       - redis
-    hostname: api_file
+    hostname: api_infile
 
   api_infile:
     image: camptocamp/shared_config_manager:latest
