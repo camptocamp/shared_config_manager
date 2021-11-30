@@ -18,6 +18,7 @@ class FileSource(BaseSource):
 
         super().__init__(*args, **kwargs)
         inotify_ = inotify.adapters.Inotify()
+        LOG.info("Watching %s", self.get_path())
         inotify_.add_watch(self.get_path())
         for _, type_names, path, filename in inotify_.event_gen(yield_nones=False):
             LOG.debug("Inotify event: %s / %s: [%s]", path, filename, ",".join(type_names))
