@@ -1,0 +1,5 @@
+skips:
+  - B404 # Consider possible security implications associated with the subprocess module.
+  - B603 # subprocess call - check for execution of untrusted input.
+  - B607 # Starting a process with a partial executable path
+  - B101 # Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
