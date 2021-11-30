@@ -3,7 +3,6 @@ import tempfile
 
 import inotify.adapters
 
-from shared_config_manager.sources import reload_master_config
 from shared_config_manager.sources.base import BaseSource
 
 TEMP_DIR = tempfile.gettempdir()
@@ -12,6 +11,10 @@ LOG = logging.getLogger(__name__)
 
 class FileSource(BaseSource):
     def __init__(self, *args, **kwargs):
+        # To avoid circular import
+        from shared_config_manager.sources import (  # pylint: disable=import-outside-toplevel
+            reload_master_config,
+        )
 
         super().__init__(*args, **kwargs)
         inotify_ = inotify.adapters.Inotify()
