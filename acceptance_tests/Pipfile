@@ -6,6 +6,7 @@ verify_ssl = true
 [packages]
 pytest-cov = "==3.0.0"
 prospector = "==1.5.2"
+astroid = "==2.8.0"
 
 [requires]
 
