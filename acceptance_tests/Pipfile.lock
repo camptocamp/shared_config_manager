@@ -253,11 +253,11 @@
         },
         "pyparsing": {
             "hashes": [
-                "sha256:10fb0827f908440eda768ec659627c3ac5dc20a25b4adaf50e7e10b248c17a4f",
-                "sha256:f72f2294ef53f917d984093e8ac8ed5818837516132e68c67b7fdd5350c8dabf"
+                "sha256:04ff808a5b90911829c55c4e26f75fa5ca8a2f5f36aa3a51f68e27033341d3e4",
+                "sha256:d9bdec0013ef1eb5a84ab39a3b3868911598afa494f5faa038647101504e2b81"
             ],
             "markers": "python_version >= '3.6'",
-            "version": "==3.0.0rc2"
+            "version": "==3.0.6"
         },
         "pytest": {
             "hashes": [
