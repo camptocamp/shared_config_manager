@@ -3,22 +3,25 @@
 version: 2
 updates:
   - package-ecosystem: pip
-    dependency-type: all
     directory: /
+    allow:
+      - dependency-type: all
     schedule:
       interval: daily
     ignore:
       - dependency-name: none
   - package-ecosystem: pip
-    dependency-type: all
     directory: '/app'
+    allow:
+      - dependency-type: all
     schedule:
       interval: daily
     ignore:
       - dependency-name: none
   - package-ecosystem: pip
-    dependency-type: all
     directory: '/acceptance_tests'
+    allow:
+      - dependency-type: all
     schedule:
       interval: daily
     ignore:
