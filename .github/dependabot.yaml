@@ -5,16 +5,22 @@ updates:
   - package-ecosystem: pip
     dependency-type: all
     directory: /
+    schedule:
+      interval: daily
     ignore:
       - dependency-name: none
   - package-ecosystem: pip
     dependency-type: all
     directory: '/app'
+    schedule:
+      interval: daily
     ignore:
       - dependency-name: none
   - package-ecosystem: pip
     dependency-type: all
     directory: '/acceptance_tests'
+    schedule:
+      interval: daily
     ignore:
       - dependency-name: none
 
