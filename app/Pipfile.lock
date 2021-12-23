@@ -307,7 +307,6 @@
                 "sha256:ed4e0ea066bb12f56b2812a15ff223c57c0a44eca817ceb96b214bb055c7051f",
                 "sha256:f9f665d69034b1fcfdbcd4197480d26298bbfb5d2dfe206245b6498addb34999"
             ],
-            "index": "pypi",
             "version": "==0.930"
         },
         "mypy-extensions": {
@@ -528,11 +527,11 @@
         },
         "setuptools": {
             "hashes": [
-                "sha256:8244876a37456ccbcbe1247b4cba1b015f4e42dfebfadd6a5488bfc12060f21b",
-                "sha256:dae4d7933ca671d51fa44c10b4ef8165319d9be3aa41807dd4c73f1c1ba81dc3"
+                "sha256:4dcae26c87ddbd48275d24a8cb06c30b52503b2dd51619e3ec1bc63b45dacdea",
+                "sha256:8d1f26f7cc0c81b7b372b0d133bb8b1b0abbb36f2083cb4a474a8b64cede98a7"
             ],
-            "markers": "python_version >= '3.7'",
-            "version": "==60.0.4"
+            "index": "pypi",
+            "version": "==60.0.5"
         },
         "smmap": {
             "hashes": [
@@ -594,7 +593,7 @@
                 "sha256:4ca091dea149f945ec56afb48dae714f21e8692ef22a395223bcd328961b6a0e",
                 "sha256:7f001e5ac290a0c0401508864c7ec868be4e701886d5b573a9528ed3973d9d3b"
             ],
-            "markers": "python_version >= '3.6'",
+            "markers": "python_version < '3.10'",
             "version": "==4.0.1"
         },
         "urllib3": {
