@@ -356,11 +356,11 @@
         },
         "setuptools": {
             "hashes": [
-                "sha256:4dcae26c87ddbd48275d24a8cb06c30b52503b2dd51619e3ec1bc63b45dacdea",
-                "sha256:8d1f26f7cc0c81b7b372b0d133bb8b1b0abbb36f2083cb4a474a8b64cede98a7"
+                "sha256:a4377723c53721515f72a3dfc1bfacdcd61edfa19a4cccf82e72e4f50d9cecbd",
+                "sha256:ad0ea3d172404abb14d8f7bd7f54f2ccd4ed9dd00c9da0b1398862e69eb22c03"
             ],
             "index": "pypi",
-            "version": "==60.0.5"
+            "version": "==60.1.0"
         },
         "snowballstemmer": {
             "hashes": [
