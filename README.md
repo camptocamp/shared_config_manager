@@ -74,7 +74,7 @@ See [https://github.com/camptocamp/c2cwsgiutils] for other parameters.
 - `type`: the type of source
 - `key`: the secret key that will be used to trigger a refresh of the source. Uses the `key` specified at the root
   of the config by default.
-- `target_dir`: the location where the source will be copied (default to the value of `id` in `/config`)
+- `target_dir`: the location where the source will be copied (default is the value of `id` in `/config`)
 - `excludes`: the list of files/directories to exclude
 - `template_engines`: a list of template engine configurations
 - `tags`: an optional list of tags. Slaves having `TAG_FILTER` defined will load only sources having the matching tag.
