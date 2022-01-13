@@ -590,10 +590,11 @@
         },
         "types-urllib3": {
             "hashes": [
-                "sha256:51b4aff54099896bea28cbdd49d6e7d389dd5ac775d7a4b72c642c56b215d26f",
-                "sha256:89372ddb3f893b24f3a3cca0113bbc722c73818b9c42dda49f1092501a1ae594"
+                "sha256:3adcf2cb5981809091dbff456e6999fe55f201652d8c360f99997de5ac2f556e",
+                "sha256:cfd1fbbe4ba9a605ed148294008aac8a7b8b7472651d1cc357d507ae5962e3d2"
             ],
-            "version": "==1.26.6"
+            "index": "pypi",
+            "version": "==1.26.7"
         },
         "typing-extensions": {
             "hashes": [
