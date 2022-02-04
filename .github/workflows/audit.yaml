@@ -25,15 +25,13 @@ jobs:
         with:
           ref: ${{ matrix.branch }}
 
-      - uses: asdf-vm/actions/install@v1
+      - uses: camptocamp/initialise-gopass-summon-action@v2
         with:
-          tool_versions: python 3.8.0
-        if: always()
+          ci-gpg-private-key: ${{secrets.CI_GPG_PRIVATE_KEY}}
+          github-gopass-ci-token: ${{secrets.GOPASS_CI_GITHUB_TOKEN}}
 
       - run: echo "${HOME}/.local/bin" >> ${GITHUB_PATH}
-      - run: python3 -m pip install --user --requirement=ci/requirements.txt
+      - run: python3 -m pip install --user --pre c2cciutils
 
       - name: Audit
         run: c2cciutils-audit --branch=${{ matrix.branch }}
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
