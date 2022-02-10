@@ -1,8 +1,11 @@
 import os
 
+import pytest
+
 from shared_config_manager import sources
 
 
+@pytest.mark.skip(reason="No more installer in the image")
 def test_rsync():
     source = sources._create_source(
         "test_rclone",

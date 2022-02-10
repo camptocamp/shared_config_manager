@@ -33,6 +33,8 @@ class GitSource(SshBaseSource):
             self._exec("git-sparse-clone", repo, branch, cwd, self._config["sub_dir"], cwd=TEMP_DIR)
         else:
             LOG.info("Cloning %s", repo)
+            if os.path.exists(cwd):
+                os.removedirs(cwd)
             os.makedirs(os.path.dirname(cwd), exist_ok=True)
             command = ["git", "clone", f"--branch={branch}", "--depth=1", repo, os.path.basename(cwd)]
             self._exec(*command, cwd=TEMP_DIR)

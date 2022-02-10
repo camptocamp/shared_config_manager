@@ -351,11 +351,11 @@
         },
         "setuptools": {
             "hashes": [
-                "sha256:716f9d20b4c3513d1720245eb1dac009b40c9694c88e940e54b67b8b65d09493",
-                "sha256:d181db00651bce5268b8f559795053d5e8f645e4dbafac6d262b22d7e72e19eb"
+                "sha256:09980778aa734c3037a47997f28d6db5ab18bdf2af0e49f719bfc53967fd2e82",
+                "sha256:608a7885b664342ae9fafc43840b29d219c5a578876f6f7e00c4e2612160587f"
             ],
-            "markers": "python_version >= '3.7'",
-            "version": "==60.9.0"
+            "index": "pypi",
+            "version": "==59.8.0"
         },
         "snowballstemmer": {
             "hashes": [
