@@ -49,7 +49,7 @@ jobs:
         env:
           PRIVATE_SSH_KEY: ${{secrets.PRIVATE_SSH_KEY}}
 
-      - run: docker-compose logs
+      - run: c2cciutils-docker-logs
         if: failure()
 
       - name: Publish
