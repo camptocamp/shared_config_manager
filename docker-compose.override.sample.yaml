@@ -7,6 +7,7 @@ services:
       LOG_LEVEL: DEBUG
       C2CWSGIUTILS_LOG_LEVEL: INFO
       OTHER_LOG_LEVEL: INFO
+      GUNICORN_CMD_ARGS: --reload
     volumes:
       - ./app/shared_config_manager:/app/shared_config_manager:ro
       # - ../c2cwsgiutils/c2cwsgiutils:/opt/c2cwsgiutils/c2cwsgiutils:ro
