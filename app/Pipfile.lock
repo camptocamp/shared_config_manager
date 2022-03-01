@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "4ea37457eb50044ba8e5a362b56aecf6ae1507d76baffafdff9b5267b558efdb"
+            "sha256": "654b4b4c82db7f1f907e391d9475375e55c2a6b6187b50b337c8a12543021e1e"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -177,7 +177,7 @@
                 "sha256:b36ffa925fe3139b2f6ff11d6925ffd4fa7bc47870165e3ac260ac7b4f91e6ac",
                 "sha256:d16e8c1deb60de41b8e8ed21c1a7b947b0bc62fab7e1d470bcdf331cea2e6735"
             ],
-            "index": "pypi",
+            "markers": "python_version < '3.9'",
             "version": "==4.11.2"
         },
         "importlib-resources": {
@@ -994,7 +994,7 @@
                 "sha256:6f62d78e2f89b4500b080fe3a81690850cd254227f27f75c3a0c491a1f351ba7",
                 "sha256:e8443a5e7a020e9d7f97f1d7d9cd17c88bcb3bc7e218bf9cf5095fe550be2951"
             ],
-            "markers": "python_version < '4' and python_full_version >= '3.6.1'",
+            "markers": "python_version < '4.0' and python_full_version >= '3.6.1'",
             "version": "==5.10.1"
         },
         "lazy-object-proxy": {
@@ -1117,11 +1117,11 @@
                 "with_pyroma"
             ],
             "hashes": [
-                "sha256:7916e72a0f960347e48df37f1376fa3ca07dac0ec109ac38ad3544dfdd12ab8c",
-                "sha256:cd8cbe646c84cf7bba7a4299c4aa5a8467616097c4fbc6ac825ff811fc6dbe16"
+                "sha256:1002046d6966262ee798980b16796ab5f675b2bceef0773ee86d8138c9284075",
+                "sha256:a02053b00fb5970e424598c91a02c6d515b5ceec72ea1bf4f26831514bedfaff"
             ],
             "index": "pypi",
-            "version": "==1.7.0"
+            "version": "==1.7.4"
         },
         "py": {
             "hashes": [
