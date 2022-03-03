@@ -15,7 +15,7 @@ WORKDIR /app
 EXPOSE 8080
 
 RUN apt-get update && \
-    apt-get install --assume-yes --no-install-recommends git rsync gettext-base python3-pip && \
+    apt-get install --assume-yes --no-install-recommends openssh-client git rsync gettext-base python3-pip && \
     apt-get clean && \
     rm -r /var/lib/apt/lists/*
 
