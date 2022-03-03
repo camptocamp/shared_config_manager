@@ -17,7 +17,9 @@ EXPOSE 8080
 RUN apt-get update && \
     apt-get install --assume-yes --no-install-recommends openssh-client git rsync gettext-base python3-pip && \
     apt-get clean && \
-    rm -r /var/lib/apt/lists/*
+    rm -r /var/lib/apt/lists/* && \
+    echo "    VerifyHostKeyDNS yes" >> /etc/ssh/ssh_config && \
+    echo "    StrictHostKeyChecking no" >> /etc/ssh/ssh_config  # TODO: find better
 
 COPY requirements.txt ./
 RUN python3 -m pip install --disable-pip-version-check --no-cache-dir --requirement=requirements.txt && \
