@@ -13,5 +13,6 @@ def main(_, **settings):
     config.include(c2cwsgiutils.pyramid.includeme)
     config.scan("shared_config_manager.services")
     HealthCheck(config)
-    sources.init(slave=False)
+    if os.environ.get("IS_SLAVE", "false").lower() == "false":
+        sources.init(slave=False)
     return config.make_wsgi_app()
