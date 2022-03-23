@@ -497,10 +497,11 @@
         },
         "redis": {
             "hashes": [
-                "sha256:001d2b22a7c4e29497ba893fe30d6c6e7b59b088f206374841c328c7f34003ec",
-                "sha256:7a79121ae02f4dfb9d6179ece854536c018a376359bd93fdcc9c363b048c5907"
+                "sha256:3cbe235cea80b9c9991b397567aa2d65eb4e6fb09787f61d227ae82eb4eb50b4",
+                "sha256:6758d01dec81af191b98a35cce3402675d115456584c39b500ab485a5e386bbb"
             ],
-            "version": "==4.2.0rc3"
+            "index": "pypi",
+            "version": "==4.2.0"
         },
         "requests": {
             "hashes": [
@@ -1006,7 +1007,7 @@
                 "sha256:6f62d78e2f89b4500b080fe3a81690850cd254227f27f75c3a0c491a1f351ba7",
                 "sha256:e8443a5e7a020e9d7f97f1d7d9cd17c88bcb3bc7e218bf9cf5095fe550be2951"
             ],
-            "markers": "python_version < '4.0' and python_full_version >= '3.6.1'",
+            "markers": "python_version < '4' and python_full_version >= '3.6.1'",
             "version": "==5.10.1"
         },
         "lazy-object-proxy": {
