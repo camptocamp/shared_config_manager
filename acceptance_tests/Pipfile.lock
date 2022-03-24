@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "b5595d31a89daf8ddea71a79ed8eaacc5d7774a7fbf4814ae0b1a05f06b3b441"
+            "sha256": "603bf2bd257eb2be40349c9425df0a3dad406eafad24b9862324ed4888711c39"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -286,7 +286,7 @@
                 "sha256:841132caef6b1ad17a9afde46dc4f6cfa59a05f9555aae5151f73bdf2820ca63",
                 "sha256:92f723789a8fdd7180b6b06483874feca4c48a5c76968e03bb3e7f806a1869ea"
             ],
-            "index": "pypi",
+            "markers": "python_version >= '3.7'",
             "version": "==7.1.1"
         },
         "pytest-cov": {
@@ -351,11 +351,11 @@
         },
         "setuptools": {
             "hashes": [
-                "sha256:6599055eeb23bfef457d5605d33a4d68804266e6cb430b0fb12417c5efeae36c",
-                "sha256:782ef48d58982ddb49920c11a0c5c9c0b02e7d7d1c2ad0aa44e1a1e133051c96"
+                "sha256:6221e37dc86fcdc9dad9d9eb2002e9f9798fe4aca1bf18f280e66e50c0eb7fca",
+                "sha256:ad88b13f3dc60420259c9877486908ddad12c7befaff0d624c7190f742abd64f"
             ],
             "index": "pypi",
-            "version": "==60.10.0"
+            "version": "==61.0.0"
         },
         "snowballstemmer": {
             "hashes": [
