@@ -190,7 +190,7 @@
                 "sha256:9c4c12f9ef4329a00c1f72f30bddb4f10e582766b8705980bb76356b3ba8bc91",
                 "sha256:f6a4a9949f36ae289facec8dac1a899a54cbaf6a135cc8552d2c8b69209c06a3"
             ],
-            "index": "pypi",
+            "markers": "python_version < '3.9'",
             "version": "==5.7.0"
         },
         "inotify": {
@@ -775,7 +775,7 @@
                 "sha256:56bf8aadb83c24db6c4b577e13de374ccfb67da2078beba1d037c17980bf43ad",
                 "sha256:c4f6e5bbf48e74f7a38e7cc5b0480ff42b0ae5178957d564d18932525d5cf099"
             ],
-            "markers": "python_version < '3.10'",
+            "markers": "python_version >= '3.7'",
             "version": "==3.8.0"
         },
         "zope.deprecation": {
@@ -1012,7 +1012,7 @@
                 "sha256:6f62d78e2f89b4500b080fe3a81690850cd254227f27f75c3a0c491a1f351ba7",
                 "sha256:e8443a5e7a020e9d7f97f1d7d9cd17c88bcb3bc7e218bf9cf5095fe550be2951"
             ],
-            "markers": "python_version < '4' and python_full_version >= '3.6.1'",
+            "markers": "python_version < '4.0' and python_full_version >= '3.6.1'",
             "version": "==5.10.1"
         },
         "lazy-object-proxy": {
@@ -1236,10 +1236,11 @@
         },
         "pyroma": {
             "hashes": [
-                "sha256:41f860851dbff82dbf4bec69da3d6b16b70f9e47e03a6d0366968b8e167293c7",
-                "sha256:b80a4727ca32b4b9f09c33f714e08908df359c6074830a6930fdffb749b30d40"
+                "sha256:8aab9bc66f6bbd8a23a545a10ceea62d858bfdd1a3bd0144c2ac0854d029aacb",
+                "sha256:b41ed0e080fb3aa9a7b8359d0ce7af39bc9b59cb9e7d696c6521f525257cc128"
             ],
-            "version": "==4.0b2"
+            "index": "pypi",
+            "version": "==4.0"
         },
         "pytest": {
             "hashes": [
