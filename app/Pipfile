@@ -14,6 +14,7 @@ pytest-cov = "==3.0.0"
 prospector = {extras = ["with_mypy", "with_bandit", "with_pyroma"],version = "==1.7.7"}
 types-pyyaml = "==6.0.8"
 types-requests = "==2.27.30"
+typing-extensions = "==4.2.0"
 
 [requires]
 python_version = "3.8"
