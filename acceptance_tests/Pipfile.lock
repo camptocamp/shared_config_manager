@@ -32,7 +32,7 @@
         },
         "coverage": {
             "extras": [
-
+                "toml"
             ],
             "hashes": [
                 "sha256:00c8544510f3c98476bbd58201ac2b150ffbcce46a8c3e4fb89ebf01998f806a",
@@ -77,7 +77,7 @@
                 "sha256:eef5292b60b6de753d6e7f2d128d5841c7915fb1e3321c3a1fe6acfe76c38052",
                 "sha256:fb45fe08e1abc64eb836d187b20a59172053999823f7f6ef4f18a819c44ba16f"
             ],
-            "index": "pypi",
+            "markers": "python_version >= '3.7'",
             "version": "==6.4"
         },
         "dill": {
@@ -390,11 +390,11 @@
         },
         "tomlkit": {
             "hashes": [
-                "sha256:30d54c0b914e595f3d10a87888599eab5321a2a69abc773bbefff51599b72db6",
-                "sha256:905cf92c2111ef80d355708f47ac24ad1b6fc2adc5107455940088c9bbecaedb"
+                "sha256:0f4050db66fd445b885778900ce4dd9aea8c90c4721141fde0d6ade893820ef1",
+                "sha256:71ceb10c0eefd8b8f11fe34e8a51ad07812cb1dc3de23247425fbc9ddc47b9dd"
             ],
-            "markers": "python_version >= '3.6' and python_version < '4.0'",
-            "version": "==0.10.2"
+            "index": "pypi",
+            "version": "==0.11.0"
         },
         "typing-extensions": {
             "hashes": [
