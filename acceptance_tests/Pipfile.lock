@@ -248,11 +248,11 @@
         },
         "pylint": {
             "hashes": [
-                "sha256:aaec437c0cd44c9b2674c8b3ebe87290f2252d4bd0939b4fbf748c4866eb9823",
-                "sha256:d21012da3129cd4cd050039245923654859860ca829fe8a67ff9d693ccb8283e"
+                "sha256:10d291ea5133645f73fc1b51ca137ad6531223c1461a5632a1db029a9bc033b5",
+                "sha256:ef64ce5d4c17b8906caeaf2c2914ef3036a3a1b7f4a86f5fbf6caff9067c5f63"
             ],
-            "markers": "python_full_version >= '3.7.2'",
-            "version": "==2.14.0b1"
+            "index": "pypi",
+            "version": "==2.14.0"
         },
         "pylint-celery": {
             "hashes": [
@@ -385,7 +385,7 @@
                 "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc",
                 "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"
             ],
-            "markers": "python_version >= '3.7'",
+            "markers": "python_version < '3.11'",
             "version": "==2.0.1"
         },
         "tomlkit": {
@@ -393,7 +393,7 @@
                 "sha256:0f4050db66fd445b885778900ce4dd9aea8c90c4721141fde0d6ade893820ef1",
                 "sha256:71ceb10c0eefd8b8f11fe34e8a51ad07812cb1dc3de23247425fbc9ddc47b9dd"
             ],
-            "index": "pypi",
+            "markers": "python_version >= '3.6' and python_version < '4.0'",
             "version": "==0.11.0"
         },
         "typing-extensions": {
