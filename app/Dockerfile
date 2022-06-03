@@ -1,4 +1,4 @@
-FROM ubuntu:20.04 AS base
+FROM ubuntu:22.04 AS base
 LABEL maintainer "info@camptocamp.org"
 
 # Fail on error on pipe, see: https://github.com/hadolint/hadolint/wiki/DL4006.
