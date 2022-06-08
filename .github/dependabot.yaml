@@ -7,7 +7,7 @@ updates:
     allow:
       - dependency-type: all
     schedule:
-      interval: daily
+      interval: monthly
     ignore:
       - dependency-name: none
   - package-ecosystem: pip
@@ -15,7 +15,7 @@ updates:
     allow:
       - dependency-type: all
     schedule:
-      interval: daily
+      interval: monthly
     ignore:
       - dependency-name: none
   - package-ecosystem: pip
@@ -23,19 +23,19 @@ updates:
     allow:
       - dependency-type: all
     schedule:
-      interval: daily
+      interval: monthly
     ignore:
       - dependency-name: none
 
   - package-ecosystem: docker
     directory: /app
     schedule:
-      interval: weekly
+      interval: monthly
     ignore:
       - dependency-name: none
   - package-ecosystem: docker
     directory: '/acceptance_tests'
     schedule:
-      interval: weekly
+      interval: monthly
     ignore:
       - dependency-name: none
