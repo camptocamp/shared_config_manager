@@ -6,7 +6,7 @@ verify_ssl = true
 [packages]
 pytest-cov = "==3.0.0"
 prospector = "==1.7.7"
-astroid = "==2.11.5"
+astroid = "==2.11.6"
 # For astroid on python < 3.10
 typing-extensions = "==4.2.0"
 setuptools = "==62.3.3"
