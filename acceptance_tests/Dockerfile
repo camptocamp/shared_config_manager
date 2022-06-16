@@ -6,12 +6,12 @@ RUN apt-get update
 RUN apt-get install --assume-yes git
 
 COPY requirements.txt ./
-RUN python3 -m pip install --disable-pip-version-check --no-cache-dir --requirement=requirements.txt && \
-  rm --recursive --force /tmp/*
+RUN python3 -m pip install --disable-pip-version-check --no-cache-dir --requirement=requirements.txt \
+    && rm --recursive --force /tmp/*
 
 COPY Pipfile Pipfile.lock ./
-RUN pipenv sync --system --clear && \
-  rm --recursive --force /usr/local/lib/python3.*/dist-packages/tests/ /tmp/* /root/.cache/*
+RUN pipenv sync --system --clear \
+    && rm --recursive --force /usr/local/lib/python3.*/dist-packages/tests/ /tmp/* /root/.cache/*
 
 COPY . ./
 
