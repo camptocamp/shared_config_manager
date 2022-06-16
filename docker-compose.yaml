@@ -115,5 +115,5 @@ services:
     command: redis-server --save "" --appendonly no
 
   tests:
-    image: camptocamp/shared_config_manager_acceptance:latest
+    image: camptocamp/shared_config_manager-acceptance:latest
     command: sleep infinity
