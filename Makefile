@@ -1,5 +1,6 @@
 DOCKER_TAG ?= latest
 DOCKER_BASE = camptocamp/shared_config_manager
+export DOCKER_BUILDKIT = 1
 
 THIS_MAKEFILE_PATH := $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
 THIS_DIR := $(shell cd $(dir $(THIS_MAKEFILE_PATH));pwd)
@@ -8,11 +9,13 @@ GIT_HASH := $(shell git rev-parse HEAD)
 
 DOCKER_TTY := $(shell [ -t 0 ] && echo -ti)
 
-.PHONY: all
-all: build acceptance
-
-.PHONY: build
-build: build_app
+.PHONY: help
+help: ## Display this help message
+	@echo "Usage: make <target>"
+	@echo
+	@echo "Available targets:"
+	@grep --extended-regexp --no-filename '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) | sort | \
+		awk 'BEGIN {FS = ":.*?## "}; {printf "	%-20s%s\n", $$1, $$2}'
 
 .venv/timestamp: app/requirements.txt requirements.txt Makefile
 	python3 -m venv .venv
@@ -28,19 +31,22 @@ pull:
 push: build
 	docker push $(DOCKER_BASE):$(DOCKER_TAG)
 
-.PHONY: build_app
-build_app:
-	docker build --tag=$(DOCKER_BASE):$(DOCKER_TAG) --build-arg="GIT_HASH=$(GIT_HASH)" \
-		--build-arg="PRIVATE_SSH_KEY=$(shell echo ${PRIVATE_SSH_KEY})" app
+.PHONY: build
+build: ## Build the application Docker image
+	docker build --tag=$(DOCKER_BASE):$(DOCKER_TAG) --build-arg="GIT_HASH=$(GIT_HASH)" app
 
-.PHONY: build_acceptance
-build_acceptance:
-	docker build --tag=$(DOCKER_BASE)_acceptance:$(DOCKER_TAG) acceptance_tests
+.PHONY: build-checker
+build-checker: # Build the Docker image for checks and tests
+	docker build --target=checker --tag=$(DOCKER_BASE)-checker:$(DOCKER_TAG) --build-arg="GIT_HASH=$(GIT_HASH)" app
+
+.PHONY: build-acceptance
+build-acceptance:
+	docker build --tag=$(DOCKER_BASE)-acceptance:$(DOCKER_TAG) acceptance_tests
 
 .PHONY: acceptance
-acceptance: build_acceptance build
+acceptance: build-acceptance build # Run the acceptance tests
 	docker-compose up -d
-	docker-compose exec -T tests py.test -vv --color=yes --junitxml /reports/acceptance.xml acceptance
+	docker-compose exec -T tests pytest -vv --color=yes --junitxml /reports/acceptance.xml acceptance
 	docker-compose down
 
 .PHONY: run
@@ -53,3 +59,21 @@ run: build
 clean:
 	rm -rf reports .venv
 	docker-compose down
+
+.PHONY: checks
+checks: prospector acceptance-prospector ## Run the checks
+
+.PHONY: acceptance-prospector
+acceptance-prospector: build-acceptance ## Run Prospector on acceptance
+	docker run --rm --volume=${PWD}/acceptance_tests:/acceptance_tests $(DOCKER_BASE)-acceptance:$(DOCKER_TAG) \
+		prospector --output=pylint --die-on-tool-error
+
+.PHONY: prospector
+prospector: build-checker ## Run Prospector
+	docker run --rm --volume=${PWD}/app:/app $(DOCKER_BASE)-checker:$(DOCKER_TAG) \
+		prospector --output=pylint --die-on-tool-error
+
+.PHONY: tests
+tests: build-checker ## Run the unit tests
+	docker run --rm --volume=${PWD}/app:/app --env=PRIVATE_SSH_KEY $(DOCKER_BASE)-checker:$(DOCKER_TAG) \
+		pytest -vv --cov=shared_config_manager --color=yes tests

@@ -21,11 +21,6 @@ jobs:
     if: "!startsWith(github.event.head_commit.message, '[skip ci] ')"
 
     steps:
-      - uses: docker-practice/actions-setup-docker@master
-        with:
-          docker_version: 19.03
-      - run: sudo python3 -m pip install docker-compose==1.28.4
-
       - uses: actions/checkout@v2
 
       - uses: camptocamp/initialise-gopass-summon-action@v2
@@ -46,13 +41,17 @@ jobs:
 
       - name: Build
         run: make build
+
+      - name: Checks
+        run: make checks
+
+      - name: Tests
+        run: make tests
         env:
           PRIVATE_SSH_KEY: ${{secrets.PRIVATE_SSH_KEY}}
 
       - name: Acceptance
         run: make acceptance
-        env:
-          PRIVATE_SSH_KEY: ${{secrets.PRIVATE_SSH_KEY}}
 
       - run: c2cciutils-docker-logs
         if: failure()
