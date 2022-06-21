@@ -25,11 +25,6 @@ jobs:
           - master
 
     steps:
-      - uses: docker-practice/actions-setup-docker@master
-        with:
-          docker_version: 19.03
-      - run: sudo python3 -m pip install docker-compose==1.28.4
-
       - uses: actions/checkout@v3
         with:
           ref: ${{ matrix.branch }}
