@@ -36,9 +36,9 @@ RUN --mount=type=cache,target=/var/lib/apt/lists \
     --mount=type=cache,target=/root/.cache \
     --mount=type=bind,from=poetry,source=/tmp,target=/poetry \
     apt-get update \
-    && apt-get install --assume-yes --no-install-recommends python3-dev gcc \
+    && apt-get install --assume-yes --no-install-recommends python3-dev libpq-dev gcc \
     && python3 -m pip install --disable-pip-version-check --no-deps --requirement=/poetry/requirements.txt \
-    && apt-get remove --assume-yes --autoremove python3-dev gcc
+    && apt-get autoremove --assume-yes python3-dev libpq-dev gcc
 
 COPY . ./
 
