@@ -46,7 +46,8 @@ RUN --mount=type=cache,target=/var/lib/apt/lists \
     && echo "    VerifyHostKeyDNS yes" >> /etc/ssh/ssh_config \
     && echo "    StrictHostKeyChecking no" >> /etc/ssh/ssh_config # TODO: find better
 
-RUN --mount=type=cache,target=/root/.cache \
+RUN --mount=type=cache,target=/var/lib/apt/lists \
+    --mount=type=cache,target=/root/.cache \
     --mount=type=cache,target=/var/cache,sharing=locked \
     --mount=type=bind,from=poetry,source=/tmp,target=/poetry \
     apt-get update \
