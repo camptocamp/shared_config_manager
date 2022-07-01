@@ -1,5 +1,6 @@
 import logging
 import os.path
+import re
 import subprocess
 from typing import Dict, List, cast
 
@@ -15,6 +16,7 @@ stats_service = services.create("stats", "/1/status/{key}")
 source_stats_service = services.create("service_stats", "/1/status/{id}/{key}")
 tarball_service = services.create("tarball", "/1/tarball/{id}/{key}")
 LOG = logging.getLogger(__name__)
+__BRANCH_NAME_SANITIZER = re.compile(r"[^0-9a-zA-z-_]")
 
 
 @refresh_service.get()
@@ -46,8 +48,13 @@ def refresh_webhook(request):
     if ref is None:
         raise HTTPServerError(f"Webhook for {id_} is missing the ref")
     if ref != "refs/heads/" + source_git.get_branch():
-        LOG.info("Ignoring webhook notif for non-matching branch %s on %s", source_git.get_branch(), id_)
-        return {"status": 200, "ignored": True, "reason": f"Not {source_git.get_branch()} branch"}
+        LOG.info(
+            "Ignoring webhook notif for non-matching branch %s on %s",
+            source_git.get_branch(),
+            id_,
+        )
+        branch = __BRANCH_NAME_SANITIZER.sub("", source_git.get_branch())
+        return {"status": 200, "ignored": True, "reason": f"Not {branch} branch"}
 
     return _refresh(request)
 
