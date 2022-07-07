@@ -75,6 +75,7 @@ def git_source(app_connection):
         assert not os.path.exists(os.path.join("/config", slave, "other"))
 
 
+@pytest.mark.skip(reason="Too many sporadic errors")
 def test_ok(app_connection, git_source):
     time.sleep(0.1)
 
