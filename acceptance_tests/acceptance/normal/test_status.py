@@ -1,6 +1,9 @@
 from pprint import pformat
 
+import pytest
 
+
+@pytest.mark.skip(reason="Too many sporadic errors")
 def test_all(app_connection):
     stats = app_connection.get_json("1/status/changeme")
     print(f"stats={pformat(stats)}")
