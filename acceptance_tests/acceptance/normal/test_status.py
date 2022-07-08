@@ -1,5 +1,7 @@
 from pprint import pformat
 
+import pytest
+
 
 @pytest.mark.skip(reason="Too many sporadic errors")
 def test_all(app_connection):
