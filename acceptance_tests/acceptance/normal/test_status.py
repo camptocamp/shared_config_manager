@@ -26,7 +26,7 @@ def test_other(app_connection):
     assert status["template_engines"][0]["environment_variables"]["TEST_ENV"] == "42", status[
         "template_engines"
     ][0]["environment_variables"]
-    assert status["template_engines"][0]["environment_variables"]["TEST_KEY"] == "xxx", status[
+    assert status["template_engines"][0]["environment_variables"]["TEST_KEY"] == "•••", status[
         "template_engines"
     ][0]["environment_variables"]
     assert set(status["tags"]) == {"1.0.0", "otherTag"}

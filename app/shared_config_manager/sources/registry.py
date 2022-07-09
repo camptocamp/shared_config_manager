@@ -193,12 +193,14 @@ def _slave_fetch(id_: str, key: str) -> None:
         reload_master_config()
 
 
-def check_id_key(id_: str, key: str) -> Tuple[Optional[base.BaseSource], bool]:
+def check_id_key(id_: str, key: Optional[str] = None) -> Tuple[Optional[base.BaseSource], bool]:
     filtered = False
     source = get_source(id_)
     if source is None:
         source = FILTERED_SOURCES.get(id_)
         filtered = True
+    if not key:
+        return source, filtered
     if source is not None and MASTER_SOURCE:
         try:
             source.validate_key(key)

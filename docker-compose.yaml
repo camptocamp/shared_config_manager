@@ -5,10 +5,13 @@ services:
   api:
     image: camptocamp/shared_config_manager:latest
     environment: &scm_env
+      C2C_AUTH_GITHUB_CLIENT_ID: an-id
+      C2C_AUTH_GITHUB_CLIENT_SECRET: a-secret
+      C2C_AUTH_GITHUB_REPOSITORY: camptocamp/shared_config_manager
+      C2C_AUTH_GITHUB_SECRET: a-secret-long-a-secret
       STATS_VIEW: 1
       # STATSD_ADDRESS: 172.17.0.1:8125
       # STATSD_PREFIX: shared_config_manager.dev.app
-      C2C_SECRET: toto
       LOG_TYPE: console
       LOG_LEVEL: DEBUG
       C2CWSGIUTILS_LOG_LEVEL: INFO
