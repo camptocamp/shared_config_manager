@@ -26,7 +26,7 @@ authors = []
 python = ">=3.8,<3.11"
 PyYAML = "6.0"
 inotify = "0.2.10"
-c2cwsgiutils = {version = "5.0.0", extras = ["broadcast", "standard"]}
+c2cwsgiutils = {version = "5.1.0", extras = ["broadcast", "standard"]}
 
 [tool.poetry.dev-dependencies]
 pytest-cov = "3.0.0"
