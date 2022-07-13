@@ -3,7 +3,9 @@ import json
 import logging
 import os
 import tempfile
+from typing import List
 
+from shared_config_manager.configuration import SourceStatus
 from shared_config_manager.sources import mode
 from shared_config_manager.sources.ssh import SshBaseSource
 
@@ -12,14 +14,14 @@ LOG = logging.getLogger(__name__)
 
 
 class GitSource(SshBaseSource):
-    def _do_refresh(self):
+    def _do_refresh(self) -> None:
         self._checkout()
         self._copy(self._copy_dir(), excludes=[".git"])
         stats = dict(hash=self._get_hash(), tags=self._get_tags())
         with open(os.path.join(self.get_path(), ".gitstats"), "w", encoding="utf-8") as gitstats:
             json.dump(stats, gitstats)
 
-    def _checkout(self):
+    def _checkout(self) -> None:
         cwd = self._clone_dir()
         repo = self._get_repo()
         branch = self.get_branch()
@@ -39,10 +41,10 @@ class GitSource(SshBaseSource):
             command = ["git", "clone", f"--branch={branch}", "--depth=1", repo, os.path.basename(cwd)]
             self._exec(*command, cwd=TEMP_DIR)
 
-    def _get_repo(self):
+    def _get_repo(self) -> str:
         return self._config["repo"]
 
-    def _clone_dir(self):
+    def _clone_dir(self) -> str:
         if self._do_sparse():
             return os.path.join(TEMP_DIR, self.get_id())
         else:
@@ -51,17 +53,17 @@ class GitSource(SshBaseSource):
             encoded_repo = base64.urlsafe_b64encode(self._get_repo().encode("utf-8")).decode("utf-8")
             return os.path.join(TEMP_DIR, encoded_repo)
 
-    def _do_sparse(self):
+    def _do_sparse(self) -> bool:
         return "sub_dir" in self._config and self._config.get("sparse", True)
 
-    def _copy_dir(self):
+    def _copy_dir(self) -> str:
         sub_dir = self._config.get("sub_dir")
         if sub_dir is None:
             return self._clone_dir()
         else:
             return os.path.join(self._clone_dir(), sub_dir)
 
-    def get_stats(self):
+    def get_stats(self) -> SourceStatus:
         stats = super().get_stats()
         stats_path = os.path.join(self.get_path(), ".gitstats")
         if os.path.isfile(stats_path):
@@ -69,19 +71,19 @@ class GitSource(SshBaseSource):
                 stats.update(json.load(gitstats))
         return stats
 
-    def _get_hash(self):
+    def _get_hash(self) -> str:
         return self._exec("git", "rev-parse", "HEAD", cwd=self._clone_dir())
 
-    def _get_tags(self):
+    def _get_tags(self) -> List[str]:
         out = self._exec("git", "tag", "--points-at", "HEAD", cwd=self._clone_dir())
         if out == "":
             return []
         return out.split("\n")
 
-    def get_branch(self):
+    def get_branch(self) -> str:
         return str(self._config.get("branch", "master"))
 
-    def delete(self):
+    def delete(self) -> None:
         super().delete()
         if mode.is_master():
             self._exec("rm", "-rf", self._clone_dir())

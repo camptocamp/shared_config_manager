@@ -2,13 +2,16 @@ import logging
 import os.path
 import re
 import subprocess
-from typing import Dict, List, cast
+from typing import Any, Dict, Iterable, List, Optional, Union, cast
 
+import pyramid.request
+import pyramid.response
 from c2cwsgiutils import services
 from pyramid.httpexceptions import HTTPNotFound, HTTPServerError
-from pyramid.response import Response
 
-from shared_config_manager import slave_status, sources
+from shared_config_manager import slave_status
+from shared_config_manager.configuration import BroadcastObject, SourceStatus
+from shared_config_manager.sources import git, registry
 
 refresh_service = services.create("refresh", "/1/refresh/{id}/{key}")
 refresh_all_service = services.create("refresh_all", "/1/refresh/{key}")
@@ -19,26 +22,26 @@ LOG = logging.getLogger(__name__)
 __BRANCH_NAME_SANITIZER = re.compile(r"[^0-9a-zA-z-_]")
 
 
-@refresh_service.get()
-def refresh(request):
+@refresh_service.get()  # type: ignore
+def refresh(request: pyramid.request.Request) -> Dict[str, Any]:
     id_ = request.matchdict["id"]
-    source, _ = sources.check_id_key(id_=id_, key=request.matchdict["key"])
+    source, _ = registry.check_id_key(id_=id_, key=request.matchdict["key"])
     if source is None:
         raise HTTPNotFound(f"Unknown id {id_}")
     return _refresh(request)
 
 
-@refresh_service.post()
-def refresh_webhook(request):
+@refresh_service.post()  # type: ignore
+def refresh_webhook(request: pyramid.request.Request) -> Dict[str, Any]:
     id_ = request.matchdict["id"]
-    source, _ = sources.check_id_key(id_=id_, key=request.matchdict["key"])
+    source, _ = registry.check_id_key(id_=id_, key=request.matchdict["key"])
     if source is None:
         raise HTTPNotFound(f"Unknown id {id_}")
 
     if source.get_type() != "git":
         raise HTTPServerError(f"Non GIT source {id_} cannot be refreshed by a webhook")
 
-    source_git = cast(sources.git.GitSource, source)
+    source_git = cast(git.GitSource, source)
 
     if request.headers.get("X-GitHub-Event") != "push":
         LOG.info("Ignoring webhook notif for a non-push event on %s", id_)
@@ -59,30 +62,30 @@ def refresh_webhook(request):
     return _refresh(request)
 
 
-def _refresh(request):
-    sources.refresh(id_=request.matchdict["id"], key=request.matchdict["key"])
+def _refresh(request: pyramid.request.Request) -> Dict[str, Any]:
+    registry.refresh(id_=request.matchdict["id"], key=request.matchdict["key"])
     return {"status": 200}
 
 
-@refresh_all_service.get()
-def refresh_all(request):
-    if not sources.MASTER_SOURCE:
+@refresh_all_service.get()  # type: ignore
+def refresh_all(request: pyramid.request.Request) -> Dict[str, Any]:
+    if not registry.MASTER_SOURCE:
         raise HTTPServerError("Master source not initialized")
     key = request.matchdict["key"]
-    sources.MASTER_SOURCE.validate_key(key)
+    registry.MASTER_SOURCE.validate_key(key)
     nb_refresh = 0
-    for id_ in sources.get_sources().keys():
-        sources.refresh(id_=id_, key=key)
+    for id_ in registry.get_sources().keys():
+        registry.refresh(id_=id_, key=key)
         nb_refresh += 1
     return {"status": 200, "nb_refresh": nb_refresh}
 
 
-@refresh_all_service.post()
-def refresh_all_webhook(request):
-    if not sources.MASTER_SOURCE:
+@refresh_all_service.post()  # type: ignore
+def refresh_all_webhook(request: pyramid.request.Request) -> Dict[str, Any]:
+    if not registry.MASTER_SOURCE:
         raise HTTPServerError("Master source not initialized")
     key = request.matchdict["key"]
-    sources.MASTER_SOURCE.validate_key(key)
+    registry.MASTER_SOURCE.validate_key(key)
 
     if request.headers.get("X-GitHub-Event") != "push":
         LOG.info("Ignoring webhook notif for a non-push event on %s")
@@ -93,11 +96,11 @@ def refresh_all_webhook(request):
         raise HTTPServerError("Webhook is missing the ref")
 
     nb_refresh = 0
-    for id_, source in sources.get_sources().items():
+    for id_, source in registry.get_sources().items():
         if not source or source.get_type() != "git":
             continue
 
-        source_git = cast(sources.git.GitSource, source)
+        source_git = cast(git.GitSource, source)
 
         if ref != "refs/heads/" + source_git.get_branch():
             LOG.info(
@@ -107,53 +110,53 @@ def refresh_all_webhook(request):
                 id_,
             )
             continue
-        sources.refresh(id_=id_, key=key)
+        registry.refresh(id_=id_, key=key)
         nb_refresh += 1
 
     return {"status": 200, "nb_refresh": nb_refresh}
 
 
-@stats_service.get()
-def stats(request):
-    if not sources.MASTER_SOURCE:
+@stats_service.get()  # type: ignore
+def stats(request: pyramid.request.Request) -> Dict[str, Any]:
+    if not registry.MASTER_SOURCE:
         return {"slaves": {}}
-    sources.MASTER_SOURCE.validate_key(request.matchdict["key"])
+    registry.MASTER_SOURCE.validate_key(request.matchdict["key"])
     slaves_status = slave_status.get_slaves_status()
     assert slaves_status is not None
     slaves = {slave["hostname"]: _cleanup_slave_status(slave) for slave in slaves_status if slave is not None}
     return {"slaves": slaves}
 
 
-@source_stats_service.get()
-def source_stats(request):
+@source_stats_service.get()  # type: ignore
+def source_stats(request: pyramid.request.Request) -> Dict[str, Any]:
     id_ = request.matchdict["id"]
-    source, _ = sources.check_id_key(id_=id_, key=request.matchdict["key"])
+    source, _ = registry.check_id_key(id_=id_, key=request.matchdict["key"])
     if source is None:
         raise HTTPNotFound(f"Unknown id {id_}")
-    slaves = slave_status.get_source_status(id_=id_)
+    slaves: Optional[List[SourceStatus]] = slave_status.get_source_status(id_=id_)
     assert slaves is not None
-    statuses: List[Dict] = []
+    statuses: List[SourceStatus] = []
     for slave in slaves:
         if slave is None or slave.get("filtered", False):
             continue
-        status = _cleanup_slave_status(slave)
+        status = cast(SourceStatus, _cleanup_slave_status(slave))
         if status not in statuses:
             statuses.append(status)
 
     return {"statuses": statuses}
 
 
-def _cleanup_slave_status(status):
-    result = dict(status)
+def _cleanup_slave_status(status: BroadcastObject) -> BroadcastObject:
+    result = cast(BroadcastObject, dict(status))
     result.pop("hostname", None)
     result.pop("pid", None)
     return result
 
 
-@tarball_service.get()
-def tarball(request):
+@tarball_service.get()  # type: ignore
+def tarball(request: pyramid.request.Request) -> pyramid.response.Response:
     id_ = request.matchdict["id"]
-    source, filtered = sources.check_id_key(id_=id_, key=request.matchdict["key"])
+    source, filtered = registry.check_id_key(id_=id_, key=request.matchdict["key"])
     if source is None:
         raise HTTPNotFound(f"Unknown id {id_}")
     if not source.is_loaded():
@@ -165,7 +168,7 @@ def tarball(request):
         LOG.error("The path %s does not exists or is not a path, for the source %s.", path, source.get_id())
         raise HTTPNotFound("Not loaded yet: path didn't exists")
 
-    response: Response = request.response
+    response: pyramid.response.Response = request.response
 
     files = os.listdir(path)
     if ".gitstats" in files:
@@ -181,7 +184,7 @@ def tarball(request):
     return response
 
 
-def _proc_iter(proc: subprocess.Popen):
+def _proc_iter(proc: subprocess.Popen[bytes]) -> Iterable[Union[bytes, Any]]:
     while True:
         block = proc.stdout.read(4096)  # type: ignore
         if not block:

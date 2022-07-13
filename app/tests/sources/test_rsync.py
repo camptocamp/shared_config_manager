@@ -1,10 +1,10 @@
 import os
 
-from shared_config_manager import sources
+from shared_config_manager.sources import registry
 
 
 def test_rsync():
-    source = sources._create_source(
+    source = registry._create_source(
         "test_rsync", {"type": "rsync", "source": "/app/tests/sources", "excludes": ["test_git.py"]}
     )
     source.refresh()

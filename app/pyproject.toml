@@ -1,10 +1,10 @@
 [tool.mypy]
 python_version = "3.8"
+ignore_missing_imports = true
 warn_redundant_casts = true
 warn_unused_ignores = true
-check_untyped_defs = true
-skip_version_check = true
-ignore_missing_imports = true
+warn_return_any = true
+strict = true
 
 [tool.isort]
 known_third_party = "c2cwsgiutils"
@@ -42,7 +42,7 @@ typing-extensions = "4.3.0"
 shared-config-slave = "shared_config_manager.scripts.shared_config_slave:main"
 
 [tool.poetry.plugins."paste.app_factory"]
-main = "shared_config_manager:main"
+main = "shared_config_manager.app:main"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

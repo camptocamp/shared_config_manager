@@ -19,5 +19,5 @@ def is_master_with_slaves() -> bool:
     return is_master() and os.environ.get("API_MASTER") is not None
 
 
-def get_fetch_url(id_, key):
+def get_fetch_url(id_: str, key: str) -> str:
     return f"{API_BASE_URL}1/tarball/{id_}/{key}"

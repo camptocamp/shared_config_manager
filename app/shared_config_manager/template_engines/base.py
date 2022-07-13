@@ -1,25 +1,27 @@
 import logging
 import os
-from typing import List
+from typing import Dict, List, cast
 
 from c2cwsgiutils import stats
+
+from shared_config_manager.configuration import TemplateEnginesConfig, TemplateEnginesStatus
 
 LOG = logging.getLogger(__name__)
 ENV_PREFIXES = os.environ.get("SCM_ENV_PREFIXES", "MUTUALIZED_").split(":")
 
 
 class BaseEngine:
-    def __init__(self, source_id, config, extension):
+    def __init__(self, source_id: str, config: TemplateEnginesConfig, extension: str) -> None:
         self._source_id = source_id
         self._config = config
         self._extension = extension
         if self._config.get("environment_variables", False):
-            self._data = _filter_env(os.environ)
+            self._data = _filter_env(cast(Dict[str, str], os.environ))
             self._data.update(config.get("data", {}))
         else:
             self._data = config.get("data", {})
 
-    def evaluate(self, root_dir: str, files: List[str]):
+    def evaluate(self, root_dir: str, files: List[str]) -> None:
         extension_len = len(self._extension) + 1
         dest_dir = self._get_dest_dir(root_dir)
         LOG.info(
@@ -46,24 +48,24 @@ class BaseEngine:
             elif src_path != dest_path and not os.path.isdir(src_path) and not os.path.exists(dest_path):
                 os.link(src_path, dest_path)
 
-    def _get_dest_dir(self, root_dir):
+    def _get_dest_dir(self, root_dir: str) -> str:
         if "dest_sub_dir" in self._config:
             return os.path.join(root_dir, self._config["dest_sub_dir"])
         else:
             return root_dir
 
-    def _evaluate_file(self, src_path, dst_path):
+    def _evaluate_file(self, src_path: str, dst_path: str) -> None:
         pass
 
-    def get_type(self):
+    def get_type(self) -> str:
         return self._config["type"]
 
-    def get_stats(self, stats):  # pylint: disable=redefined-outer-name
+    def get_stats(self, stats: TemplateEnginesStatus) -> None:  # pylint: disable=redefined-outer-name
         if self._config.get("environment_variables", False):
-            stats["environment_variables"] = _filter_env(os.environ)
+            stats["environment_variables"] = _filter_env(cast(Dict[str, str], os.environ))
 
 
-def _filter_env(env):
+def _filter_env(env: Dict[str, str]) -> Dict[str, str]:
     result = {}
     for key, value in env.items():
         if any(key.startswith(i) for i in ENV_PREFIXES):
