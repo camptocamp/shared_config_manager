@@ -1,11 +1,11 @@
 import os
-import time
 
 import yaml
 from acceptance import get_hash, wait_sync
+from c2cwsgiutils.acceptance.connection import Connection
 
 
-def test_ok(app_connection):
+def test_ok(app_connection: Connection):
     test_git_hash = get_hash("/repos/test_git")
 
     # Be sure that we have the initial config (empty)
@@ -13,7 +13,6 @@ def test_ok(app_connection):
         config_file.write(
             yaml.dump(
                 {
-                    "key": "changeme",
                     "sources": {},
                 }
             )
@@ -30,12 +29,10 @@ def test_ok(app_connection):
         config_file.write(
             yaml.dump(
                 {
-                    "key": "changeme",
                     "sources": {
                         "test_git": {
                             "type": "git",
                             "repo": "/repos/test_git",
-                            "key": "changeme",
                             "tags": ["test"],
                             "template_engines": [{"type": "shell", "environment_variables": True}],
                         }
@@ -53,14 +50,7 @@ def test_ok(app_connection):
 
     # Go back to an empty config
     with open("/etc/shared_config_manager/config.yaml", "w") as config_file:
-        config_file.write(
-            yaml.dump(
-                {
-                    "key": "changeme",
-                    "sources": {},
-                }
-            )
-        )
+        config_file.write(yaml.dump({"sources": {}}))
 
     # Wait that's applied
     wait_sync(app_connection, "test_git", None)

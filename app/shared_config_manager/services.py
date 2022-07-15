@@ -13,11 +13,11 @@ from shared_config_manager import slave_status
 from shared_config_manager.configuration import BroadcastObject, SourceStatus
 from shared_config_manager.sources import git, registry
 
-_refresh_service = services.create("refresh", "/1/refresh/{id}/{key}")
-_refresh_all_service = services.create("refresh_all", "/1/refresh/{key}")
-_status_service = services.create("stats", "/1/status/{key}")
-_source_stats_service = services.create("service_stats", "/1/status/{id}/{key}")
-_tarball_service = services.create("tarball", "/1/tarball/{id}/{key}")
+_refresh_service = services.create("refresh", "/1/refresh/{id}")
+_refresh_all_service = services.create("refresh_all", "/1/refresh")
+_status_service = services.create("stats", "/1/status")
+_source_stats_service = services.create("service_stats", "/1/status/{id}")
+_tarball_service = services.create("tarball", "/1/tarball/{id}")
 
 
 _LOG = logging.getLogger(__name__)
@@ -27,7 +27,7 @@ __BRANCH_NAME_SANITIZER = re.compile(r"[^0-9a-zA-z-_]")
 @_refresh_service.get()  # type: ignore
 def _refresh_view(request: pyramid.request.Request) -> Dict[str, Any]:
     id_ = request.matchdict["id"]
-    source, _ = registry.check_id_key(id_=id_, key=request.matchdict["key"])
+    source, _ = registry.get_source_check_auth(id_=id_, request=request)
     if source is None:
         raise HTTPNotFound(f"Unknown id {id_}")
     return _refresh(request)
@@ -36,7 +36,7 @@ def _refresh_view(request: pyramid.request.Request) -> Dict[str, Any]:
 @_refresh_service.post()  # type: ignore
 def _refresh_webhook(request: pyramid.request.Request) -> Dict[str, Any]:
     id_ = request.matchdict["id"]
-    source, _ = registry.check_id_key(id_=id_, key=request.matchdict["key"])
+    source, _ = registry.get_source_check_auth(id_=id_, request=request)
     if source is None:
         raise HTTPNotFound(f"Unknown id {id_}")
 
@@ -65,7 +65,7 @@ def _refresh_webhook(request: pyramid.request.Request) -> Dict[str, Any]:
 
 
 def _refresh(request: pyramid.request.Request) -> Dict[str, Any]:
-    registry.refresh(id_=request.matchdict["id"], key=request.matchdict["key"])
+    registry.refresh(id_=request.matchdict["id"], request=request)
     return {"status": 200}
 
 
@@ -73,11 +73,10 @@ def _refresh(request: pyramid.request.Request) -> Dict[str, Any]:
 def _refresh_all(request: pyramid.request.Request) -> Dict[str, Any]:
     if not registry.MASTER_SOURCE:
         raise HTTPServerError("Master source not initialized")
-    key = request.matchdict["key"]
-    registry.MASTER_SOURCE.validate_key(key)
+    registry.MASTER_SOURCE.validate_auth(request)
     nb_refresh = 0
     for id_ in registry.get_sources().keys():
-        registry.refresh(id_=id_, key=key)
+        registry.refresh(id_=id_, request=request)
         nb_refresh += 1
     return {"status": 200, "nb_refresh": nb_refresh}
 
@@ -86,8 +85,7 @@ def _refresh_all(request: pyramid.request.Request) -> Dict[str, Any]:
 def _refresh_all_webhook(request: pyramid.request.Request) -> Dict[str, Any]:
     if not registry.MASTER_SOURCE:
         raise HTTPServerError("Master source not initialized")
-    key = request.matchdict["key"]
-    registry.MASTER_SOURCE.validate_key(key)
+    registry.MASTER_SOURCE.validate_auth(request=request)
 
     if request.headers.get("X-GitHub-Event") != "push":
         _LOG.info("Ignoring webhook notif for a non-push event on %s")
@@ -112,7 +110,7 @@ def _refresh_all_webhook(request: pyramid.request.Request) -> Dict[str, Any]:
                 id_,
             )
             continue
-        registry.refresh(id_=id_, key=key)
+        registry.refresh(id_=id_, request=request)
         nb_refresh += 1
 
     return {"status": 200, "nb_refresh": nb_refresh}
@@ -122,7 +120,7 @@ def _refresh_all_webhook(request: pyramid.request.Request) -> Dict[str, Any]:
 def _stats(request: pyramid.request.Request) -> Dict[str, Any]:
     if not registry.MASTER_SOURCE:
         return {"slaves": {}}
-    registry.MASTER_SOURCE.validate_key(request.matchdict["key"])
+    registry.MASTER_SOURCE.validate_auth(request=request)
     slaves_status = slave_status.get_slaves_status()
     assert slaves_status is not None
     slaves = {slave["hostname"]: _cleanup_slave_status(slave) for slave in slaves_status if slave is not None}
@@ -132,7 +130,7 @@ def _stats(request: pyramid.request.Request) -> Dict[str, Any]:
 @_source_stats_service.get()  # type: ignore
 def _source_stats(request: pyramid.request.Request) -> Dict[str, Any]:
     id_ = request.matchdict["id"]
-    source, _ = registry.check_id_key(id_=id_, key=request.matchdict["key"])
+    source, _ = registry.get_source_check_auth(id_=id_, request=request)
     if source is None:
         raise HTTPNotFound(f"Unknown id {id_}")
     slaves: Optional[List[SourceStatus]] = slave_status.get_source_status(id_=id_)
@@ -158,7 +156,7 @@ def _cleanup_slave_status(status: BroadcastObject) -> BroadcastObject:
 @_tarball_service.get()  # type: ignore
 def _tarball(request: pyramid.request.Request) -> pyramid.response.Response:
     id_ = request.matchdict["id"]
-    source, filtered = registry.check_id_key(id_=id_, key=request.matchdict["key"])
+    source, filtered = registry.get_source_check_auth(id_=id_, request=request)
     if source is None:
         raise HTTPNotFound(f"Unknown id {id_}")
     if not source.is_loaded():

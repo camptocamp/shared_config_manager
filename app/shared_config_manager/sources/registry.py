@@ -7,9 +7,10 @@ from threading import Thread
 from typing import Dict, Mapping, Optional, Tuple
 
 import inotify.adapters
+import pyramid.request
 import yaml
 from c2cwsgiutils import broadcast
-from pyramid.httpexceptions import HTTPBadRequest, HTTPForbidden, HTTPNotFound
+from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
 
 from shared_config_manager.configuration import Config, SourceConfig, SourceStatus
 from shared_config_manager.sources import base, git, mode, rclone, rsync
@@ -23,11 +24,9 @@ FILTERED_SOURCES: Mapping[str, base.BaseSource] = {}
 _TAG_FILTER = os.environ.get("TAG_FILTER")
 
 
-def _create_source(
-    id_: str, config: SourceConfig, is_master: bool = False, default_key: Optional[str] = None
-) -> base.BaseSource:
+def _create_source(id_: str, config: SourceConfig, is_master: bool = False) -> base.BaseSource:
     type_ = config["type"]
-    return _ENGINES[type_](id_, config, is_master, default_key)
+    return _ENGINES[type_](id_, config, is_master)
 
 
 def get_sources() -> Mapping[str, base.BaseSource]:
@@ -69,7 +68,7 @@ def init(slave: bool) -> None:
         _LOG.info("The master config is inline")
         content["standalone"] = True
         # A fake master source to have auth work
-        MASTER_SOURCE = base.BaseSource(_MASTER_ID, content, is_master=True, default_key=content.get("key"))
+        MASTER_SOURCE = base.BaseSource(_MASTER_ID, content, is_master=True)
         Thread(target=_handle_master_config, args=[content], name="master_config_loader", daemon=True).start()
     else:
         MASTER_SOURCE = _create_source(_MASTER_ID, content, is_master=True)
@@ -112,7 +111,7 @@ def _handle_master_config(config: Config) -> None:
             _delete_source(id_)  # to be sure the old stuff is cleaned
 
         try:
-            _SOURCES[id_] = _create_source(id_, source_config, default_key=config.get("key"))
+            _SOURCES[id_] = _create_source(id_, source_config)
             _SOURCES[id_].refresh_or_fetch()
         except Exception:
             _LOG.error("Cannot load the %s config", id_, exc_info=True)
@@ -162,30 +161,30 @@ def _filter_sources(
     return result, filtered
 
 
-def refresh(id_: str, key: str) -> None:
+def refresh(id_: str, request: Optional[pyramid.request.Request]) -> None:
     """
     This is called from the web service to start a refresh.
     """
     _LOG.info("Reloading the %s config", id_)
-    source, _ = check_id_key(id_, key)
+    source, _ = get_source_check_auth(id_, request)
     if source is None:
         raise HTTPNotFound(f"Unknown id {id_}")
     source.refresh()
     if source.is_master() and (not MASTER_SOURCE or not MASTER_SOURCE.get_config().get("standalone", False)):
         reload_master_config()
-    broadcast.broadcast("slave_fetch", params=dict(id_=id_, key=key))
+    broadcast.broadcast("slave_fetch", params=dict(id_=id_))
 
 
-def _slave_fetch(id_: str, key: str) -> None:
+def _slave_fetch(id_: str) -> None:
     """
     This is run on every slave when a source needs a refresh.
     """
-    source, filtered = check_id_key(id_, key)
+    source, filtered = get_source_check_auth(id_, None)
     if source is None:
         _LOG.error("Unknown id %d", id_)
         return
     if filtered and not mode.is_master():
-        _LOG.info("The reloading the %s config is filtred", id_)
+        _LOG.info("The reloading the %s config is filtered", id_)
         return
     _LOG.info("Reloading the %s config from event", id_)
     source.fetch()
@@ -193,19 +192,17 @@ def _slave_fetch(id_: str, key: str) -> None:
         reload_master_config()
 
 
-def check_id_key(id_: str, key: Optional[str] = None) -> Tuple[Optional[base.BaseSource], bool]:
+def get_source_check_auth(
+    id_: str, request: Optional[pyramid.request.Request]
+) -> Tuple[Optional[base.BaseSource], bool]:
     filtered = False
     source = get_source(id_)
     if source is None:
         source = FILTERED_SOURCES.get(id_)
         filtered = True
-    if not key:
-        return source, filtered
-    if source is not None and MASTER_SOURCE:
-        try:
-            source.validate_key(key)
-        except HTTPForbidden:
-            MASTER_SOURCE.validate_key(key)
+    if source is not None:
+        if request is not None:
+            source.validate_auth(request)
         return source, filtered
     return None, filtered
 

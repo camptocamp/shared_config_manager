@@ -11,7 +11,7 @@ LOG = logging.getLogger(__name__)
 
 def wait_slaves():
     def what() -> bool:
-        r = requests.get("http://api:8080/scm/1/status/changeme")
+        r = requests.get("http://api:8080/scm/1/status", headers={"X-Scm-Secret": "changeme"})
         if r.status_code == 200:
             json = r.json()
             if len(json["slaves"]) != 3:
@@ -49,7 +49,7 @@ def composition(request):
 
 
 @pytest.fixture
-def app_connection(composition):
+def app_connection(composition: None):
     """
     Fixture that returns a connection to a running batch container.
     """

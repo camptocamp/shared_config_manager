@@ -67,15 +67,25 @@ checks: prospector acceptance-prospector ## Run the checks
 
 .PHONY: acceptance-prospector
 acceptance-prospector: build-acceptance ## Run Prospector on acceptance
-	docker run --rm --volume=${PWD}/acceptance_tests:/acceptance_tests $(DOCKER_BASE)-acceptance:$(DOCKER_TAG) \
-		prospector --output=pylint --die-on-tool-error
+	docker run --rm --volume=${PWD}/acceptance_tests:/acceptance_tests --volume=${PWD}/acceptance_tests:/acceptance_tests/acceptance_tests $(DOCKER_BASE)-acceptance:$(DOCKER_TAG) \
+		prospector --output=pylint --die-on-tool-error acceptance_tests
 
 .PHONY: prospector
 prospector: build-checker ## Run Prospector
-	docker run --rm --volume=${PWD}/app:/app $(DOCKER_BASE)-checker:$(DOCKER_TAG) \
-		prospector --output=pylint --die-on-tool-error
+	docker run --rm --volume=${PWD}/app:/app --volume=${PWD}/app:/app/app $(DOCKER_BASE)-checker:$(DOCKER_TAG) \
+		prospector --output=pylint --die-on-tool-error app
+
+.PHONY: prospector-fast
+prospector-fast: ## Run Prospector without building the Docker image
+	docker run --rm --volume=${PWD}/app:/app --volume=${PWD}/app:/app/app $(DOCKER_BASE)-checker:$(DOCKER_TAG) \
+		prospector --output=pylint --die-on-tool-error app
 
 .PHONY: tests
 tests: build-checker ## Run the unit tests
 	docker run --rm --volume=${PWD}/app:/app --env=PRIVATE_SSH_KEY $(DOCKER_BASE)-checker:$(DOCKER_TAG) \
+		pytest -vv --cov=shared_config_manager --color=yes tests
+
+.PHONY: tests-fast
+tests-fast: ## Run the unit tests
+	docker run --rm --volume=${PWD}/app:/app --env=PRIVATE_SSH_KEY=$(shell gopass show gs/ci/github/token/gopass) $(DOCKER_BASE)-checker:$(DOCKER_TAG) \
 		pytest -vv --cov=shared_config_manager --color=yes tests

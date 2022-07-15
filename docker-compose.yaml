@@ -16,12 +16,13 @@ services:
       LOG_LEVEL: DEBUG
       C2CWSGIUTILS_LOG_LEVEL: INFO
       OTHER_LOG_LEVEL: DEBUG
+      SCM_SECRET: changeme
+      GITHUB_SECRET: changeme
       C2C_REDIS_URL: redis://redis:6379/1
       DEVELOPMENT: 1
       GUNICORN_PARAMS: '-b :8080 --reload'
       MASTER_CONFIG: |
         type: git
-        key: changeme
         repo: /repos/master
       API_BASE_URL: http://api:8080/scm
       TARGET: /config/api
@@ -39,12 +40,10 @@ services:
     environment:
       <<: *scm_env
       MASTER_CONFIG: |
-        key: changeme
         sources:
           test_git:
             type: git
             repo: /repos/test_git
-            key: changeme
             tags: ['test']
             template_engines:
               - type: shell

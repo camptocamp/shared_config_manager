@@ -32,7 +32,7 @@ def repo():
 
 
 def test_git(repo):
-    git = registry._create_source("test_git", {"type": "git", "key": "changeme", "repo": repo})
+    git = registry._create_source("test_git", {"type": "git", "repo": repo})
     assert not git._do_sparse()
     git.refresh()
     subprocess.check_call(["ls", "/config/test_git"])
@@ -57,9 +57,7 @@ def test_git(repo):
 
 
 def test_git_sub_dir(repo):
-    git = registry._create_source(
-        "test_git", {"type": "git", "key": "changeme", "repo": repo, "sub_dir": "toto"}
-    )
+    git = registry._create_source("test_git", {"type": "git", "repo": repo, "sub_dir": "toto"})
     assert git._do_sparse()
     git.refresh()
     subprocess.check_call(["ls", "/config/test_git"])
@@ -85,7 +83,7 @@ def test_git_sub_dir(repo):
 
 def test_git_sub_dir_no_sparse(repo):
     git = registry._create_source(
-        "test_git", {"type": "git", "key": "changeme", "repo": repo, "sub_dir": "toto", "sparse": False}
+        "test_git", {"type": "git", "repo": repo, "sub_dir": "toto", "sparse": False}
     )
     assert not git._do_sparse()
     git.refresh()
@@ -123,7 +121,6 @@ def test_git_with_key():
         {
             "type": "git",
             "repo": "git@github.com:camptocamp/private-geo-charts.git",
-            "key": "changeme",
             "ssh_key": "\n".join(ssh_key),
         },
     )

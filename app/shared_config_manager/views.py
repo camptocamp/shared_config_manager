@@ -45,7 +45,7 @@ def _ui_source(request: pyramid.request.Request) -> Dict[str, Any]:
     is_admin = isinstance(permission, Allowed)
 
     id_ = request.matchdict["id"]
-    source, filtered = registry.check_id_key(id_=id_)
+    source, filtered = registry.get_source_check_auth(id_=id_, request=request)
     if source is None:
         raise HTTPNotFound(f"Unknown id {id_} or forbidden")
     if not is_admin:

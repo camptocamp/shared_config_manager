@@ -1,14 +1,13 @@
 import os
 import re
-from typing import Optional
 
 from shared_config_manager.configuration import SourceConfig, SourceStatus
 from shared_config_manager.sources.base import BaseSource
 
 
 class RcloneSource(BaseSource):
-    def __init__(self, id_: str, config: SourceConfig, is_master: bool, default_key: Optional[str]):
-        super().__init__(id_, config, is_master, default_key)
+    def __init__(self, id_: str, config: SourceConfig, is_master: bool):
+        super().__init__(id_, config, is_master)
         self._setup_config(config["config"])
 
     def _do_refresh(self) -> None:
