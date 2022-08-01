@@ -416,8 +416,8 @@ optional = false
 python-versions = "*"
 
 [package.extras]
+docs = ["pylons-sphinx-themes", "Sphinx (>=1.7.5)"]
 paste = ["paste"]
-docs = ["Sphinx (>=1.7.5)", "pylons-sphinx-themes"]
 
 [[package]]
 name = "pep8-naming"
@@ -466,7 +466,7 @@ PasteDeploy = ">=2.0"
 plaster = ">=0.5"
 
 [package.extras]
-testing = ["pytest", "pytest-cov"]
+testing = ["pytest-cov", "pytest"]
 
 [[package]]
 name = "platformdirs"
@@ -489,8 +489,8 @@ optional = false
 python-versions = ">=3.6"
 
 [package.extras]
-dev = ["pre-commit", "tox"]
-testing = ["pytest", "pytest-benchmark"]
+testing = ["pytest-benchmark", "pytest"]
+dev = ["tox", "pre-commit"]
 
 [[package]]
 name = "prospector"
@@ -580,10 +580,10 @@ optional = false
 python-versions = ">=3.6"
 
 [package.extras]
+tests = ["coverage[toml] (==5.0.4)", "pytest (>=6.0.0,<7.0.0)"]
+docs = ["zope.interface", "sphinx-rtd-theme", "sphinx"]
+dev = ["pre-commit", "mypy", "coverage[toml] (==5.0.4)", "pytest (>=6.0.0,<7.0.0)", "cryptography (>=3.3.1)", "zope.interface", "sphinx-rtd-theme", "sphinx"]
 crypto = ["cryptography (>=3.3.1)"]
-dev = ["sphinx", "sphinx-rtd-theme", "zope.interface", "cryptography (>=3.3.1)", "pytest (>=6.0.0,<7.0.0)", "coverage[toml] (==5.0.4)", "mypy", "pre-commit"]
-docs = ["sphinx", "sphinx-rtd-theme", "zope.interface"]
-tests = ["pytest (>=6.0.0,<7.0.0)", "coverage[toml] (==5.0.4)"]
 
 [[package]]
 name = "pylint"
@@ -689,8 +689,8 @@ webob = ">=1.8.3"
 "zope.interface" = ">=3.8.0"
 
 [package.extras]
-docs = ["Sphinx (>=3.0.0)", "docutils", "pylons-sphinx-themes (>=1.0.8)", "pylons-sphinx-latesturl", "repoze.sphinx.autointerface", "sphinx-copybutton", "sphinxcontrib-autoprogram"]
-testing = ["webtest (>=1.3.1)", "zope.component (>=4.0)", "coverage", "pytest (>=5.4.2)", "pytest-cov"]
+testing = ["pytest-cov", "pytest (>=5.4.2)", "coverage", "zope.component (>=4.0)", "webtest (>=1.3.1)"]
+docs = ["sphinxcontrib-autoprogram", "sphinx-copybutton", "repoze.sphinx.autointerface", "pylons-sphinx-latesturl", "pylons-sphinx-themes (>=1.0.8)", "docutils", "Sphinx (>=3.0.0)"]
 
 [[package]]
 name = "pyramid-tm"
@@ -742,7 +742,7 @@ coverage = {version = ">=5.2.1", extras = ["toml"]}
 pytest = ">=4.6"
 
 [package.extras]
-testing = ["fields", "hunter", "process-tests", "six", "pytest-xdist", "virtualenv"]
+testing = ["virtualenv", "pytest-xdist", "six", "process-tests", "hunter", "fields"]
 
 [[package]]
 name = "pyyaml"
@@ -798,7 +798,7 @@ astroid = ">=1.4"
 
 [[package]]
 name = "sentry-sdk"
-version = "1.7.2"
+version = "1.9.0"
 description = "Python client for Sentry (https://sentry.io)"
 category = "main"
 optional = false
@@ -816,6 +816,7 @@ celery = ["celery (>=3)"]
 chalice = ["chalice (>=1.16.0)"]
 django = ["django (>=1.8)"]
 falcon = ["falcon (>=1.4)"]
+fastapi = ["fastapi (>=0.79.0)"]
 flask = ["flask (>=0.11)", "blinker (>=1.1)"]
 httpx = ["httpx (>=0.16.0)"]
 pure_eval = ["pure-eval", "executing", "asttokens"]
@@ -824,6 +825,7 @@ quart = ["quart (>=0.16.1)", "blinker (>=1.1)"]
 rq = ["rq (>=0.6)"]
 sanic = ["sanic (>=0.8)"]
 sqlalchemy = ["sqlalchemy (>=1.2)"]
+starlette = ["starlette (>=0.19.1)"]
 tornado = ["tornado (>=5)"]
 
 [[package]]
@@ -951,7 +953,7 @@ optional = false
 python-versions = "*"
 
 [package.extras]
-docs = ["Sphinx (>=1.3.1)", "docutils", "pylons-sphinx-themes"]
+docs = ["pylons-sphinx-themes", "docutils", "Sphinx (>=1.3.1)"]
 
 [[package]]
 name = "typing-extensions"
@@ -991,8 +993,8 @@ optional = false
 python-versions = ">=3.5"
 
 [package.extras]
-docs = ["sphinx", "repoze.sphinx.autointerface"]
-testing = ["pytest", "pytest-cov", "coverage"]
+testing = ["coverage", "pytest-cov", "pytest"]
+docs = ["repoze.sphinx.autointerface", "sphinx"]
 
 [[package]]
 name = "waitress"
@@ -1629,8 +1631,8 @@ requirements-detector = [
     {file = "requirements-detector-0.7.tar.gz", hash = "sha256:0d1e13e61ed243f9c3c86e6cbb19980bcb3a0e0619cde2ec1f3af70fdbee6f7b"},
 ]
 sentry-sdk = [
-    {file = "sentry-sdk-1.7.2.tar.gz", hash = "sha256:95fd321f583dfcfaf279a0b2cdc83d8d28c8b7cca4d2959fc4539bb4fecb56a0"},
-    {file = "sentry_sdk-1.7.2-py2.py3-none-any.whl", hash = "sha256:6f460da98b730d671510af18f119f96d01e3ba027ac0e985871abb3aede1c514"},
+    {file = "sentry-sdk-1.9.0.tar.gz", hash = "sha256:f185c53496d79b280fe5d9d21e6572aee1ab802d3354eb12314d216cfbaa8d30"},
+    {file = "sentry_sdk-1.9.0-py2.py3-none-any.whl", hash = "sha256:60b13757d6344a94bf0ccb3c0a006c4de77daab09871b30fbbd05d5ec24e54fb"},
 ]
 setoptconf-tmp = [
     {file = "setoptconf-tmp-0.3.1.tar.gz", hash = "sha256:e0480addd11347ba52f762f3c4d8afa3e10ad0affbc53e3ffddc0ca5f27d5778"},
