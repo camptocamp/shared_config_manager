@@ -32,7 +32,7 @@ c2cwsgiutils = {version = "5.1.0", extras = ["broadcast", "standard"]}
 pytest-cov = "3.0.0"
 prospector = {extras = ["with_mypy", "with_bandit"],version = "1.7.7"}
 pylint = "2.14.4"
-mypy = "0.961"
+mypy = "0.971"
 flake8 = "4.0.1"
 types-pyyaml = "6.0.9"
 types-requests = "2.28.0"
