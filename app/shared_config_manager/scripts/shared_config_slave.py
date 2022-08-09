@@ -5,14 +5,16 @@ import os
 import signal
 import sys
 import time
+from types import FrameType
+from typing import Optional
 
 import c2cwsgiutils.setup_process
 
 from shared_config_manager import slave_status  # noqa: F401, pylint: disable=unused-import
-from shared_config_manager import sources
+from shared_config_manager.sources import registry
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Run the shared config slave")
     c2cwsgiutils.setup_process.fill_arguments(parser)
     args = parser.parse_args()
@@ -23,12 +25,12 @@ def main():
 
     c2cwsgiutils.setup_process.bootstrap_application_from_options(args)
 
-    sources.init(slave=True)
+    registry.init(slave=True)
     while True:
         time.sleep(3600)
 
 
-def _sig_term(signum, frame):
+def _sig_term(signum: int, frame: Optional[FrameType]) -> None:
     logging.getLogger("shared_config_slave").info("Got a SIGTERM, stopping the slave")
     sys.exit(0)
 

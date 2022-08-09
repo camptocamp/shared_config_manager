@@ -3,3 +3,5 @@
 __pycache__/
 .pytest_cache/
 /app/shared_config_manager.egg-info/
+/app/.coverage
+/docker-compose.override.yaml

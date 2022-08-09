@@ -1,10 +1,12 @@
 import fileinput
 import os
+from typing import Optional
 
+from shared_config_manager.configuration import SourceConfig, SourceStatus
 from shared_config_manager.sources.base import BaseSource
 
 
-def _patch_openshift():
+def _patch_openshift() -> None:
     os.environ["HOME"] = "/var/www"
     try:
         with open("/etc/passwd", "a", encoding="utf-8") as passwd:
@@ -19,11 +21,11 @@ if os.getuid() not in (33, 0):
 
 
 class SshBaseSource(BaseSource):
-    def __init__(self, id_, config, is_master, default_key):
+    def __init__(self, id_: str, config: SourceConfig, is_master: bool, default_key: Optional[str]) -> None:
         super().__init__(id_, config, is_master, default_key)
         self._setup_key(config.get("ssh_key"))
 
-    def _setup_key(self, ssh_key):
+    def _setup_key(self, ssh_key: Optional[str]) -> None:
         if ssh_key is None:
             return
         ssh_path = self._ssh_path()
@@ -39,16 +41,16 @@ class SshBaseSource(BaseSource):
                 config.write(f"IdentityFile {key_path}\n")
 
     @staticmethod
-    def _ssh_path():
+    def _ssh_path() -> str:
         return os.path.join(os.environ["HOME"], ".ssh")
 
-    def get_stats(self):
+    def get_stats(self) -> SourceStatus:
         stats = super().get_stats()
         if "ssh_key" in stats:
             del stats["ssh_key"]
         return stats
 
-    def delete(self):
+    def delete(self) -> None:
         super().delete()
         ssh_key = self._config.get("ssh_key")
         if ssh_key is not None:

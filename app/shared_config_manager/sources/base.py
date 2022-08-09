@@ -5,13 +5,14 @@ import pathlib
 import shutil
 import subprocess
 import time
-from typing import Dict
+from typing import Any, Dict, List, Optional, cast
 
 import requests
 from c2cwsgiutils import stats
 from pyramid.httpexceptions import HTTPForbidden
 
 from shared_config_manager import template_engines
+from shared_config_manager.configuration import SourceConfig, SourceStatus
 from shared_config_manager.sources import mode
 
 LOG = logging.getLogger(__name__)
@@ -20,7 +21,7 @@ MASTER_TARGET = os.environ.get("MASTER_TARGET", "/master_config")
 
 
 class BaseSource:
-    def __init__(self, id_, config, is_master, default_key):
+    def __init__(self, id_: str, config: SourceConfig, is_master: bool, default_key: Optional[str]) -> None:
         self._id = id_
         self._config = config
         self._is_master = is_master
@@ -29,16 +30,16 @@ class BaseSource:
             template_engines.create_engine(self.get_id(), engine_conf)
             for engine_conf in config.get("template_engines", [])
         ]
-        if "key" not in config:
+        if "key" not in config and default_key is not None:
             config["key"] = default_key
 
-    def refresh_or_fetch(self):
+    def refresh_or_fetch(self) -> None:
         if mode.is_master():
             self.refresh()
         else:
             self.fetch()
 
-    def refresh(self):
+    def refresh(self) -> None:
         LOG.info("Doing a refresh of %s", self.get_id())
         try:
             self._is_loaded = False
@@ -52,7 +53,7 @@ class BaseSource:
         finally:
             self._is_loaded = True
 
-    def _eval_templates(self):
+    def _eval_templates(self) -> None:
         if mode.is_master_with_slaves():
             # masters with slaves don't need to evaluate templates
             return
@@ -67,7 +68,7 @@ class BaseSource:
             with stats.timer_context(["source", self.get_id(), "template", engine.get_type()]):
                 engine.evaluate(root_dir, files)
 
-    def fetch(self):
+    def fetch(self) -> None:
         try:
             self._is_loaded = False
             with stats.timer_context(["source", self.get_id(), "fetch"]):
@@ -80,10 +81,10 @@ class BaseSource:
         finally:
             self._is_loaded = True
 
-    def _do_refresh(self):
+    def _do_refresh(self) -> None:
         pass
 
-    def _do_fetch(self):
+    def _do_fetch(self) -> None:
         path = self.get_path()
         url = mode.get_fetch_url(self.get_id(), self._config["key"])
         while True:
@@ -120,7 +121,7 @@ class BaseSource:
                 )
                 time.sleep(1)
 
-    def _copy(self, source, excludes=None):
+    def _copy(self, source: str, excludes: Optional[List[str]] = None) -> None:
         os.makedirs(self.get_path(), exist_ok=True)
         cmd = [
             "rsync",
@@ -140,7 +141,7 @@ class BaseSource:
         with stats.timer_context(["source", self.get_id(), "copy"]):
             self._exec(*cmd)
 
-    def delete_target_dir(self):
+    def delete_target_dir(self) -> None:
         dest = self.get_path()
         LOG.info("Deleting target dir %s", dest)
         if os.path.isdir(dest):
@@ -156,43 +157,55 @@ class BaseSource:
         else:
             return os.path.join(MASTER_TARGET if self._is_master else TARGET, self.get_id())
 
-    def get_id(self):
+    def get_id(self) -> str:
         return self._id
 
-    def validate_key(self, key):
+    def validate_key(self, key: str) -> None:
         if key != self._config["key"]:
             raise HTTPForbidden("Invalid key")
 
-    def is_master(self):
+    def is_master(self) -> bool:
         return self._is_master
 
-    def get_stats(self):
-        stats_ = copy.deepcopy(self._config)
-        del stats_["key"]
+    def get_stats(self) -> SourceStatus:
+        config_copy = copy.deepcopy(self._config)
+        del config_copy["key"]
+        stats_ = cast(SourceStatus, config_copy)
         for template_stats, template_engine in zip(
             stats_.get("template_engines", []), self._template_engines
         ):
             template_engine.get_stats(template_stats)
+
             BaseSource._hide_sensitive(template_stats.get("data"))
             BaseSource._hide_sensitive(template_stats.get("environment_variables"))
         return stats_
 
-    def get_config(self):
+    def get_config(self) -> SourceConfig:
         return self._config
 
-    def get_type(self):
+    def get_type(self) -> str:
         return self._config["type"]
 
-    def delete(self):
+    def delete(self) -> None:
         self.delete_target_dir()
 
     @staticmethod
-    def _exec(*args, **kwargs):
+    def _exec(*args: Any, **kwargs: Any) -> str:
         try:
             args_ = list(map(str, args))
             LOG.debug("Running: %s", " ".join(args_))
-            output = subprocess.check_output(args_, stderr=subprocess.STDOUT, env=dict(os.environ), **kwargs)
-            output = output.decode("utf-8").strip()
+            output: str = (
+                subprocess.run(
+                    args_,
+                    check=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    env=dict(os.environ),
+                    **kwargs,
+                )
+                .stdout.decode("utf-8")
+                .strip()
+            )
             if output:
                 LOG.debug(output)
             return output
@@ -200,11 +213,11 @@ class BaseSource:
             LOG.error(exception.output.decode("utf-8").strip())
             raise
 
-    def is_loaded(self):
+    def is_loaded(self) -> bool:
         return self._is_loaded
 
     @staticmethod
-    def _hide_sensitive(data: Dict[str, str]) -> None:
+    def _hide_sensitive(data: Optional[Dict[str, str]]) -> None:
         if data is None:
             return
         for key in list(data.keys()):

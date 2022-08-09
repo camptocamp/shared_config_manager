@@ -4,7 +4,7 @@ import tempfile
 
 import pytest
 
-from shared_config_manager import sources
+from shared_config_manager.sources import registry
 
 TEMP_DIR = tempfile.gettempdir()
 
@@ -32,7 +32,7 @@ def repo():
 
 
 def test_git(repo):
-    git = sources._create_source("test_git", {"type": "git", "key": "changeme", "repo": repo})
+    git = registry._create_source("test_git", {"type": "git", "key": "changeme", "repo": repo})
     assert not git._do_sparse()
     git.refresh()
     subprocess.check_call(["ls", "/config/test_git"])
@@ -57,7 +57,7 @@ def test_git(repo):
 
 
 def test_git_sub_dir(repo):
-    git = sources._create_source(
+    git = registry._create_source(
         "test_git", {"type": "git", "key": "changeme", "repo": repo, "sub_dir": "toto"}
     )
     assert git._do_sparse()
@@ -84,7 +84,7 @@ def test_git_sub_dir(repo):
 
 
 def test_git_sub_dir_no_sparse(repo):
-    git = sources._create_source(
+    git = registry._create_source(
         "test_git", {"type": "git", "key": "changeme", "repo": repo, "sub_dir": "toto", "sparse": False}
     )
     assert not git._do_sparse()
