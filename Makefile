@@ -45,15 +45,17 @@ build-acceptance:
 
 .PHONY: acceptance
 acceptance: build-acceptance build # Run the acceptance tests
-	docker-compose up -d
+	docker-compose up --detach
 	docker-compose exec -T tests pytest -vv --color=yes --junitxml /reports/acceptance.xml acceptance
 	docker-compose down
 
 .PHONY: run
 run: build
-	docker-compose stop && \
-	docker-compose rm -f && \
-	docker-compose up
+	docker-compose stop
+	docker-compose rm --force
+	C2C_AUTH_GITHUB_CLIENT_ID=$(shell gopass show gs/projects/github/oauth-apps/geoservices-int/client-id) \
+	C2C_AUTH_GITHUB_CLIENT_SECRET=$(shell gopass show gs/projects/github/oauth-apps/geoservices-int/client-secret) \
+	docker-compose up --detach
 
 .PHONY: clean
 clean:

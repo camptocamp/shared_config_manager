@@ -7,7 +7,12 @@ def test_ok(app_connection):
 
 
 def test_bad_key(app_connection):
-    app_connection.get("1/refresh/test_git/bad", expected_status=403, cache_expected=CacheExpected.DONT_CARE)
+    app_connection.get(
+        "1/refresh/test_git/bad",
+        expected_status=302,
+        allow_redirects=False,
+        cache_expected=CacheExpected.DONT_CARE,
+    )
 
 
 def test_bad_id(app_connection):
@@ -68,4 +73,6 @@ def test_all_webhook(app_connection):
 
 
 def test_all_bad_key(app_connection):
-    app_connection.get("1/refresh/bad", expected_status=403, cache_expected=CacheExpected.DONT_CARE)
+    app_connection.get(
+        "1/refresh/bad", expected_status=302, allow_redirects=False, cache_expected=CacheExpected.DONT_CARE
+    )

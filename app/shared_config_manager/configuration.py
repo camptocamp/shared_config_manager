@@ -25,8 +25,15 @@ class TemplateEnginesConfig(TypedDict, total=False):
     data: Dict[str, str]
 
 
+class AuthConfig(TypedDict, total=False):
+    github_repository: str
+    github_access_type: str
+
+
 class SourceConfig(_SourceBase, total=False):
     key: str
+    name: str
+    auth: AuthConfig
     template_engines: List[TemplateEnginesConfig]
 
 
@@ -44,6 +51,7 @@ class BroadcastObject(TypedDict, total=False):
 class SourceStatus(_SourceBase, BroadcastObject, total=False):
     filtered: bool
     template_engines: List[TemplateEnginesStatus]
+    hash: str
 
 
 class SlaveStatus(BroadcastObject, total=False):

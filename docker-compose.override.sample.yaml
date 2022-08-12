@@ -4,19 +4,36 @@ version: '2'
 services:
   api:
     environment: &scm_env
-      LOG_LEVEL: DEBUG
-      C2CWSGIUTILS_LOG_LEVEL: INFO
-      OTHER_LOG_LEVEL: INFO
-      GUNICORN_CMD_ARGS: --reload
+      - LOG_LEVEL=DEBUG
+      - C2CWSGIUTILS_LOG_LEVEL=INFO
+      - OTHER_LOG_LEVEL=INFO
+      - GUNICORN_CMD_ARGS=--reload
+      - C2C_AUTH_GITHUB_CLIENT_ID
+      - C2C_AUTH_GITHUB_CLIENT_SECRET
+      - C2C_AUTH_GITHUB_SECRET=a-long-secret-a-long-secret
+      - C2C_AUTH_GITHUB_PROXY_URL=https://mutualize-int.apps.gs-ch-dev.camptocamp.com/redirect
+      - OAUTHLIB_INSECURE_TRANSPORT=1
     volumes:
       - ./app/shared_config_manager:/app/shared_config_manager:ro
       # - ../c2cwsgiutils/c2cwsgiutils:/opt/c2cwsgiutils/c2cwsgiutils:ro
+    ports:
+      - '8491:8080'
 
   api_inline:
     environment: *scm_env
     volumes:
       - ./app/shared_config_manager:/app/shared_config_manager:ro
       # - ../c2cwsgiutils/c2cwsgiutils:/opt/c2cwsgiutils/c2cwsgiutils:ro
+    ports:
+      - '8492:8080'
+
+  api_file:
+    environment: *scm_env
+    volumes:
+      - ./app/shared_config_manager:/app/shared_config_manager:ro
+      # - ../c2cwsgiutils/c2cwsgiutils:/opt/c2cwsgiutils/c2cwsgiutils:ro
+    ports:
+      - '8493:8080'
 
   slave:
     environment: *scm_env

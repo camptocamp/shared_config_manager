@@ -13,17 +13,19 @@ from shared_config_manager import slave_status
 from shared_config_manager.configuration import BroadcastObject, SourceStatus
 from shared_config_manager.sources import git, registry
 
-refresh_service = services.create("refresh", "/1/refresh/{id}/{key}")
-refresh_all_service = services.create("refresh_all", "/1/refresh/{key}")
-stats_service = services.create("stats", "/1/status/{key}")
-source_stats_service = services.create("service_stats", "/1/status/{id}/{key}")
-tarball_service = services.create("tarball", "/1/tarball/{id}/{key}")
-LOG = logging.getLogger(__name__)
+_refresh_service = services.create("refresh", "/1/refresh/{id}/{key}")
+_refresh_all_service = services.create("refresh_all", "/1/refresh/{key}")
+_status_service = services.create("stats", "/1/status/{key}")
+_source_stats_service = services.create("service_stats", "/1/status/{id}/{key}")
+_tarball_service = services.create("tarball", "/1/tarball/{id}/{key}")
+
+
+_LOG = logging.getLogger(__name__)
 __BRANCH_NAME_SANITIZER = re.compile(r"[^0-9a-zA-z-_]")
 
 
-@refresh_service.get()  # type: ignore
-def refresh(request: pyramid.request.Request) -> Dict[str, Any]:
+@_refresh_service.get()  # type: ignore
+def _refresh_view(request: pyramid.request.Request) -> Dict[str, Any]:
     id_ = request.matchdict["id"]
     source, _ = registry.check_id_key(id_=id_, key=request.matchdict["key"])
     if source is None:
@@ -31,8 +33,8 @@ def refresh(request: pyramid.request.Request) -> Dict[str, Any]:
     return _refresh(request)
 
 
-@refresh_service.post()  # type: ignore
-def refresh_webhook(request: pyramid.request.Request) -> Dict[str, Any]:
+@_refresh_service.post()  # type: ignore
+def _refresh_webhook(request: pyramid.request.Request) -> Dict[str, Any]:
     id_ = request.matchdict["id"]
     source, _ = registry.check_id_key(id_=id_, key=request.matchdict["key"])
     if source is None:
@@ -44,14 +46,14 @@ def refresh_webhook(request: pyramid.request.Request) -> Dict[str, Any]:
     source_git = cast(git.GitSource, source)
 
     if request.headers.get("X-GitHub-Event") != "push":
-        LOG.info("Ignoring webhook notif for a non-push event on %s", id_)
+        _LOG.info("Ignoring webhook notif for a non-push event on %s", id_)
         return {"status": 200, "ignored": True, "reason": "Not a push"}
 
     ref = request.json.get("ref")
     if ref is None:
         raise HTTPServerError(f"Webhook for {id_} is missing the ref")
     if ref != "refs/heads/" + source_git.get_branch():
-        LOG.info(
+        _LOG.info(
             "Ignoring webhook notif for non-matching branch %s on %s",
             source_git.get_branch(),
             id_,
@@ -67,8 +69,8 @@ def _refresh(request: pyramid.request.Request) -> Dict[str, Any]:
     return {"status": 200}
 
 
-@refresh_all_service.get()  # type: ignore
-def refresh_all(request: pyramid.request.Request) -> Dict[str, Any]:
+@_refresh_all_service.get()  # type: ignore
+def _refresh_all(request: pyramid.request.Request) -> Dict[str, Any]:
     if not registry.MASTER_SOURCE:
         raise HTTPServerError("Master source not initialized")
     key = request.matchdict["key"]
@@ -80,15 +82,15 @@ def refresh_all(request: pyramid.request.Request) -> Dict[str, Any]:
     return {"status": 200, "nb_refresh": nb_refresh}
 
 
-@refresh_all_service.post()  # type: ignore
-def refresh_all_webhook(request: pyramid.request.Request) -> Dict[str, Any]:
+@_refresh_all_service.post()  # type: ignore
+def _refresh_all_webhook(request: pyramid.request.Request) -> Dict[str, Any]:
     if not registry.MASTER_SOURCE:
         raise HTTPServerError("Master source not initialized")
     key = request.matchdict["key"]
     registry.MASTER_SOURCE.validate_key(key)
 
     if request.headers.get("X-GitHub-Event") != "push":
-        LOG.info("Ignoring webhook notif for a non-push event on %s")
+        _LOG.info("Ignoring webhook notif for a non-push event on %s")
         return {"status": 200, "ignored": True, "reason": "Not a push"}
 
     ref = request.json.get("ref")
@@ -103,7 +105,7 @@ def refresh_all_webhook(request: pyramid.request.Request) -> Dict[str, Any]:
         source_git = cast(git.GitSource, source)
 
         if ref != "refs/heads/" + source_git.get_branch():
-            LOG.info(
+            _LOG.info(
                 "Ignoring webhook notif for non-matching branch %s!=refs/heads/%s on %s",
                 ref,
                 source_git.get_branch(),
@@ -116,8 +118,8 @@ def refresh_all_webhook(request: pyramid.request.Request) -> Dict[str, Any]:
     return {"status": 200, "nb_refresh": nb_refresh}
 
 
-@stats_service.get()  # type: ignore
-def stats(request: pyramid.request.Request) -> Dict[str, Any]:
+@_status_service.get()  # type: ignore
+def _stats(request: pyramid.request.Request) -> Dict[str, Any]:
     if not registry.MASTER_SOURCE:
         return {"slaves": {}}
     registry.MASTER_SOURCE.validate_key(request.matchdict["key"])
@@ -127,8 +129,8 @@ def stats(request: pyramid.request.Request) -> Dict[str, Any]:
     return {"slaves": slaves}
 
 
-@source_stats_service.get()  # type: ignore
-def source_stats(request: pyramid.request.Request) -> Dict[str, Any]:
+@_source_stats_service.get()  # type: ignore
+def _source_stats(request: pyramid.request.Request) -> Dict[str, Any]:
     id_ = request.matchdict["id"]
     source, _ = registry.check_id_key(id_=id_, key=request.matchdict["key"])
     if source is None:
@@ -153,8 +155,8 @@ def _cleanup_slave_status(status: BroadcastObject) -> BroadcastObject:
     return result
 
 
-@tarball_service.get()  # type: ignore
-def tarball(request: pyramid.request.Request) -> pyramid.response.Response:
+@_tarball_service.get()  # type: ignore
+def _tarball(request: pyramid.request.Request) -> pyramid.response.Response:
     id_ = request.matchdict["id"]
     source, filtered = registry.check_id_key(id_=id_, key=request.matchdict["key"])
     if source is None:
@@ -165,7 +167,7 @@ def tarball(request: pyramid.request.Request) -> pyramid.response.Response:
     path = source.get_path()
 
     if not os.path.isdir(path):
-        LOG.error("The path %s does not exists or is not a path, for the source %s.", path, source.get_id())
+        _LOG.error("The path %s does not exists or is not a path, for the source %s.", path, source.get_id())
         raise HTTPNotFound("Not loaded yet: path didn't exists")
 
     response: pyramid.response.Response = request.response

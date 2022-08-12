@@ -169,7 +169,8 @@ class BaseSource:
 
     def get_stats(self) -> SourceStatus:
         config_copy = copy.deepcopy(self._config)
-        del config_copy["key"]
+        if "key" in config_copy:
+            del config_copy["key"]
         stats_ = cast(SourceStatus, config_copy)
         for template_stats, template_engine in zip(
             stats_.get("template_engines", []), self._template_engines
@@ -223,4 +224,4 @@ class BaseSource:
         for key in list(data.keys()):
             k = key.upper()
             if "KEY" in k or "PASSWORD" in k or "SECRET" in k:
-                data[key] = "xxx"
+                data[key] = "•••"
