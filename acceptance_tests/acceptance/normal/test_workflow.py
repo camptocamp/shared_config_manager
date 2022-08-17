@@ -5,17 +5,17 @@ import time
 import pytest
 import requests
 from acceptance import get_hash, wait_sync
+from c2cwsgiutils.acceptance.connection import Connection
 
 
 @pytest.fixture()
-def git_source(app_connection):
+def git_source(app_connection: Connection):
     with open("/repos/master/shared_config_manager.yaml", "a") as config:
         config.write(
             """\
   other:
     type: git
     repo: /repos/other
-    key: changeme
     tags: ['others']
     template_engines:
       - type: mako
@@ -46,7 +46,7 @@ def git_source(app_connection):
     master_hash = get_hash("/repos/master")
     other_hash = get_hash("/repos/other")
 
-    response = requests.get("http://api:8080/scm/1/refresh/master/changeme")
+    response = requests.get("http://api:8080/scm/1/refresh/master", headers={"X-Scm-Secret": "changeme"})
     assert response.ok
 
     wait_sync(app_connection, "master", master_hash)
@@ -67,7 +67,7 @@ def git_source(app_connection):
     )
     time.sleep(0.1)
 
-    app_connection.get_json("1/refresh/master/changeme")
+    app_connection.get_json("1/refresh/master", headers={"X-Scm-Secret": "changeme"})
     wait_sync(app_connection, "other", None)
     time.sleep(0.1)
 
@@ -97,7 +97,7 @@ def test_ok(app_connection, git_source):
     time.sleep(0.1)
 
     hash_ = get_hash(git_source)
-    app_connection.get_json("1/refresh/other/changeme")
+    app_connection.get_json("1/refresh/other", headers={"X-Scm-Secret": "changeme"})
     wait_sync(app_connection, "other", hash_)
     time.sleep(0.1)
 

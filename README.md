@@ -21,7 +21,6 @@ First you need to configure the source for the master configuration using the
 env:
   MASTER_CONFIG: |
     type: git
-    key: changeme
     repo: git@github.com:camptocamp/master_config.git
 ```
 
@@ -33,7 +32,6 @@ sources:
   test_git:
     type: git
     repo: git@github.com:camptocamp/test_git.git
-    key: changeme
     target_dir: /usr/local/tomcat/webapps/ROOT/print-apps
 ```
 
@@ -48,8 +46,7 @@ environment variable. For that, set the `standalone` key to `true` in the `MASTE
 `shared_config_manager.yaml` will be searched.
 
 There is also a mode where you can put directly the sources in the `MASTER_CONFIG`
-by setting the `sources` section and setting a `key` string both directly at the root of the
-`MASTER_CONFIG`.
+by setting the `sources` section directly at the root of the `MASTER_CONFIG`.
 
 ### Tunnings
 
@@ -64,6 +61,7 @@ A few environment variables can be used to tune the containers:
 - `MASTER_TARGET`: where to store the master config (defaults to `/master_config`)
 - `API_BASE_URL`: how to reach the master for slaves.
 - `API_MASTER`: if defined, this is a master with slaves (no template evaluation)
+- `SCM_SECRET`: the secret used to authenticate the request between the client and the server
 
 See [https://github.com/camptocamp/c2cwsgiutils] for other parameters.
 
@@ -72,8 +70,6 @@ See [https://github.com/camptocamp/c2cwsgiutils] for other parameters.
 #### Common source configuration parameters
 
 - `type`: the type of source
-- `key`: the secret key that will be used to trigger a refresh of the source. Uses the `key` specified at the root
-  of the config by default.
 - `target_dir`: the location where the source will be copied (default is the value of `id` in `/config`)
 - `excludes`: the list of files/directories to exclude
 - `template_engines`: a list of template engine configurations
@@ -88,7 +84,7 @@ See [https://github.com/camptocamp/c2cwsgiutils] for other parameters.
 - `sub_dir`: if only a sub_directory of the repository needs to be copied (defaults to the root of the
   repository)
 - `sparse`: if true (the default) and `sub_dir` is defined, will use a sparse clone. Disable that if you have multiple
-  sources using the same repository (will avoid cloning it for each sources).
+  sources using the same repository (will avoid cloning it for each source).
 
 #### Rsync source configuration parameters
 
@@ -131,8 +127,8 @@ services:
       C2C_REDIS_URL: redis://redis:6379
       MASTER_CONFIG: &master_config |
         type: git
-        key: changeme
         repo: git@github.com:camptocamp/master_config.git
+      SCM_SECRET: changeme
       TAG_FILTER: master
     links:
       - redis
@@ -210,29 +206,29 @@ Look there: [https://github.com/camptocamp/private-geo-charts/tree/master/mutual
 
 ## Refresh
 
-- `GET {ROUTE_PREFIX}/1/refresh/{ID}/{KEY}`
+- `GET {ROUTE_PREFIX}/1/refresh/{ID}`
 
 Refresh the given source `{ID}`. Returns 200 in case of success. The actual work is done asynchronously.
 
 To refresh the master configuration (list of sources), use `master` as ID.
 
-- `POST {ROUTE_PREFIX}/1/refresh/{ID}/{KEY}`
+- `POST {ROUTE_PREFIX}/1/refresh/{ID}`
 
 Same as the GET API, but to be used with a GutHub/GitLab webhook for push events. Will ignore events for other branches.
 
-- `GET {ROUTE_PREFIX}/1/refresh/{KEY}`
+- `GET {ROUTE_PREFIX}/1/refresh`
 
 Refresh all sources. Returns 200 in case of success. The actual work is done asynchronously.
 
 The master configuration is not refreshed.
 
-- `POST {ROUTE_PREFIX}/1/refresh/{KEY}`
+- `POST {ROUTE_PREFIX}/1/refresh`
 
 Same as the GET API, but to be used with a GutHub/GitLab webhook for push events. Will ignore events for other branches.
 
 ## Status
 
-- `GET {ROUTE_PREFIX}/1/status/{key}`
+- `GET {ROUTE_PREFIX}/1/status`
 
 Returns the glable status, looking like that:
 
@@ -283,7 +279,7 @@ Returns the glable status, looking like that:
 }
 ```
 
-- `GET {ROUTE_PREFIX}/1/status/{ID}/{KEY}`
+- `GET {ROUTE_PREFIX}/1/status/{ID}`
 
 Returns the status for the given source ID, looking like that:
 
@@ -307,6 +303,6 @@ Returns the status for the given source ID, looking like that:
 
 ## tarball
 
-- `GET {ROUTE_PREFIX}/1/tarball/{ID}/{KEY}`
+- `GET {ROUTE_PREFIX}/1/tarball/{ID}`
 
 Returns a `.tar.gz` containing the current content for the given source.

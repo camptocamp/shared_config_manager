@@ -13,7 +13,6 @@ sources:
   test_git:
     type: git
     repo: /repos/test_git
-    key: changeme
     tags: ['test']
     template_engines:
       - type: shell

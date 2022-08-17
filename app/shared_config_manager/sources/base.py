@@ -7,9 +7,11 @@ import subprocess
 import time
 from typing import Any, Dict, List, Optional, cast
 
+import pyramid.request
 import requests
 from c2cwsgiutils import stats
 from pyramid.httpexceptions import HTTPForbidden
+from pyramid.security import Allowed
 
 from shared_config_manager import template_engines
 from shared_config_manager.configuration import SourceConfig, SourceStatus
@@ -21,7 +23,7 @@ MASTER_TARGET = os.environ.get("MASTER_TARGET", "/master_config")
 
 
 class BaseSource:
-    def __init__(self, id_: str, config: SourceConfig, is_master: bool, default_key: Optional[str]) -> None:
+    def __init__(self, id_: str, config: SourceConfig, is_master: bool) -> None:
         self._id = id_
         self._config = config
         self._is_master = is_master
@@ -30,8 +32,6 @@ class BaseSource:
             template_engines.create_engine(self.get_id(), engine_conf)
             for engine_conf in config.get("template_engines", [])
         ]
-        if "key" not in config and default_key is not None:
-            config["key"] = default_key
 
     def refresh_or_fetch(self) -> None:
         if mode.is_master():
@@ -86,11 +86,11 @@ class BaseSource:
 
     def _do_fetch(self) -> None:
         path = self.get_path()
-        url = mode.get_fetch_url(self.get_id(), self._config["key"])
+        url = mode.get_fetch_url(self.get_id())
         while True:
             try:
                 LOG.info("Doing a fetch of %s", self.get_id())
-                response = requests.get(url, stream=True)
+                response = requests.get(url, headers={"X-Scm-Secret": os.environ["SCM_SECRET"]}, stream=True)
                 response.raise_for_status()
                 if os.path.exists(path):
                     shutil.rmtree(path)
@@ -160,17 +160,16 @@ class BaseSource:
     def get_id(self) -> str:
         return self._id
 
-    def validate_key(self, key: str) -> None:
-        if key != self._config["key"]:
-            raise HTTPForbidden("Invalid key")
+    def validate_auth(self, request: pyramid.request.Request) -> None:
+        permission = request.has_permission("all", self.get_config())
+        if not isinstance(permission, Allowed):
+            raise HTTPForbidden("Not allowed to access this source")
 
     def is_master(self) -> bool:
         return self._is_master
 
     def get_stats(self) -> SourceStatus:
         config_copy = copy.deepcopy(self._config)
-        if "key" in config_copy:
-            del config_copy["key"]
         stats_ = cast(SourceStatus, config_copy)
         for template_stats, template_engine in zip(
             stats_.get("template_engines", []), self._template_engines

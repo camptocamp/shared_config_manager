@@ -31,7 +31,6 @@ class AuthConfig(TypedDict, total=False):
 
 
 class SourceConfig(_SourceBase, total=False):
-    key: str
     name: str
     auth: AuthConfig
     template_engines: List[TemplateEnginesConfig]
@@ -59,5 +58,4 @@ class SlaveStatus(BroadcastObject, total=False):
 
 
 class Config(TypedDict, total=False):
-    key: str
     sources: Dict[str, SourceConfig]

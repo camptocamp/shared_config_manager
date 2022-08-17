@@ -1,22 +1,24 @@
 from pprint import pformat
 
+from c2cwsgiutils.acceptance.connection import Connection
 
-def test_all(app_connection):
-    stats = app_connection.get_json("1/status/changeme")
+
+def test_all(app_connection: Connection):
+    stats = app_connection.get_json("1/status", headers={"X-Scm-Secret": "changeme"})
     print(f"stats={pformat(stats)}")
     assert len(stats["slaves"]) == 3, stats["slaves"].keys()
     assert stats["slaves"]["api"]["sources"] == stats["slaves"]["slave"]["sources"]
     assert set(stats["slaves"]["slave-others"]["sources"].keys()) == {"master"}
 
 
-def test_master(app_connection):
-    stats = app_connection.get_json("1/status/master/changeme")
+def test_master(app_connection: Connection):
+    stats = app_connection.get_json("1/status/master", headers={"X-Scm-Secret": "changeme"})
     print(f"stats={pformat(stats)}")
     assert len(stats["statuses"]) == 1
 
 
-def test_other(app_connection):
-    stats = app_connection.get_json("1/status/test_git/changeme")
+def test_other(app_connection: Connection):
+    stats = app_connection.get_json("1/status/test_git", headers={"X-Scm-Secret": "changeme"})
     print(f"stats={pformat(stats)}")
     assert len(stats["statuses"]) == 1, stats["statuses"]
     status = stats["statuses"][0]

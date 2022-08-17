@@ -21,8 +21,8 @@ if os.getuid() not in (33, 0):
 
 
 class SshBaseSource(BaseSource):
-    def __init__(self, id_: str, config: SourceConfig, is_master: bool, default_key: Optional[str]) -> None:
-        super().__init__(id_, config, is_master, default_key)
+    def __init__(self, id_: str, config: SourceConfig, is_master: bool) -> None:
+        super().__init__(id_, config, is_master)
         self._setup_key(config.get("ssh_key"))
 
     def _setup_key(self, ssh_key: Optional[str]) -> None:
