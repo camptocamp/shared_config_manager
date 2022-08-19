@@ -5,3 +5,4 @@ __pycache__/
 /app/shared_config_manager.egg-info/
 /app/.coverage
 /docker-compose.override.yaml
+/acceptance_tests/node_modules/

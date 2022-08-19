@@ -49,9 +49,23 @@ jobs:
         run: make tests
         env:
           PRIVATE_SSH_KEY: ${{secrets.PRIVATE_SSH_KEY}}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: results
+          path: results
+          if-no-files-found: ignore
+          retention-days: 5
+        if: failure()
 
       - name: Acceptance
         run: make acceptance
+      - uses: actions/upload-artifact@v3
+        with:
+          name: acceptance
+          path: acceptance_tests/results
+          if-no-files-found: ignore
+          retention-days: 5
+        if: failure()
 
       - run: c2cciutils-docker-logs
         if: failure()

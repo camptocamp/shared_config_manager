@@ -35,6 +35,17 @@ services:
       - redis
     hostname: api
 
+  api_test_user:
+    image: camptocamp/shared_config_manager:latest
+    environment:
+      <<: *scm_env
+      TEST_USER: Test
+    volumes_from:
+      - tests:rw
+    links:
+      - redis
+    hostname: api_test_user
+
   api_inline:
     image: camptocamp/shared_config_manager:latest
     environment:
@@ -119,3 +130,6 @@ services:
   tests:
     image: camptocamp/shared_config_manager-acceptance:latest
     command: sleep infinity
+    volumes:
+      - ./acceptance_tests/results:/results
+      - ./acceptance_tests/acceptance:/acceptance_tests/acceptance

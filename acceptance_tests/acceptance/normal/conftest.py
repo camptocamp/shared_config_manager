@@ -14,9 +14,9 @@ def wait_slaves():
         r = requests.get("http://api:8080/scm/1/status", headers={"X-Scm-Secret": "changeme"})
         if r.status_code == 200:
             json = r.json()
-            if len(json["slaves"]) != 3:
+            if len(json["slaves"]) != 4:
                 raise Exception(
-                    f"Not seeing 3 slaves but {len(json['slaves'])}.",
+                    f"Not seeing 4 slaves but {len(json['slaves'])}.",
                 )
             for name, status in json["slaves"].items():
                 if name == "slave-others":

@@ -29,7 +29,20 @@ WORKDIR /acceptance_tests
 RUN --mount=type=cache,target=/var/lib/apt/lists \
     --mount=type=cache,target=/var/cache,sharing=locked \
     apt-get update \
-    && apt-get install --assume-yes --no-install-recommends git
+    && apt-get install --assume-yes --no-install-recommends git curl gnupg \
+        libglib2.0-0 libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 \
+        libxdamage1 libxfixes3 libxrandr2 libgbm1 libpango-1.0-0 libcairo2 libasound2
+
+RUN --mount=type=cache,target=/var/lib/apt/lists \
+    --mount=type=cache,target=/var/cache,sharing=locked \
+    . /etc/os-release \
+    && echo "deb https://deb.nodesource.com/node_18.x ${VERSION_CODENAME} main" > /etc/apt/sources.list.d/nodesource.list \
+    && curl --silent https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - \
+    && apt-get update \
+    && apt-get install --assume-yes --no-install-recommends 'nodejs=18.*'
+
+COPY package.json ./
+RUN npm install
 
 RUN --mount=type=cache,target=/var/lib/apt/lists \
     --mount=type=cache,target=/var/cache,sharing=locked \

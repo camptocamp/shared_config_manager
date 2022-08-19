@@ -35,6 +35,13 @@ services:
     ports:
       - '8493:8080'
 
+  api_test_user:
+    environment: *scm_env
+    volumes:
+      - ./app/shared_config_manager:/app/shared_config_manager:ro
+    ports:
+      - '8494:8080'
+
   slave:
     environment: *scm_env
     volumes:

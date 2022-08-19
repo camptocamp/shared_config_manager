@@ -45,6 +45,8 @@ build-acceptance:
 
 .PHONY: acceptance
 acceptance: build-acceptance build # Run the acceptance tests
+	C2C_AUTH_GITHUB_CLIENT_ID=$(shell gopass show gs/projects/github/oauth-apps/geoservices-int/client-id) \
+	C2C_AUTH_GITHUB_CLIENT_SECRET=$(shell gopass show gs/projects/github/oauth-apps/geoservices-int/client-secret) \
 	docker-compose up --detach
 	docker-compose exec -T tests pytest -vv --color=yes --junitxml /reports/acceptance.xml acceptance
 	docker-compose down
@@ -80,12 +82,13 @@ prospector-fast: ## Run Prospector without building the Docker image
 	docker run --rm --volume=${PWD}/app:/app --volume=${PWD}/app:/app/app $(DOCKER_BASE)-checker:$(DOCKER_TAG) \
 		prospector --output=pylint --die-on-tool-error app
 
+DOCKER_RUN_TESTS = docker run --rm --volume=${PWD}/results/:/results --volume=${PWD}/app:/app
+DOCKER_IMAGE_PYTEST = $(DOCKER_BASE)-checker:$(DOCKER_TAG) pytest -vv --color=yes
+
 .PHONY: tests
 tests: build-checker ## Run the unit tests
-	docker run --rm --volume=${PWD}/app:/app --env=PRIVATE_SSH_KEY $(DOCKER_BASE)-checker:$(DOCKER_TAG) \
-		pytest -vv --cov=shared_config_manager --color=yes tests
+	$(DOCKER_RUN_TESTS) --env=PRIVATE_SSH_KEY $(DOCKER_IMAGE_PYTEST) tests
 
 .PHONY: tests-fast
 tests-fast: ## Run the unit tests
-	docker run --rm --volume=${PWD}/app:/app --env=PRIVATE_SSH_KEY=$(shell gopass show gs/ci/github/token/gopass) $(DOCKER_BASE)-checker:$(DOCKER_TAG) \
-		pytest -vv --cov=shared_config_manager --color=yes tests
+	$(DOCKER_RUN_TESTS) --env=PRIVATE_SSH_KEY=$(shell gopass show gs/ci/github/token/gopass) $(DOCKER_IMAGE_PYTEST) tests
