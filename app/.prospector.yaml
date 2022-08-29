@@ -14,6 +14,7 @@ pylint:
     - no-else-return
     - broad-except
     - raising-format-tuple
+    - missing-timeout # Default timeout set by c2cwsgiutils
 
 mccabe:
   run: false
