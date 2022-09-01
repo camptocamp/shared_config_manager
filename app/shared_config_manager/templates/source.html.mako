@@ -51,7 +51,7 @@
             %if commit:
               %for s in commit:
               <br />
-              ${s | h}
+              ${s}
               %endfor
             %else:
             ${status.get('hash') | h}

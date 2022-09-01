@@ -9,6 +9,7 @@ pylint:
     - too-many-branches
     - too-many-arguments
     - too-many-instance-attributes
+    - too-many-statements
     - too-few-public-methods
     - wrong-import-order
     - no-else-return
