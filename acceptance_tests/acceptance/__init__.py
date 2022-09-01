@@ -7,6 +7,8 @@ def wait_sync(app_connection, name, hash_):
     def what():
         status = app_connection.get_json("1/status", headers={"X-Scm-Secret": "changeme"})
         for slave_name, slave in status["slaves"].items():
+            if slave_name == "api_test_user":
+                continue
             if hash_ is None:
                 if name in slave["sources"]:
                     print(f"{name} still found in sources")

@@ -47,7 +47,7 @@
           <div class="col">
             <h4>${status.get('hostname') | h}</h4>
             <p>
-            Tags: ${', '.join(status.get('tags', [])) | h}<br>
+            Tags: ${', '.join(status.get('tags', [])) if status.get('tags', []) else '-' | h}<br>
             %if commit:
               %for s in commit:
               <br />

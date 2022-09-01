@@ -115,9 +115,12 @@ def _ui_source(request: pyramid.request.Request) -> Dict[str, Any]:
             _LOG.warning("Unable to get the commit status for %s", slave.get("hash"), exc_info=True)
             _slave_status.append((slave, []))
 
+    def _get_sort_key(elem: Tuple[SourceStatus, List[str]]) -> str:
+        return elem[0].get("hostname", "")
+
     return {
         "key_format": key_format,
         "source": source,
         "attributes": attributes4,
-        "slave_status": _slave_status,
+        "slave_status": sorted(_slave_status, key=_get_sort_key),
     }
