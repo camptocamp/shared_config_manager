@@ -1,11 +1,13 @@
 import logging
 import math
 import os.path
+import re
 import subprocess
 from typing import Any, Dict, List, Tuple, Union, cast
 
 import pyramid.request
 import pyramid.response
+import requests
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.security import Allowed
 from pyramid.view import view_config
@@ -94,23 +96,39 @@ def _ui_source(request: pyramid.request.Request) -> Dict[str, Any]:
             attributes4.append((attributes[index][0], attributes[index][1], "", ""))
 
     _slave_status: List[Tuple[SourceStatus, List[str]]] = []
+    _repo_re = re.compile(r"^git@github.com:(.*).git$")
     for slave in statuses:
         try:
-            _slave_status.append(
-                (
-                    slave,
-                    (
-                        subprocess.run(
-                            ["git", "show", "--quiet", slave["hash"]],
-                            cwd=os.path.join("/repos", source.get_id()),
-                            check=True,
-                            stdout=subprocess.PIPE,
-                        )
-                        .stdout.decode("utf-8")
-                        .split("\n")
-                    ),
+            match = _repo_re.match(source.get_config().get("repo", ""))
+            if match is not None:
+                headers = {"Accept": "application/vnd.github+json"}
+                if "GITHUB_TOKEN" in os.environ:
+                    headers["Authorization"] = f"token {os.environ['GITHUB_TOKEN']}"
+
+                commit_response = requests.get(
+                    f"https://api.github.com/repos/{match.group(0)}/commits/{slave['hash']}", headers=headers
                 )
-            )
+                commit_response.raise_for_status()
+                commit_json = commit_response.json()
+                commit_details = [
+                    f"<a href=\"{commit_json['html_url']}\">{commit_json['sha']}</a>",
+                    f"Author: {commit_json['commit']['author']['name']}",
+                    f"Date: {commit_json['commit']['author']['date']}",
+                    f"Message: {commit_json['commit']['message']}",
+                ]
+
+            else:
+                commit_details = (
+                    subprocess.run(
+                        ["git", "show", "--quiet", slave["hash"]],
+                        cwd=os.path.join("/repos", source.get_id()),
+                        check=True,
+                        stdout=subprocess.PIPE,
+                    )
+                    .stdout.decode("utf-8")
+                    .split("\n")
+                )
+            _slave_status.append((slave, commit_details))
         except Exception:
             _LOG.warning("Unable to get the commit status for %s", slave.get("hash"), exc_info=True)
             _slave_status.append((slave, []))
