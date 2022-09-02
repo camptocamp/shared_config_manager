@@ -41,7 +41,7 @@ RUN --mount=type=cache,target=/var/lib/apt/lists \
     && apt-get update \
     && apt-get install --assume-yes --no-install-recommends 'nodejs=18.*'
 
-COPY package.json ./
+COPY package.json package-lock.json ./
 RUN npm install
 
 RUN --mount=type=cache,target=/var/lib/apt/lists \

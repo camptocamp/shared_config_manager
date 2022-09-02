@@ -40,15 +40,7 @@ class User:
         self.is_auth = is_auth
         self.token = token
         self.request = request
-        self.is_admin = (
-            c2cwsgiutils.auth.check_access(
-                self.request,
-                os.environ["C2C_AUTH_GITHUB_REPOSITORY"],
-                os.environ.get("C2C_AUTH_GITHUB_ACCESS_TYPE", "admin"),
-            )
-            if token is not None
-            else False
-        )
+        self.is_admin = c2cwsgiutils.auth.check_access(self.request) if token is not None else False
 
     def has_access(self, source_config: SourceConfig) -> bool:
         if self.is_admin:
@@ -56,14 +48,7 @@ class User:
 
         auth_config = source_config.get("auth", {})
         if "github_repository" in auth_config:
-            return (
-                c2cwsgiutils.auth.check_access(
-                    self.request,
-                    auth_config["github_repository"],
-                    auth_config.get("github_access_type", "push"),
-                )
-                or self.is_admin
-            )
+            return c2cwsgiutils.auth.check_access_config(self.request, auth_config) or self.is_admin
 
         return False
 
@@ -80,7 +65,7 @@ class SecurityPolicy:
                     auth_type="test_user",
                     login=os.environ["TEST_USER"],
                     name=os.environ["TEST_USER"],
-                    url="http://example.com/user",
+                    url="https://example.com/user",
                     is_auth=True,
                     token=None,
                     request=request,
