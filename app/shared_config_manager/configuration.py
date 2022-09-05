@@ -1,5 +1,7 @@
 from typing import Dict, List, TypedDict
 
+from c2cwsgiutils.auth import AuthConfig
+
 
 class _SourceBase(TypedDict, total=False):
     type: str
@@ -23,11 +25,6 @@ class TemplateEnginesConfig(TypedDict, total=False):
     dest_sub_dir: str
     environment_variables: bool
     data: Dict[str, str]
-
-
-class AuthConfig(TypedDict, total=False):
-    github_repository: str
-    github_access_type: str
 
 
 class SourceConfig(_SourceBase, total=False):
