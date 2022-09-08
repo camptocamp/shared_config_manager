@@ -6,3 +6,4 @@ __pycache__/
 /app/.coverage
 /docker-compose.override.yaml
 /acceptance_tests/node_modules/
+/.github/changelog-generator-cache
