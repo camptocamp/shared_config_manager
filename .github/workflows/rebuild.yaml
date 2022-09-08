@@ -1,9 +1,8 @@
----
 name: Nightly
 
 on:
   schedule:
-    - cron: '45 3 * * *'
+    - cron: 45 3 * * *
 
 env:
   SUMMON_PROVIDER: /usr/local/bin/gopass
@@ -25,6 +24,7 @@ jobs:
           - master
 
     steps:
+      - run: docker system prune --all --force
       - uses: actions/checkout@v3
         with:
           ref: ${{ matrix.branch }}
