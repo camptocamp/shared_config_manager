@@ -76,7 +76,9 @@ class SecurityPolicy:
                     msg=request.body,
                     digestmod=hashlib.sha256,
                 ).hexdigest()
-                if hmac.compare_digest(our_signature, request.headers["X-Hub-Signature-256"]):
+                if hmac.compare_digest(
+                    our_signature, request.headers["X-Hub-Signature-256"].split("=", 1)[1]
+                ):
                     user = User("github_webhook", None, None, None, True, None, request)
                 else:
                     _LOG.warning("Invalid GitHub signature")
