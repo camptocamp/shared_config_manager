@@ -94,7 +94,6 @@ body:
                         request.body,
                     )
 
-
             elif "X-Scm-Secret" in request.headers and "SCM_SECRET" in os.environ:
                 if request.headers["X-Scm-Secret"] == os.environ["SCM_SECRET"]:
                     user = User("scm_internal", None, None, None, True, None, request)
