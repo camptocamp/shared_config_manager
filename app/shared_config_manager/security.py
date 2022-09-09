@@ -77,6 +77,9 @@ class SecurityPolicy:
                     digestmod=hashlib.sha256,
                 ).hexdigest()
                 if hmac.compare_digest(our_signature, request.headers["X-Hub-Signature-256"]):
+                    user = User("github_webhook", None, None, None, True, None, request)
+                else:
+                    _LOG.warning("Invalid GitHub signature")
                     _LOG.debug(
                         """Incorrect GitHub signature
 GitHub signature: %s
@@ -91,9 +94,6 @@ body:
                         request.body,
                     )
 
-                    user = User("github_webhook", None, None, None, True, None, request)
-                else:
-                    _LOG.warning("Invalid GitHub signature")
 
             elif "X-Scm-Secret" in request.headers and "SCM_SECRET" in os.environ:
                 if request.headers["X-Scm-Secret"] == os.environ["SCM_SECRET"]:
