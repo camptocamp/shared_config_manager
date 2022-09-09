@@ -65,6 +65,7 @@ ARG GIT_HASH
 
 RUN --mount=type=cache,target=/root/.cache \
     python3 -m pip install --disable-pip-version-check --no-deps --editable=. \
+    && python3 -m pip freeze > /requirements.txt \
     && c2cwsgiutils-genversion $GIT_HASH \
     && mkdir -p /master_config /config /var/www \
     && adduser www-data root \
