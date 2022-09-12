@@ -79,7 +79,7 @@ python-versions = "*"
 
 [[package]]
 name = "c2cwsgiutils"
-version = "5.1.4"
+version = "5.1.5"
 description = "Common utilities for Camptocamp WSGI applications"
 category = "main"
 optional = false
@@ -1159,7 +1159,7 @@ python-versions = "*"
 
 [[package]]
 name = "types-requests"
-version = "2.28.9"
+version = "2.28.10"
 description = "Typing stubs for requests"
 category = "dev"
 optional = false
@@ -1312,7 +1312,7 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<3.11"
-content-hash = "91ba7ec38dbbf24514fdac23d14a6c7c05478a1e6176a9ca3aebc4fb9a6948cc"
+content-hash = "72462f6460bc40b11e4d417ed4b842453834815b2af3eb53809eedd830f06468"
 
 [metadata.files]
 alembic = [
@@ -1340,7 +1340,7 @@ boltons = [
     {file = "boltons-21.0.0.tar.gz", hash = "sha256:65e70a79a731a7fe6e98592ecfb5ccf2115873d01dbc576079874629e5c90f13"},
 ]
 c2cwsgiutils = [
-    {file = "c2cwsgiutils-5.1.4-py3-none-any.whl", hash = "sha256:885adee57d87a0de0dd52de9b49875e840a10a09dd3a037510b26846a95f3cfa"},
+    {file = "c2cwsgiutils-5.1.5-py3-none-any.whl", hash = "sha256:bfe7950cc303626b0dc0c29bbd684632aa985cc457727928741eb543b396b33b"},
 ]
 cee-syslog-handler = [
     {file = "cee_syslog_handler-0.6.0-py3-none-any.whl", hash = "sha256:13b60f5b4f9f04e2868316d88bf63d51b4b4b273ba7df12af6f21ee10e223ca3"},
@@ -2033,8 +2033,8 @@ types-PyYAML = [
     {file = "types_PyYAML-6.0.11-py3-none-any.whl", hash = "sha256:8f890028123607379c63550179ddaec4517dc751f4c527a52bb61934bf495989"},
 ]
 types-requests = [
-    {file = "types-requests-2.28.9.tar.gz", hash = "sha256:feaf581bd580497a47fe845d506fa3b91b484cf706ff27774e87659837de9962"},
-    {file = "types_requests-2.28.9-py3-none-any.whl", hash = "sha256:86cb66d3de2f53eac5c09adc42cf6547eefbd0c7e1210beca1ee751c35d96083"},
+    {file = "types-requests-2.28.10.tar.gz", hash = "sha256:97d8f40aa1ffe1e58c3726c77d63c182daea9a72d9f1fa2cafdea756b2a19f2c"},
+    {file = "types_requests-2.28.10-py3-none-any.whl", hash = "sha256:45b485725ed58752f2b23461252f1c1ad9205b884a1e35f786bb295525a3e16a"},
 ]
 types-urllib3 = [
     {file = "types-urllib3-1.26.24.tar.gz", hash = "sha256:a1b3aaea7dda3eb1b51699ee723aadd235488e4dc4648e030f09bc429ecff42f"},
