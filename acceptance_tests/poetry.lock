@@ -52,7 +52,7 @@ python-versions = "*"
 
 [[package]]
 name = "c2cwsgiutils"
-version = "5.1.4"
+version = "5.1.5"
 description = "Common utilities for Camptocamp WSGI applications"
 category = "main"
 optional = false
@@ -1239,7 +1239,7 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<3.11"
-content-hash = "776d4cb00e2077ef9bc004f48dee0b0f38c1bf0defd8967a890d36b4a6100523"
+content-hash = "a476a682c640813fe05598bb77e3bc9908c8f4420d25d49ee00330877c75dd51"
 
 [metadata.files]
 alembic = [
@@ -1259,7 +1259,7 @@ boltons = [
     {file = "boltons-21.0.0.tar.gz", hash = "sha256:65e70a79a731a7fe6e98592ecfb5ccf2115873d01dbc576079874629e5c90f13"},
 ]
 c2cwsgiutils = [
-    {file = "c2cwsgiutils-5.1.4-py3-none-any.whl", hash = "sha256:885adee57d87a0de0dd52de9b49875e840a10a09dd3a037510b26846a95f3cfa"},
+    {file = "c2cwsgiutils-5.1.5-py3-none-any.whl", hash = "sha256:bfe7950cc303626b0dc0c29bbd684632aa985cc457727928741eb543b396b33b"},
 ]
 cee-syslog-handler = [
     {file = "cee_syslog_handler-0.6.0-py3-none-any.whl", hash = "sha256:13b60f5b4f9f04e2868316d88bf63d51b4b4b273ba7df12af6f21ee10e223ca3"},
