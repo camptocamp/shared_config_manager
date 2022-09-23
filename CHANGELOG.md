@@ -330,7 +330,7 @@
 
 - \[Backport release_2\] Use Ubuntu 20.04 [\#37](https://github.com/camptocamp/shared_config_manager/pull/37) ([c2c-bot-gis-ci](https://github.com/c2c-bot-gis-ci))
 - \[Backport release_2\] Fix clean Docker hub tags [\#36](https://github.com/camptocamp/shared_config_manager/pull/36) ([c2c-bot-gis-ci](https://github.com/c2c-bot-gis-ci))
-- \[Backport release_2\] Use secret defined in organization [\#34](https://github.com/camptocamp/shared_config_manager/pull/34) ([c2c-bot-gis-ci](https://github.com/c2c-bot-gis-ci))
+- \[Backport release_2\] Use secret defined in organisation [\#34](https://github.com/camptocamp/shared_config_manager/pull/34) ([c2c-bot-gis-ci](https://github.com/c2c-bot-gis-ci))
 - \[Backport release_2\] Add Clean docker hub tags workflow [\#33](https://github.com/camptocamp/shared_config_manager/pull/33) ([c2c-bot-gis-ci](https://github.com/c2c-bot-gis-ci))
 - Don't commit a private ssh key [\#20](https://github.com/camptocamp/shared_config_manager/pull/20) ([sbrunner](https://github.com/sbrunner))
 - Fix flipping test [\#16](https://github.com/camptocamp/shared_config_manager/pull/16) ([sbrunner](https://github.com/sbrunner))
