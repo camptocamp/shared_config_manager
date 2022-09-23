@@ -102,7 +102,7 @@ See [https://github.com/camptocamp/c2cwsgiutils] for other parameters.
 
 - `type`: can be `mako` or `shell`
 - `data`: a dictionary of key/value to pass as a parameter to the template engine
-- `environment_variables`: If `true`, take into account the process' environment variables
+- `environment_variables`: If `true`, take into account the process's environment variables
   if not found in `data`. Only variables starting with a prefix listed in `SCM_ENV_PREFIXES`
   (list separated by `:`) are allowed.
 - `dest_sub_dir`: If specified, all the files, including the ones not evaluated as templates
