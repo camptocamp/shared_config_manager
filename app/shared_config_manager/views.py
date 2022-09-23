@@ -95,7 +95,7 @@ def _ui_source(request: pyramid.request.Request) -> Dict[str, Any]:
         else:
             attributes4.append((attributes[index][0], attributes[index][1], "", ""))
 
-    _slave_status: List[Tuple[SourceStatus, List[str]]] = []
+    _slave_status: List[Tuple[SourceStatus, List[Union[str, Tuple[str, str]]]]] = []
     _repo_re = re.compile(r"^git@github.com:(.*).git$")
     for slave in statuses:
         try:
@@ -110,8 +110,8 @@ def _ui_source(request: pyramid.request.Request) -> Dict[str, Any]:
                 )
                 commit_response.raise_for_status()
                 commit_json = commit_response.json()
-                commit_details = [
-                    f"<a href=\"{commit_json['html_url']}\">{commit_json['sha']}</a>",
+                commit_details: List[Union[str, Tuple[str, str]]] = [
+                    (commit_json["html_url"], commit_json["sha"]),
                     f"Author: {commit_json['commit']['author']['name']}",
                     f"Date: {commit_json['commit']['author']['date']}",
                     f"Message: {commit_json['commit']['message']}",
@@ -119,7 +119,7 @@ def _ui_source(request: pyramid.request.Request) -> Dict[str, Any]:
 
             else:
                 commit_details = (
-                    subprocess.run(
+                    subprocess.run(  # type: ignore
                         ["git", "show", "--quiet", slave["hash"]],
                         cwd=os.path.join("/repos", source.get_id()),
                         check=True,
