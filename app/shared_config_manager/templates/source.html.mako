@@ -51,7 +51,11 @@
             %if commit:
               %for s in commit:
               <br />
+              %if isinstance(s, tuple):
+              <a href="${s[0]}">${s[1]}</a>
+              %else:
               ${s}
+              %endif
               %endfor
             %else:
             ${status.get('hash') | h}
