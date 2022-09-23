@@ -106,7 +106,7 @@ def _ui_source(request: pyramid.request.Request) -> Dict[str, Any]:
                     headers["Authorization"] = f"token {os.environ['GITHUB_TOKEN']}"
 
                 commit_response = requests.get(
-                    f"https://api.github.com/repos/{match.group(0)}/commits/{slave['hash']}", headers=headers
+                    f"https://api.github.com/repos/{match.group(1)}/commits/{slave['hash']}", headers=headers
                 )
                 commit_response.raise_for_status()
                 commit_json = commit_response.json()
