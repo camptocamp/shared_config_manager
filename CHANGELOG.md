@@ -4,13 +4,15 @@
 
 [Full Changelog](https://github.com/camptocamp/shared_config_manager/compare/3.1.0...3.2.0)
 
-#### :package: Dependencies update
+**Merged pull requests:**
 
 - Bump redis from 4.2.0rc1 to 4.2.0rc2 in /app [\#405](https://github.com/camptocamp/shared_config_manager/pull/405) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump sqlalchemy from 1.4.31 to 1.4.32 in /app [\#403](https://github.com/camptocamp/shared_config_manager/pull/403) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Fix the logging setup [\#402](https://github.com/camptocamp/shared_config_manager/pull/402) ([sbrunner](https://github.com/sbrunner))
 - Bump prospector from 1.7.5 to 1.7.6 in /app [\#400](https://github.com/camptocamp/shared_config_manager/pull/400) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump prospector from 1.7.5 to 1.7.6 in /acceptance_tests [\#399](https://github.com/camptocamp/shared_config_manager/pull/399) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump c2cciutils from 1.2.dev20220302121825 to 1.2.dev20220304093002 [\#398](https://github.com/camptocamp/shared_config_manager/pull/398) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Add missing ssh command [\#397](https://github.com/camptocamp/shared_config_manager/pull/397) ([sbrunner](https://github.com/sbrunner))
 - Bump c2cciutils from 1.2.dev20220301083327 to 1.2.dev20220302121825 [\#396](https://github.com/camptocamp/shared_config_manager/pull/396) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump prospector from 1.7.4 to 1.7.5 in /app [\#395](https://github.com/camptocamp/shared_config_manager/pull/395) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump prospector from 1.7.4 to 1.7.5 in /acceptance_tests [\#394](https://github.com/camptocamp/shared_config_manager/pull/394) ([dependabot[bot]](https://github.com/apps/dependabot))
@@ -39,6 +41,7 @@
 - Bump c2cciutils from 1.2.dev20220209105112 to 1.2.dev20220214091642 [\#355](https://github.com/camptocamp/shared_config_manager/pull/355) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump pytest from 7.0.0 to 7.0.1 in /app [\#354](https://github.com/camptocamp/shared_config_manager/pull/354) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump pytest from 7.0.0 to 7.0.1 in /acceptance_tests [\#353](https://github.com/camptocamp/shared_config_manager/pull/353) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Upgrade to c2cwsgiutils 5 [\#352](https://github.com/camptocamp/shared_config_manager/pull/352) ([sbrunner](https://github.com/sbrunner))
 - Bump types-requests from 2.27.8 to 2.27.9 in /app [\#351](https://github.com/camptocamp/shared_config_manager/pull/351) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump setuptools from 60.8.1 to 60.8.2 in /app [\#350](https://github.com/camptocamp/shared_config_manager/pull/350) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump platformdirs from 2.4.1 to 2.5.0 in /acceptance_tests [\#348](https://github.com/camptocamp/shared_config_manager/pull/348) ([dependabot[bot]](https://github.com/apps/dependabot))
@@ -89,6 +92,7 @@
 - Bump setuptools from 60.2.0 to 60.3.1 in /acceptance_tests [\#278](https://github.com/camptocamp/shared_config_manager/pull/278) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump requests from 2.27.0 to 2.27.1 in /app [\#277](https://github.com/camptocamp/shared_config_manager/pull/277) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump c2cciutils from 1.1.dev20211215101636 to 1.1.dev20220105162844 [\#276](https://github.com/camptocamp/shared_config_manager/pull/276) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Fix 'default to' to 'default is' [\#275](https://github.com/camptocamp/shared_config_manager/pull/275) ([sbrunner](https://github.com/sbrunner))
 - Bump charset-normalizer from 2.0.9 to 2.0.10 in /app [\#274](https://github.com/camptocamp/shared_config_manager/pull/274) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump astroid from 2.9.1 to 2.9.2 in /acceptance_tests [\#273](https://github.com/camptocamp/shared_config_manager/pull/273) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump requests from 2.26.0 to 2.27.0 in /app [\#272](https://github.com/camptocamp/shared_config_manager/pull/272) ([dependabot[bot]](https://github.com/apps/dependabot))
@@ -126,6 +130,18 @@
 - Bump prospector from 1.5.2 to 1.5.3 in /acceptance_tests [\#229](https://github.com/camptocamp/shared_config_manager/pull/229) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump charset-normalizer from 2.0.8 to 2.0.9 in /app [\#227](https://github.com/camptocamp/shared_config_manager/pull/227) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump astroid from 2.8.0 to 2.8.6 in /acceptance_tests [\#226](https://github.com/camptocamp/shared_config_manager/pull/226) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Fix Dependabot configuration [\#223](https://github.com/camptocamp/shared_config_manager/pull/223) ([sbrunner](https://github.com/sbrunner))
+- Bump wrapt [\#222](https://github.com/camptocamp/shared_config_manager/pull/222) ([sbrunner](https://github.com/sbrunner))
+- Bump typing extensions [\#221](https://github.com/camptocamp/shared_config_manager/pull/221) ([sbrunner](https://github.com/sbrunner))
+- Bump tomli [\#220](https://github.com/camptocamp/shared_config_manager/pull/220) ([sbrunner](https://github.com/sbrunner))
+- Bump coverage [\#219](https://github.com/camptocamp/shared_config_manager/pull/219) ([sbrunner](https://github.com/sbrunner))
+- Bump snowballstemmer [\#218](https://github.com/camptocamp/shared_config_manager/pull/218) ([sbrunner](https://github.com/sbrunner))
+- Bump setuptools [\#217](https://github.com/camptocamp/shared_config_manager/pull/217) ([sbrunner](https://github.com/sbrunner))
+- Bump pyyaml [\#216](https://github.com/camptocamp/shared_config_manager/pull/216) ([sbrunner](https://github.com/sbrunner))
+- Bump pyparsing [\#215](https://github.com/camptocamp/shared_config_manager/pull/215) ([sbrunner](https://github.com/sbrunner))
+- Bump py [\#214](https://github.com/camptocamp/shared_config_manager/pull/214) ([sbrunner](https://github.com/sbrunner))
+- Bump packaging [\#213](https://github.com/camptocamp/shared_config_manager/pull/213) ([sbrunner](https://github.com/sbrunner))
+- Bump isort [\#212](https://github.com/camptocamp/shared_config_manager/pull/212) ([sbrunner](https://github.com/sbrunner))
 - Bump prospector from 1.5.1 to 1.5.2 in /app [\#211](https://github.com/camptocamp/shared_config_manager/pull/211) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump prospector from 1.5.1 to 1.5.2 in /acceptance_tests [\#210](https://github.com/camptocamp/shared_config_manager/pull/210) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump types-requests from 2.26.0 to 2.26.1 in /app [\#208](https://github.com/camptocamp/shared_config_manager/pull/208) ([dependabot[bot]](https://github.com/apps/dependabot))
@@ -183,6 +199,7 @@
 - Bump c2cciutils from 1.1.dev20210701074602 to 1.1.dev20210709152623 [\#148](https://github.com/camptocamp/shared_config_manager/pull/148) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump c2cciutils from 1.1.dev20210629154910 to 1.1.dev20210701074602 [\#147](https://github.com/camptocamp/shared_config_manager/pull/147) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump c2cwsgiutils from 4.1.3 to 4.1.4 [\#146](https://github.com/camptocamp/shared_config_manager/pull/146) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Upgrade for Python 3.6 \(with pyupgrade\) [\#145](https://github.com/camptocamp/shared_config_manager/pull/145) ([sbrunner](https://github.com/sbrunner))
 - Bump c2cciutils from 1.1.dev20210623154317 to 1.1.dev20210629154910 [\#144](https://github.com/camptocamp/shared_config_manager/pull/144) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump c2cwsgiutils from 4.1.2 to 4.1.3 [\#143](https://github.com/camptocamp/shared_config_manager/pull/143) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump c2cciutils from 1.1.dev20210617081616 to 1.1.dev20210623154317 [\#142](https://github.com/camptocamp/shared_config_manager/pull/142) ([dependabot[bot]](https://github.com/apps/dependabot))
@@ -192,6 +209,7 @@
 - Bump types-pyyaml from 5.4.2 to 5.4.3 in /app [\#138](https://github.com/camptocamp/shared_config_manager/pull/138) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump types-requests from 0.1.11 to 0.1.12 in /app [\#137](https://github.com/camptocamp/shared_config_manager/pull/137) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump c2cciutils from 1.1.dev20210615102932 to 1.1.dev20210617081616 [\#136](https://github.com/camptocamp/shared_config_manager/pull/136) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Be able to have the master configuration in a file [\#135](https://github.com/camptocamp/shared_config_manager/pull/135) ([sbrunner](https://github.com/sbrunner))
 - Bump types-pyyaml from 5.4.1 to 5.4.2 in /app [\#134](https://github.com/camptocamp/shared_config_manager/pull/134) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump types-pyyaml from 5.4.0 to 5.4.1 in /app [\#133](https://github.com/camptocamp/shared_config_manager/pull/133) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump c2cciutils from 1.1.dev20210614101225 to 1.1.dev20210615102932 [\#132](https://github.com/camptocamp/shared_config_manager/pull/132) ([dependabot[bot]](https://github.com/apps/dependabot))
@@ -205,27 +223,6 @@
 - Bump pytest-cov from 2.12.0 to 2.12.1 in /acceptance_tests [\#122](https://github.com/camptocamp/shared_config_manager/pull/122) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump pipenv from 2020.11.15 to 2021.5.29 in /app [\#121](https://github.com/camptocamp/shared_config_manager/pull/121) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump pipenv from 2020.11.15 to 2021.5.29 [\#119](https://github.com/camptocamp/shared_config_manager/pull/119) ([dependabot[bot]](https://github.com/apps/dependabot))
-
-**Merged pull requests:**
-
-- Fix the logging setup [\#402](https://github.com/camptocamp/shared_config_manager/pull/402) ([sbrunner](https://github.com/sbrunner))
-- Add missing ssh command [\#397](https://github.com/camptocamp/shared_config_manager/pull/397) ([sbrunner](https://github.com/sbrunner))
-- Upgrade to c2cwsgiutils 5 [\#352](https://github.com/camptocamp/shared_config_manager/pull/352) ([sbrunner](https://github.com/sbrunner))
-- Fix 'default to' to 'default is' [\#275](https://github.com/camptocamp/shared_config_manager/pull/275) ([sbrunner](https://github.com/sbrunner))
-- Fix Dependabot configuration [\#223](https://github.com/camptocamp/shared_config_manager/pull/223) ([sbrunner](https://github.com/sbrunner))
-- Bump wrapt [\#222](https://github.com/camptocamp/shared_config_manager/pull/222) ([sbrunner](https://github.com/sbrunner))
-- Bump typing extensions [\#221](https://github.com/camptocamp/shared_config_manager/pull/221) ([sbrunner](https://github.com/sbrunner))
-- Bump tomli [\#220](https://github.com/camptocamp/shared_config_manager/pull/220) ([sbrunner](https://github.com/sbrunner))
-- Bump coverage [\#219](https://github.com/camptocamp/shared_config_manager/pull/219) ([sbrunner](https://github.com/sbrunner))
-- Bump snowballstemmer [\#218](https://github.com/camptocamp/shared_config_manager/pull/218) ([sbrunner](https://github.com/sbrunner))
-- Bump setuptools [\#217](https://github.com/camptocamp/shared_config_manager/pull/217) ([sbrunner](https://github.com/sbrunner))
-- Bump pyyaml [\#216](https://github.com/camptocamp/shared_config_manager/pull/216) ([sbrunner](https://github.com/sbrunner))
-- Bump pyparsing [\#215](https://github.com/camptocamp/shared_config_manager/pull/215) ([sbrunner](https://github.com/sbrunner))
-- Bump py [\#214](https://github.com/camptocamp/shared_config_manager/pull/214) ([sbrunner](https://github.com/sbrunner))
-- Bump packaging [\#213](https://github.com/camptocamp/shared_config_manager/pull/213) ([sbrunner](https://github.com/sbrunner))
-- Bump isort [\#212](https://github.com/camptocamp/shared_config_manager/pull/212) ([sbrunner](https://github.com/sbrunner))
-- Upgrade for Python 3.6 \(with pyupgrade\) [\#145](https://github.com/camptocamp/shared_config_manager/pull/145) ([sbrunner](https://github.com/sbrunner))
-- Be able to have the master configuration in a file [\#135](https://github.com/camptocamp/shared_config_manager/pull/135) ([sbrunner](https://github.com/sbrunner))
 - Add new branch to rebuild and audit [\#118](https://github.com/camptocamp/shared_config_manager/pull/118) ([sbrunner](https://github.com/sbrunner))
 - Create new release [\#117](https://github.com/camptocamp/shared_config_manager/pull/117) ([sbrunner](https://github.com/sbrunner))
 
@@ -233,22 +230,19 @@
 
 [Full Changelog](https://github.com/camptocamp/shared_config_manager/compare/3.0.0...3.1.0)
 
-#### :package: Dependencies update
+**Merged pull requests:**
 
 - Bump c2cwsgiutils from 4.1.1 to 4.1.2 [\#116](https://github.com/camptocamp/shared_config_manager/pull/116) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump pytest-cov from 2.11.1 to 2.12.0 in /app [\#115](https://github.com/camptocamp/shared_config_manager/pull/115) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump pytest-cov from 2.11.1 to 2.12.0 in /acceptance_tests [\#114](https://github.com/camptocamp/shared_config_manager/pull/114) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump c2cciutils from 1.1.dev20210504062412 to 1.1.dev20210511092229 [\#113](https://github.com/camptocamp/shared_config_manager/pull/113) ([dependabot[bot]](https://github.com/apps/dependabot))
-
-**Merged pull requests:**
-
 - Create a new release [\#112](https://github.com/camptocamp/shared_config_manager/pull/112) ([sbrunner](https://github.com/sbrunner))
 
 ## [3.0.0](https://github.com/camptocamp/shared_config_manager/tree/3.0.0) (2021-05-05)
 
 [Full Changelog](https://github.com/camptocamp/shared_config_manager/compare/2.0.0...3.0.0)
 
-#### :package: Dependencies update
+**Merged pull requests:**
 
 - Bump c2cciutils from 1.1.dev20210428132049 to 1.1.dev20210504062412 [\#111](https://github.com/camptocamp/shared_config_manager/pull/111) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump c2cciutils from 1.1.dev20210427101151 to 1.1.dev20210428132049 [\#109](https://github.com/camptocamp/shared_config_manager/pull/109) ([dependabot[bot]](https://github.com/apps/dependabot))
@@ -269,7 +263,9 @@
 - Bump c2cciutils from 1.0.dev20210305083859 to 1.1.dev20210308113838 [\#88](https://github.com/camptocamp/shared_config_manager/pull/88) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump c2cciutils from 1.0.dev20210304083613 to 1.0.dev20210305083859 [\#87](https://github.com/camptocamp/shared_config_manager/pull/87) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump c2cciutils from 1.0.dev20210302092543 to 1.0.dev20210304083613 [\#86](https://github.com/camptocamp/shared_config_manager/pull/86) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Use pipenv sync [\#85](https://github.com/camptocamp/shared_config_manager/pull/85) ([sbrunner](https://github.com/sbrunner))
 - Bump c2cciutils from 1.0.dev20210111121829 to 1.0.dev20210302092543 [\#84](https://github.com/camptocamp/shared_config_manager/pull/84) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Fix master [\#83](https://github.com/camptocamp/shared_config_manager/pull/83) ([sbrunner](https://github.com/sbrunner))
 - Bump yamllint from 1.25.0 to 1.26.0 [\#78](https://github.com/camptocamp/shared_config_manager/pull/78) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump c2cciutils from 1.0.dev20210108163130 to 1.0.dev20210111121829 [\#77](https://github.com/camptocamp/shared_config_manager/pull/77) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump c2cciutils from 1.0.dev20210107153221 to 1.0.dev20210108163130 [\#76](https://github.com/camptocamp/shared_config_manager/pull/76) ([dependabot[bot]](https://github.com/apps/dependabot))
@@ -290,21 +286,24 @@
 - Bump c2cciutils from 1.0.dev20201208090910 to 1.0.dev20201209103850 in /ci [\#55](https://github.com/camptocamp/shared_config_manager/pull/55) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump c2cciutils from 1.0.dev20201202131358 to 1.0.dev20201208090910 in /ci [\#51](https://github.com/camptocamp/shared_config_manager/pull/51) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump wheel from 0.35.1 to 0.36.1 [\#49](https://github.com/camptocamp/shared_config_manager/pull/49) ([dependabot[bot]](https://github.com/apps/dependabot))
-
-**Merged pull requests:**
-
-- Use pipenv sync [\#85](https://github.com/camptocamp/shared_config_manager/pull/85) ([sbrunner](https://github.com/sbrunner))
-- Fix master [\#83](https://github.com/camptocamp/shared_config_manager/pull/83) ([sbrunner](https://github.com/sbrunner))
 - Use c2cciutils - Publish to GitHub Container Registry [\#46](https://github.com/camptocamp/shared_config_manager/pull/46) ([sbrunner](https://github.com/sbrunner))
 
 ## [2.0.0](https://github.com/camptocamp/shared_config_manager/tree/2.0.0) (2020-11-16)
 
 [Full Changelog](https://github.com/camptocamp/shared_config_manager/compare/1.0.0...2.0.0)
 
-#### :package: Dependencies update
+**Closed issues:**
+
+- Dependabot couldn't authenticate with https://pypi.org/simple/ [\#17](https://github.com/camptocamp/shared_config_manager/issues/17)
+
+**Merged pull requests:**
 
 - Bump pipenv from 2020.11.4 to 2020.11.15 [\#39](https://github.com/camptocamp/shared_config_manager/pull/39) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump pipenv from 2020.11.4 to 2020.11.15 in /app [\#38](https://github.com/camptocamp/shared_config_manager/pull/38) ([dependabot[bot]](https://github.com/apps/dependabot))
+- \[Backport release_2\] Use Ubuntu 20.04 [\#37](https://github.com/camptocamp/shared_config_manager/pull/37) ([c2c-bot-gis-ci](https://github.com/c2c-bot-gis-ci))
+- \[Backport release_2\] Fix clean Docker hub tags [\#36](https://github.com/camptocamp/shared_config_manager/pull/36) ([c2c-bot-gis-ci](https://github.com/c2c-bot-gis-ci))
+- \[Backport release_2\] Use secret defined in organisation [\#34](https://github.com/camptocamp/shared_config_manager/pull/34) ([c2c-bot-gis-ci](https://github.com/c2c-bot-gis-ci))
+- \[Backport release_2\] Add Clean docker hub tags workflow [\#33](https://github.com/camptocamp/shared_config_manager/pull/33) ([c2c-bot-gis-ci](https://github.com/c2c-bot-gis-ci))
 - Bump pipenv from 2020.8.13 to 2020.11.4 [\#32](https://github.com/camptocamp/shared_config_manager/pull/32) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump pipenv from 2020.8.13 to 2020.11.4 in /app [\#31](https://github.com/camptocamp/shared_config_manager/pull/31) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump pipenv from 2020.8.13 to 2020.11.4 in /acceptance_tests [\#30](https://github.com/camptocamp/shared_config_manager/pull/30) ([dependabot[bot]](https://github.com/apps/dependabot))
@@ -314,41 +313,27 @@
 - Bump pytest-cov from 2.10.0 to 2.10.1 in /acceptance_tests [\#25](https://github.com/camptocamp/shared_config_manager/pull/25) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump c2cwsgiutils from 4.0.0 to 4.0.1 [\#23](https://github.com/camptocamp/shared_config_manager/pull/23) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump yamllint from 1.10.0 to 1.25.0 [\#22](https://github.com/camptocamp/shared_config_manager/pull/22) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Don't commit a private ssh key [\#20](https://github.com/camptocamp/shared_config_manager/pull/20) ([sbrunner](https://github.com/sbrunner))
 - Bump prospector from 1.3.0 to 1.3.1 in /app [\#19](https://github.com/camptocamp/shared_config_manager/pull/19) ([dependabot-preview[bot]](https://github.com/apps/dependabot-preview))
 - Bump mypy from 0.782 to 0.790 in /app [\#18](https://github.com/camptocamp/shared_config_manager/pull/18) ([dependabot-preview[bot]](https://github.com/apps/dependabot-preview))
+- Fix flipping test [\#16](https://github.com/camptocamp/shared_config_manager/pull/16) ([sbrunner](https://github.com/sbrunner))
 - Bump wheel from 0.35.0 to 0.35.1 in /app [\#15](https://github.com/camptocamp/shared_config_manager/pull/15) ([dependabot-preview[bot]](https://github.com/apps/dependabot-preview))
 - Bump pytest-cov from 2.10.0 to 2.10.1 in /app [\#14](https://github.com/camptocamp/shared_config_manager/pull/14) ([dependabot-preview[bot]](https://github.com/apps/dependabot-preview))
 - Bump wheel from 0.34.2 to 0.35.0 in /app [\#13](https://github.com/camptocamp/shared_config_manager/pull/13) ([dependabot-preview[bot]](https://github.com/apps/dependabot-preview))
 - Bump pipenv from 2020.6.2 to 2020.8.13 in /app [\#12](https://github.com/camptocamp/shared_config_manager/pull/12) ([dependabot-preview[bot]](https://github.com/apps/dependabot-preview))
 - Bump mypy from 0.761 to 0.782 in /app [\#11](https://github.com/camptocamp/shared_config_manager/pull/11) ([dependabot-preview[bot]](https://github.com/apps/dependabot-preview))
 
-**Closed issues:**
-
-- Dependabot couldn't authenticate with https://pypi.org/simple/ [\#17](https://github.com/camptocamp/shared_config_manager/issues/17)
-
-**Merged pull requests:**
-
-- \[Backport release_2\] Use Ubuntu 20.04 [\#37](https://github.com/camptocamp/shared_config_manager/pull/37) ([c2c-bot-gis-ci](https://github.com/c2c-bot-gis-ci))
-- \[Backport release_2\] Fix clean Docker hub tags [\#36](https://github.com/camptocamp/shared_config_manager/pull/36) ([c2c-bot-gis-ci](https://github.com/c2c-bot-gis-ci))
-- \[Backport release_2\] Use secret defined in organization [\#34](https://github.com/camptocamp/shared_config_manager/pull/34) ([c2c-bot-gis-ci](https://github.com/c2c-bot-gis-ci))
-- \[Backport release_2\] Add Clean docker hub tags workflow [\#33](https://github.com/camptocamp/shared_config_manager/pull/33) ([c2c-bot-gis-ci](https://github.com/c2c-bot-gis-ci))
-- Don't commit a private ssh key [\#20](https://github.com/camptocamp/shared_config_manager/pull/20) ([sbrunner](https://github.com/sbrunner))
-- Fix flipping test [\#16](https://github.com/camptocamp/shared_config_manager/pull/16) ([sbrunner](https://github.com/sbrunner))
-
 ## [1.0.0](https://github.com/camptocamp/shared_config_manager/tree/1.0.0) (2020-07-09)
 
 [Full Changelog](https://github.com/camptocamp/shared_config_manager/compare/057e5a7c698af5de1acb47d5afd81d284cfa2888...1.0.0)
 
-#### :sparkles: Enhancements
+**Implemented enhancements:**
 
 - Add support for rclone sync [\#1](https://github.com/camptocamp/shared_config_manager/issues/1)
 
-#### :package: Dependencies update
-
-- Update c2cwsgiutils requirement from \<4,\>=3.2.0 to \>=3.2.0,\<5 in /app [\#9](https://github.com/camptocamp/shared_config_manager/pull/9) ([dependabot-preview[bot]](https://github.com/apps/dependabot-preview))
-
 **Merged pull requests:**
 
+- Update c2cwsgiutils requirement from \<4,\>=3.2.0 to \>=3.2.0,\<5 in /app [\#9](https://github.com/camptocamp/shared_config_manager/pull/9) ([dependabot-preview[bot]](https://github.com/apps/dependabot-preview))
 - Optimizations [\#8](https://github.com/camptocamp/shared_config_manager/pull/8) ([pvalsecc](https://github.com/pvalsecc))
 - Fix webhook log message when non-matching branch [\#6](https://github.com/camptocamp/shared_config_manager/pull/6) ([pvalsecc](https://github.com/pvalsecc))
 - Make slaves fetch from the master instead of the source [\#5](https://github.com/camptocamp/shared_config_manager/pull/5) ([pvalsecc](https://github.com/pvalsecc))
