@@ -13,3 +13,8 @@ checks:
 publish:
   pypi:
     packages: []
+
+audit:
+  snyk:
+    no_install:
+    - acceptance_tests/Pipfile
