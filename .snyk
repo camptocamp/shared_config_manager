@@ -1,0 +1,13 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.25.0
+# ignores vulnerabilities until expiry date; change duration by modifying expiry date
+ignore:
+  SNYK-PYTHON-PYLINT-1089548:
+    - '*':
+        reason: Present in code lint
+        created: 2022-10-11T12:01:26.252Z
+  SNYK-PYTHON-PYLINT-609883:
+    - '*':
+        reason: Present in code lint
+        created: 2022-10-11T12:01:26.252Z
+patch: {}
