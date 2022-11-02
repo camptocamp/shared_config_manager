@@ -15,18 +15,25 @@
   </head>
   <body style="padding-bottom: 1rem;">
     <div class="container-fluid">
-      <h1>${source.get_config().get("name", source.get_id()) | h}</h1>
+      <div style="position: absolute; right: 1rem;">
+        <p style="text-align: right;">
+         %if request.identity is not None:
+         Logged as: <a href="${request.identity.url}">${request.identity.name}</a>,
+         <a role="button" class="btn btn-secondary mt-4"
+         href="${request.route_url('c2c_github_logout', _query={'came_from': request.current_route_url()}) | h}" style="vertical-align: baseline;">Logout</a>
+         %else:
+         <a class="btn btn-primary"
+         href="${request.route_url('c2c_github_login', _query={'came_from': request.current_route_url()}) | h}">Login with GitHub</a>
+         %endif
+        </p>
 
-      <p style="text-align: right;">
-      %if request.identity is not None:
-      Logged as: <a href="${request.identity.url}">${request.identity.name}</a>,
-      <a role="button" class="btn btn-secondary mt-4"
-      href="${request.route_url('c2c_github_logout', _query={'came_from': request.current_route_url()}) | h}" style="vertical-align: baseline;">Logout</a>
-      %else:
-      <a class="btn btn-primary"
-      href="${request.route_url('c2c_github_login', _query={'came_from': request.current_route_url()}) | h}">Login with GitHub</a>
-      %endif
-      </p>
+        <p style="text-align: right;">
+          <a class="btn btn-secondary" href="${request.route_url('ui_index') | h}">Back to the list</a>
+          <a class="btn btn-secondary" target="_blank" href="${request.route_url('refresh', id=source.get_id()) | h}">Refresh</a>
+        </p>
+      </div>
+
+      <h1 style="margin-bottom: 4rem;">${source.get_config().get("name", source.get_id()) | h}</h1>
 
       <h3>Config</h3>
       <dl class="border rounded row mx-1 bg-light">
