@@ -36,6 +36,8 @@ def main(_: Any, **settings: Any) -> Any:
     config.add_route("ui_index", "/", request_method="GET")
     config.add_route("ui_source", "/source/{id}", request_method="GET")
 
+    config.add_static_view(name="static", path="/app/shared_config_manager/static")
+
     config.scan("shared_config_manager.services")
     config.scan("shared_config_manager.views")
     HealthCheck(config)
