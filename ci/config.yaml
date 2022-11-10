@@ -10,8 +10,7 @@ checks:
   codespell: False
   isort: False
   black: False
-  required_workflows:
-    audit.yaml: False
+  required_workflows: False
 
 publish:
   pypi:
