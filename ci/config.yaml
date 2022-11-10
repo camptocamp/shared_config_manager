@@ -5,6 +5,9 @@ version:
     - from: master
       to: master
 
+checks:
+  required_workflows: False
+
 publish:
   pypi:
     packages: []
@@ -12,4 +15,4 @@ publish:
 audit:
   snyk:
     no_install:
-    - acceptance_tests/Pipfile
+      - acceptance_tests/Pipfile
