@@ -6,6 +6,7 @@ version:
       to: '3'
 
 checks:
+  required_workflows: False
   versions:
     extra_versions:
       - '3'
