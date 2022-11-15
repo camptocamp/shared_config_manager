@@ -6,6 +6,9 @@ LABEL maintainer "info@camptocamp.org"
 # Print commands and their arguments as they are executed.
 SHELL ["/bin/bash", "-o", "pipefail", "-cux"]
 
+# Fix for newer version of setuptools
+ENV SETUPTOOLS_USE_DISTUTILS=stdlib
+
 # Doing things in two steps to avoid needing to re-install everything when we do a rebuild
 # after changing code
 
