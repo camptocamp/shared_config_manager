@@ -7,8 +7,7 @@ verify_ssl = true
 PyYAML = "==6.0"
 inotify = "==0.2.10"
 c2cwsgiutils = {version = "==5.0.0", extras = ["broadcast", "standard"]}
-setuptools = "==59.8.0"
-
+setuptools = "==65.5.1"
 # Lock dependencies
 alembic = "==1.7.6"
 async-timeout = "==4.0.2"
@@ -69,7 +68,6 @@ pytest-cov = "==3.0.0"
 prospector = {extras = ["with_mypy", "with_bandit", "with_pyroma"],version = "==1.7.6"}
 types-pyyaml = "==6.0.4"
 types-requests = "==2.27.11"
-
 # Lock dependencies
 astroid = "==2.6.6"
 attrs = "==21.4.0"
