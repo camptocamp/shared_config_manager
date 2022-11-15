@@ -50,8 +50,6 @@ pytest = "==6.2.4"
 pyyaml = "==5.4"
 requests = "==2.25.1"
 requirements-detector = "==0.7"
-setoptconf = "==0.2.0"
-setuptools = "==45.2.0"
 six = "==1.16.0"
 smmap = "==4.0.0"
 snowballstemmer = "==2.1.0"
@@ -61,6 +59,9 @@ typed-ast = "==1.4.3"
 typing-extensions = "==3.10.0.0"
 urllib3 = "==1.26.8"
 wrapt = "==1.12.1"
+
+[requires]
+python_version = "3.8"
 
 [pipenv]
 allow_prereleases = true
