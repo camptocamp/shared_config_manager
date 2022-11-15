@@ -12,6 +12,7 @@ typing-extensions = "==4.1.1"
 setuptools = "==65.5.1"
 
 [requires]
+python_version = "3.8"
 
 [pipenv]
 allow_prereleases = true
