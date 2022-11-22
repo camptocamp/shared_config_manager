@@ -13,7 +13,6 @@ prospector = {extras = ["with_mypy", "with_bandit", "with_pyroma"],version = "==
 mypy = "==0.812"
 flake8 = "==3.8.4"
 # Lock dependencies
-astroid = "==2.4.2"
 attrs = "==21.2.0"
 bandit = "==1.7.4"
 certifi = "==2020.12.5"
