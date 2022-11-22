@@ -7,6 +7,7 @@ version:
 
 checks:
   required_workflows: False
+  prettier: false
 
 publish:
   pypi:
