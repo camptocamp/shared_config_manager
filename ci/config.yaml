@@ -7,9 +7,8 @@ version:
 
 checks:
   required_workflows: False
-  versions:
-    extra_versions:
-      - '3'
+  versions: false
+  prettier: false
 
 publish:
   pypi:

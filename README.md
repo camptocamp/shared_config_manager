@@ -5,13 +5,12 @@ Solves the problem of maintaining configuration volumes in the Docker world.
 It allows to have a container (in the same POD for Kubernetes or as a sidekick in
 Rancher) maintaining a few configuration/resource directories from different sources:
 
-* A GIT repository
-* A S3 bucket
-* Another volume or server through rsync
+- A GIT repository
+- A S3 bucket
+- Another volume or server through rsync
 
 A source can be refreshed through a webhook and the status of all the containers can be
 queried through a simple API.
-
 
 ## Configuration
 
@@ -20,10 +19,10 @@ First you need to configure the source for the master configuration using the
 
 ```yaml
 env:
-    MASTER_CONFIG: |
-      type: git
-      key: changeme
-      repo: git@github.com:camptocamp/master_config.git
+  MASTER_CONFIG: |
+    type: git
+    key: changeme
+    repo: git@github.com:camptocamp/master_config.git
 ```
 
 That will use the `shared_config_manager.yaml` file at the root of the repository
@@ -56,15 +55,15 @@ by setting the `sources` section and setting a `key` string both directly at the
 
 A few environment variables can be used to tune the containers:
 
-* `C2C_REDIS_URL`: Must point to a running Redis (typical: `redis://redis:6379`) for being able to
+- `C2C_REDIS_URL`: Must point to a running Redis (typical: `redis://redis:6379`) for being able to
   broadcast the refresh notifications
-* `MASTER_CONFIG`: The master configuration (string containing the YAML config)
-* `ROUTE_PREFIX`: The prefix to use for the HTTP API (defaults to `/scm`)
-* `TAG_FILTER`: Load only the sources having the given tag (the master config is always loaded)
-* `TARGET`: default base directory for the `target_dir` configuration (defaults to `/config`)
-* `MASTER_TARGET`: where to store the master config (defaults to `/master_config`)
-* `API_BASE_URL`: how to reach the master for slaves.
-* `API_MASTER`: if defined, this is a master with slaves (no template evaluation)
+- `MASTER_CONFIG`: The master configuration (string containing the YAML config)
+- `ROUTE_PREFIX`: The prefix to use for the HTTP API (defaults to `/scm`)
+- `TAG_FILTER`: Load only the sources having the given tag (the master config is always loaded)
+- `TARGET`: default base directory for the `target_dir` configuration (defaults to `/config`)
+- `MASTER_TARGET`: where to store the master config (defaults to `/master_config`)
+- `API_BASE_URL`: how to reach the master for slaves.
+- `API_MASTER`: if defined, this is a master with slaves (no template evaluation)
 
 See [https://github.com/camptocamp/c2cwsgiutils] for other parameters.
 
@@ -72,54 +71,52 @@ See [https://github.com/camptocamp/c2cwsgiutils] for other parameters.
 
 #### Common source configuration parameters
 
-* `type`: the type of source
-* `key`: the secret key that will be used to trigger a refresh of the source. Uses the `key` specified at the root
-         of the config by default.
-* `target_dir`: the location where the source will be copied (default to the value of `id` in `/config`)
-* `excludes`: the list of files/directories to exclude
-* `template_engines`: a list of template engine configurations
-* `tags`: an optional list of tags. Slaves having `TAG_FILTER` defined will load only sources having the matching tag.
+- `type`: the type of source
+- `key`: the secret key that will be used to trigger a refresh of the source. Uses the `key` specified at the root
+  of the config by default.
+- `target_dir`: the location where the source will be copied (default to the value of `id` in `/config`)
+- `excludes`: the list of files/directories to exclude
+- `template_engines`: a list of template engine configurations
+- `tags`: an optional list of tags. Slaves having `TAG_FILTER` defined will load only sources having the matching tag.
 
 #### GIT source configuration parameters
 
-* `type`: `git`
-* `ssh_key`: the private SSH key to use as identity (optional)
-* `repo`: the GIT repository URL
-* `branch`: the GIT branch to use (defaults to `master`)
-* `sub_dir`: if only a sub_directory of the repository needs to be copied (defaults to the root of the
+- `type`: `git`
+- `ssh_key`: the private SSH key to use as identity (optional)
+- `repo`: the GIT repository URL
+- `branch`: the GIT branch to use (defaults to `master`)
+- `sub_dir`: if only a sub_directory of the repository needs to be copied (defaults to the root of the
   repository)
-* `sparse`: if true (the default) and `sub_dir` is defined, will use a sparse clone. Disable that if you have multiple
-            sources using the same repository (will avoid cloning it for each sources).
+- `sparse`: if true (the default) and `sub_dir` is defined, will use a sparse clone. Disable that if you have multiple
+  sources using the same repository (will avoid cloning it for each sources).
 
 #### Rsync source configuration parameters
 
-* `type`: `rsync`
-* `source`: the source for the rsync command
-* `ssh_key`: the private SSH key to use as identity (optional)
+- `type`: `rsync`
+- `source`: the source for the rsync command
+- `ssh_key`: the private SSH key to use as identity (optional)
 
 #### Rclone source configuration parameters
 
-* `type`: `rclone`
-* `config`: The content of the rclone configuration section to use.
-* `sub_dir`: An optional sub-directory inside the remote (bucket + path for the S3 remotes)
+- `type`: `rclone`
+- `config`: The content of the rclone configuration section to use.
+- `sub_dir`: An optional sub-directory inside the remote (bucket + path for the S3 remotes)
 
 ### Template engines
 
-* `type`: can be `mako`  or `shell`
-* `data`: a dictionary of key/value to pass as a parameter to the template engine
-* `environment_variables`: If `true`, take into account the process' environment variables
+- `type`: can be `mako` or `shell`
+- `data`: a dictionary of key/value to pass as a parameter to the template engine
+- `environment_variables`: If `true`, take into account the process' environment variables
   if not found in `data`. Only variables starting with a prefix listed in `SCM_ENV_PREFIXES`
   (list separated by `:`) are allowed.
-* `dest_sub_dir`: If specified, all the files, including the ones not evaluated as templates
+- `dest_sub_dir`: If specified, all the files, including the ones not evaluated as templates
   will be copied into the given sub directory.
-
 
 ## Slave only mode
 
 By default the image starts a WSGI server listening on port 8080. In big deployments a full WSGI server
 could use a sizeable amount of RAM. So you could have only a couple of such containers and the rest running
 as slaves. For that, change the command run by the container to `shared-config-slave`.
-
 
 ## Example docker-compose for Rancher
 
@@ -142,7 +139,7 @@ services:
     labels:
       io.rancher.container.hostname_override: container_name
       lb.routing_key: scm-${ENVIRONMENT_NAME}
-      lb.haproxy_backend.timeout_server: "timeout server 120s"
+      lb.haproxy_backend.timeout_server: 'timeout server 120s'
       lb.haproxy_backend.maxconn: default-server maxconn 1
 
   scm_slave:
@@ -205,39 +202,37 @@ services:
       response_timeout: 3000
 ```
 
-
 ## Example OpenShift chart
 
 Look there: [https://github.com/camptocamp/private-geo-charts/tree/master/mutualized-print]
-
 
 # API
 
 ## Refresh
 
-* `GET {ROUTE_PREFIX}/1/refresh/{ID}/{KEY}`
+- `GET {ROUTE_PREFIX}/1/refresh/{ID}/{KEY}`
 
 Refresh the given source `{ID}`. Returns 200 in case of success. The actual work is done asynchronously.
 
 To refresh the master configuration (list of sources), use `master` as ID.
 
-* `POST {ROUTE_PREFIX}/1/refresh/{ID}/{KEY}`
+- `POST {ROUTE_PREFIX}/1/refresh/{ID}/{KEY}`
 
 Same as the GET API, but to be used with a GutHub/GitLab webhook for push events. Will ignore events for other branches.
 
-* `GET {ROUTE_PREFIX}/1/refresh/{KEY}`
+- `GET {ROUTE_PREFIX}/1/refresh/{KEY}`
 
 Refresh all sources. Returns 200 in case of success. The actual work is done asynchronously.
 
 The master configuration is not refreshed.
 
-* `POST {ROUTE_PREFIX}/1/refresh/{KEY}`
+- `POST {ROUTE_PREFIX}/1/refresh/{KEY}`
 
 Same as the GET API, but to be used with a GutHub/GitLab webhook for push events. Will ignore events for other branches.
 
 ## Status
 
-* `GET {ROUTE_PREFIX}/1/status/{key}`
+- `GET {ROUTE_PREFIX}/1/status/{key}`
 
 Returns the glable status, looking like that:
 
@@ -256,7 +251,7 @@ Returns the glable status, looking like that:
           "repo": "/repos/test_git",
           "template_engines": [
             {
-              "environment_variables": {"TEST_ENV": "42"},
+              "environment_variables": { "TEST_ENV": "42" },
               "type": "shell"
             }
           ],
@@ -276,7 +271,7 @@ Returns the glable status, looking like that:
           "repo": "/repos/test_git",
           "template_engines": [
             {
-              "environment_variables": {"TEST_ENV": "42"},
+              "environment_variables": { "TEST_ENV": "42" },
               "type": "shell"
             }
           ],
@@ -288,9 +283,10 @@ Returns the glable status, looking like that:
 }
 ```
 
-* `GET {ROUTE_PREFIX}/1/status/{ID}/{KEY}`
+- `GET {ROUTE_PREFIX}/1/status/{ID}/{KEY}`
 
 Returns the status for the given source ID, looking like that:
+
 ```json
 {
   "statuses": [
@@ -299,7 +295,7 @@ Returns the status for the given source ID, looking like that:
       "repo": "/repos/test_git",
       "template_engines": [
         {
-          "environment_variables": {"TEST_ENV": "42"},
+          "environment_variables": { "TEST_ENV": "42" },
           "type": "shell"
         }
       ],
@@ -311,6 +307,6 @@ Returns the status for the given source ID, looking like that:
 
 ## tarball
 
-* `GET {ROUTE_PREFIX}/1/tarball/{ID}/{KEY}`
+- `GET {ROUTE_PREFIX}/1/tarball/{ID}/{KEY}`
 
 Returns a `.tar.gz` containing the current content for the given source.
