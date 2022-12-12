@@ -1,3 +1,5 @@
+# pylint: disable=unspecified-encoding
+
 import os
 import subprocess
 import time
@@ -55,7 +57,7 @@ def git_source(app_connection: Connection):
     yield "/repos/other"
 
     subprocess.check_call(
-        f"""
+        """
     set -eaux
     cd /repos
     rm -rf other
