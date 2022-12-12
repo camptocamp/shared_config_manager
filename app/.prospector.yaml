@@ -17,6 +17,10 @@ pylint:
     - raising-format-tuple
     - missing-timeout # Default timeout set by c2cwsgiutils
 
+pyflakes:
+  disable:
+    - F401 # imported but unused, done by pylint
+
 mccabe:
   run: false
 

@@ -1,3 +1,5 @@
+# pylint: disable=unspecified-encoding
+
 import os
 
 from acceptance import get_hash, wait_sync
