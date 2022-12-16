@@ -16,7 +16,6 @@ jobs:
       matrix:
         branch:
           - release_2
-          - master
 
     steps:
       - uses: actions/checkout@v3
