@@ -7,10 +7,6 @@ version:
     - from: master
       to: master
 
-checks:
-  versions:
-    audit: False
-
 publish:
   pypi:
     packages: []
