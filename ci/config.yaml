@@ -8,5 +8,7 @@ version:
       to: master
 
 publish:
+  docker:
+    dispatch: {}
   pypi:
     packages: []
