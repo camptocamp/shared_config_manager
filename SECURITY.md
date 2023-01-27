@@ -9,3 +9,4 @@
 | 3       | Unsupported     |
 | 3.1     | Unsupported     |
 | 3.2     | Unsupported     |
+| 3.3     | Best effort     |

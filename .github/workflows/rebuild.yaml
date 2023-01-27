@@ -18,7 +18,7 @@ jobs:
       matrix:
         branch:
           - release_2
-          - master
+          - '3.3'
 
     steps:
       - run: docker system prune --all --force
