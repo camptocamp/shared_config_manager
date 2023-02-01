@@ -174,7 +174,7 @@ def refresh(id_: str, request: Optional[pyramid.request.Request]) -> None:
     source.refresh()
     if source.is_master() and (not MASTER_SOURCE or not MASTER_SOURCE.get_config().get("standalone", False)):
         reload_master_config()
-    broadcast.broadcast("slave_fetch", params=dict(id_=id_))
+    broadcast.broadcast("slave_fetch", params={"id_": id_})
 
 
 def _slave_fetch(id_: str) -> None:
