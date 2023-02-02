@@ -17,7 +17,7 @@ class GitSource(SshBaseSource):
     def _do_refresh(self) -> None:
         self._checkout()
         self._copy(self._copy_dir(), excludes=[".git"])
-        stats = dict(hash=self._get_hash(), tags=self._get_tags())
+        stats = {"hash": self._get_hash(), "tags": self._get_tags()}
         with open(os.path.join(self.get_path(), ".gitstats"), "w", encoding="utf-8") as gitstats:
             json.dump(stats, gitstats)
 

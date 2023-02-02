@@ -15,20 +15,26 @@ def wait_slaves():
         if r.status_code == 200:
             json = r.json()
             if len(json["slaves"]) != 4:
-                raise Exception(
+                raise Exception(  # pylint: disable=broad-exception-raised
                     f"Not seeing 4 slaves but {len(json['slaves'])}.",
                 )
             for name, status in json["slaves"].items():
                 if name == "slave-others":
                     if set(status["sources"].keys()) != {"master"}:
-                        raise Exception(f"Not seeing the 1 source on {name}")
+                        raise Exception(  # pylint: disable=broad-exception-raised
+                            f"Not seeing the 1 source on {name}"
+                        )
                 else:
                     if set(status["sources"].keys()) != {"master", "test_git"}:
-                        raise Exception(f"Not seeing the 2 sources on {name}: {status['sources'].keys()}")
+                        raise Exception(  # pylint: disable=broad-exception-raised
+                            f"Not seeing the 2 sources on {name}: {status['sources'].keys()}",
+                        )
             return True
         else:
             LOG.warning("%i, %s: %s", r.status_code, r.status, r.text)
-            raise Exception(f"Not having a 200 status: {r.status_code}")
+            raise Exception(  # pylint: disable=broad-exception-raised
+                f"Not having a 200 status: {r.status_code}"
+            )
 
     utils.retry_timeout(what, timeout=10, interval=1)
 
