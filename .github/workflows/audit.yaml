@@ -6,7 +6,7 @@ on:
     - cron: '30 2 * * *'
 
 jobs:
-  main:
+  audit:
     runs-on: ubuntu-20.04
     name: Audit
     timeout-minutes: 10
