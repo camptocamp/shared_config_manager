@@ -17,25 +17,25 @@ WORKDIR /app
 
 EXPOSE 8080
 
-RUN curl https://downloads.rclone.org/v1.52.2/rclone-v1.52.2-linux-amd64.deb > /tmp/rclone.deb && \
-    dpkg -i /tmp/rclone.deb && \
-    rm /tmp/rclone.deb && \
-    apt update && \
-    apt install --assume-yes --no-install-recommends git ssh rsync gettext-base && \
-    apt clean && \
-    rm -r /var/lib/apt/lists/* && \
-    echo "    VerifyHostKeyDNS yes" >> /etc/ssh/ssh_config && \
-    echo "    StrictHostKeyChecking no" >> /etc/ssh/ssh_config  # TODO: find better
+RUN curl https://downloads.rclone.org/v1.52.2/rclone-v1.52.2-linux-amd64.deb > /tmp/rclone.deb \
+    && dpkg -i /tmp/rclone.deb \
+    && rm /tmp/rclone.deb \
+    && apt update \
+    && apt install --assume-yes --no-install-recommends git ssh rsync gettext-base \
+    && apt clean \
+    && rm -r /var/lib/apt/lists/* \
+    && echo "    VerifyHostKeyDNS yes" >> /etc/ssh/ssh_config \
+    && echo "    StrictHostKeyChecking no" >> /etc/ssh/ssh_config # TODO: find better
 
 COPY requirements.txt ./
-RUN python3 -m pip install --disable-pip-version-check --no-cache-dir --requirement=requirements.txt && \
-    rm --recursive --force /tmp/*
+RUN python3 -m pip install --disable-pip-version-check --no-cache-dir --requirement=requirements.txt \
+    && rm --recursive --force /tmp/*
 
 COPY Pipfile Pipfile.lock ./
-RUN pipenv install --system --clear && \
-    rm --recursive --force /usr/local/lib/python3.8/dist-packages/tests/ /tmp/* /root/.cache/* && \
-    python3 -m compileall -q /usr/local/lib/python3.8 \
-    -x '/usr/local/lib/python3.8/dist-packages/pipenv/'
+RUN pipenv install --system --clear \
+    && rm --recursive --force /usr/local/lib/python3.8/dist-packages/tests/ /tmp/* /root/.cache/* \
+    && python3 -m compileall -q /usr/local/lib/python3.8 \
+        -x '/usr/local/lib/python3.8/dist-packages/pipenv/'
 
 # Copy the rest of the files (watch for the .dockerignore)
 COPY setup.py production.ini ./
@@ -44,21 +44,20 @@ COPY shared_config_manager/ ./shared_config_manager/
 
 ARG GIT_HASH
 
-RUN python3 -m pip install --no-cache-dir --editable=. && \
-    c2cwsgiutils-genversion $GIT_HASH && \
-    mkdir -p /master_config /config /var/www && \
-    adduser www-data root && \
-    chown www-data:root /master_config /config /var/www && \
-    chmod og+rwx /master_config /config /var/www && \
-    chmod g+w /etc/passwd && \
-    python3 -m compileall -q . && \
-    rm -rf /tmp/* /master_config/* /config/*
+RUN python3 -m pip install --no-cache-dir --editable=. \
+    && c2cwsgiutils-genversion $GIT_HASH \
+    && mkdir -p /master_config /config /var/www \
+    && adduser www-data root \
+    && chown www-data:root /master_config /config /var/www \
+    && chmod og+rwx /master_config /config /var/www \
+    && chmod g+w /etc/passwd \
+    && python3 -m compileall -q . \
+    && rm -rf /tmp/* /master_config/* /config/*
 
 ENV GUNICORN_PARAMS="-b :8080 --workers 1 --worker-class gthread --threads 10" \
     LOG_LEVEL=WARN \
     LOG_TYPE=json \
     C2C_BROADCAST_PREFIX=broadcast_scm_
-
 
 FROM base AS tests
 
@@ -71,6 +70,5 @@ COPY setup.cfg ./
 COPY tests/ ./tests/
 RUN prospector
 RUN pytest -vv --cov=shared_config_manager --color=yes tests
-
 
 FROM base AS runner
