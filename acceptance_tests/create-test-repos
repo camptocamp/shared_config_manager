@@ -8,7 +8,7 @@ cd /repos
 
 git init master
 cd master
-cat > shared_config_manager.yaml <<END
+cat > shared_config_manager.yaml << END
 sources:
   test_git:
     type: git
