@@ -306,3 +306,12 @@ Returns the status for the given source ID, looking like that:
 - `GET {ROUTE_PREFIX}/1/tarball/{ID}`
 
 Returns a `.tar.gz` containing the current content for the given source.
+
+## Contributing
+
+Install the pre-commit hooks:
+
+```bash
+pip install pre-commit
+pre-commit install --allow-missing-config
+```

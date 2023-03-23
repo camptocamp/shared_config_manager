@@ -24,6 +24,7 @@ cd ..
 
 git init test_git
 cd test_git
+# shellcheck disable=SC2238
 echo "Hello world" > test
 git add test
 git commit --message="Initial commit"
