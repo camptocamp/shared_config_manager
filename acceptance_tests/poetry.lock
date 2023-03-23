@@ -1667,14 +1667,14 @@ test = ["asv", "gmpy2", "mpmath", "pytest", "pytest-cov", "pytest-xdist", "sciki
 
 [[package]]
 name = "sentry-sdk"
-version = "1.12.1"
+version = "1.14.0"
 description = "Python client for Sentry (https://sentry.io)"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "sentry-sdk-1.12.1.tar.gz", hash = "sha256:5bbe4b72de22f9ac1e67f2a4e6efe8fbd595bb59b7b223443f50fe5802a5551c"},
-    {file = "sentry_sdk-1.12.1-py2.py3-none-any.whl", hash = "sha256:9f0b960694e2d8bb04db4ba6ac2a645040caef4e762c65937998ff06064f10d6"},
+    {file = "sentry-sdk-1.14.0.tar.gz", hash = "sha256:273fe05adf052b40fd19f6d4b9a5556316807246bd817e5e3482930730726bb0"},
+    {file = "sentry_sdk-1.14.0-py2.py3-none-any.whl", hash = "sha256:72c00322217d813cf493fe76590b23a757e063ff62fec59299f4af7201dd4448"},
 ]
 
 [package.dependencies]
@@ -1692,7 +1692,7 @@ falcon = ["falcon (>=1.4)"]
 fastapi = ["fastapi (>=0.79.0)"]
 flask = ["blinker (>=1.1)", "flask (>=0.11)"]
 httpx = ["httpx (>=0.16.0)"]
-opentelemetry = ["opentelemetry-distro (>=0.350b0)"]
+opentelemetry = ["opentelemetry-distro (>=0.35b0)"]
 pure-eval = ["asttokens", "executing", "pure-eval"]
 pymongo = ["pymongo (>=3.1)"]
 pyspark = ["pyspark (>=2.4.4)"]
@@ -1701,6 +1701,7 @@ rq = ["rq (>=0.6)"]
 sanic = ["sanic (>=0.8)"]
 sqlalchemy = ["sqlalchemy (>=1.2)"]
 starlette = ["starlette (>=0.19.1)"]
+starlite = ["starlite (>=1.48)"]
 tornado = ["tornado (>=5)"]
 
 [[package]]
@@ -2275,4 +2276,4 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.11"
-content-hash = "f16444c0c37483f6abc522b189cf613b584dc184755b93090391e1457f2d7499"
+content-hash = "2b5801f04c62543bbac0db90867f8f87cc9b839dd222c9e745b709a52e55bd3f"
