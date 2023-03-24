@@ -4,10 +4,10 @@ import re
 import subprocess
 from typing import Any, Dict, Iterable, List, Optional, Union, cast
 
-import pyramid.request
-import pyramid.response
 from c2cwsgiutils import services
 from pyramid.httpexceptions import HTTPNotFound, HTTPServerError
+import pyramid.request
+import pyramid.response
 
 from shared_config_manager import slave_status
 from shared_config_manager.configuration import BroadcastObject, SourceStatus

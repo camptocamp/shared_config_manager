@@ -1,15 +1,15 @@
 import os
 from typing import Any
 
+from c2cwsgiutils.health_check import HealthCheck
 import c2cwsgiutils.pyramid
+from pyramid.config import Configurator
 import pyramid.request
 import pyramid.response
-from c2cwsgiutils.health_check import HealthCheck
-from pyramid.config import Configurator
 
 import shared_config_manager.security
-import shared_config_manager.views
 from shared_config_manager.sources import registry
+import shared_config_manager.views
 
 
 def forbidden(request: pyramid.request.Request) -> pyramid.response.Response:

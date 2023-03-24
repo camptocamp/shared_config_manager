@@ -6,11 +6,11 @@ import tempfile
 from threading import Thread
 from typing import Dict, Mapping, Optional, Tuple
 
+from c2cwsgiutils import broadcast
 import inotify.adapters
+from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
 import pyramid.request
 import yaml
-from c2cwsgiutils import broadcast
-from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
 
 from shared_config_manager.configuration import Config, SourceConfig, SourceStatus
 from shared_config_manager.sources import base, git, mode, rclone, rsync

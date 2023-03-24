@@ -5,12 +5,12 @@ import re
 import subprocess
 from typing import Any, Dict, List, Tuple, Union, cast
 
+from pyramid.httpexceptions import HTTPNotFound
 import pyramid.request
 import pyramid.response
-import requests
-from pyramid.httpexceptions import HTTPNotFound
 from pyramid.security import Allowed
 from pyramid.view import view_config
+import requests
 
 from shared_config_manager import slave_status
 from shared_config_manager.configuration import SourceStatus
