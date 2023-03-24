@@ -6,14 +6,13 @@ import tempfile
 from threading import Thread
 from typing import Dict, Mapping, Optional, Tuple
 
-import inotify.adapters
-import pyramid.request
-import yaml
 from c2cwsgiutils import broadcast
+import inotify.adapters
 from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
-
+import pyramid.request
 from shared_config_manager.configuration import Config, SourceConfig, SourceStatus
 from shared_config_manager.sources import base, git, mode, rclone, rsync
+import yaml
 
 _LOG = logging.getLogger(__name__)
 _ENGINES = {"git": git.GitSource, "rsync": rsync.RsyncSource, "rclone": rclone.RcloneSource}

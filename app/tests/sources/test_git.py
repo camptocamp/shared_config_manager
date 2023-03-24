@@ -3,7 +3,6 @@ import subprocess
 import tempfile
 
 import pytest
-
 from shared_config_manager.sources import registry
 
 TEMP_DIR = tempfile.gettempdir()
@@ -13,9 +12,13 @@ TEMP_DIR = tempfile.gettempdir()
 def repo():
     repo_path = os.path.join(TEMP_DIR, "repo")
     subprocess.check_call(
-        ["git", "config", "--global", "user.email", "you@example.com"], stderr=subprocess.STDOUT
+        ["git", "config", "--global", "user.email", "you@example.com"],
+        stderr=subprocess.STDOUT,
     )
-    subprocess.check_call(["git", "config", "--global", "user.name", "Your Name"], stderr=subprocess.STDOUT)
+    subprocess.check_call(
+        ["git", "config", "--global", "user.name", "Your Name"],
+        stderr=subprocess.STDOUT,
+    )
     subprocess.check_call(["git", "init", repo_path], stderr=subprocess.STDOUT)
     file_path = os.path.join(repo_path, "toto", "test")
     os.makedirs(os.path.dirname(file_path))
@@ -23,7 +26,9 @@ def repo():
         file.write("Hello world")
     subprocess.check_call(["git", "add", file_path], cwd=repo_path, stderr=subprocess.STDOUT)
     subprocess.check_call(
-        ["git", "commit", "-a", "-m", "Initial commit"], cwd=repo_path, stderr=subprocess.STDOUT
+        ["git", "commit", "-a", "-m", "Initial commit"],
+        cwd=repo_path,
+        stderr=subprocess.STDOUT,
     )
 
     yield repo_path
@@ -45,7 +50,11 @@ def test_git(repo):
     with open(repo_file_path, "w") as file:
         file.write("Good bye")
     subprocess.check_call(["git", "add", repo_file_path], cwd=repo, stderr=subprocess.STDOUT)
-    subprocess.check_call(["git", "commit", "-a", "-m", "Initial commit"], cwd=repo, stderr=subprocess.STDOUT)
+    subprocess.check_call(
+        ["git", "commit", "-a", "-m", "Initial commit"],
+        cwd=repo,
+        stderr=subprocess.STDOUT,
+    )
 
     git.refresh()
     try:
@@ -70,7 +79,11 @@ def test_git_sub_dir(repo):
     with open(repo_file_path, "w") as file:
         file.write("Good bye")
     subprocess.check_call(["git", "add", repo_file_path], cwd=repo, stderr=subprocess.STDOUT)
-    subprocess.check_call(["git", "commit", "-a", "-m", "Initial commit"], cwd=repo, stderr=subprocess.STDOUT)
+    subprocess.check_call(
+        ["git", "commit", "-a", "-m", "Initial commit"],
+        cwd=repo,
+        stderr=subprocess.STDOUT,
+    )
 
     git.refresh()
     try:
@@ -97,7 +110,11 @@ def test_git_sub_dir_no_sparse(repo):
     with open(repo_file_path, "w") as file:
         file.write("Good bye")
     subprocess.check_call(["git", "add", repo_file_path], cwd=repo, stderr=subprocess.STDOUT)
-    subprocess.check_call(["git", "commit", "-a", "-m", "Initial commit"], cwd=repo, stderr=subprocess.STDOUT)
+    subprocess.check_call(
+        ["git", "commit", "-a", "-m", "Initial commit"],
+        cwd=repo,
+        stderr=subprocess.STDOUT,
+    )
 
     git.refresh()
     try:
@@ -108,7 +125,7 @@ def test_git_sub_dir_no_sparse(repo):
         git.delete()
 
 
-@pytest.mark.skipif(os.environ.get("PRIVATE_SSH_KEY") is not None, reason="We needs to kave the key")
+@pytest.mark.skipif(os.environ.get("PRIVATE_SSH_KEY") is not None, reason="We needs to have the key")
 def test_git_with_key():
     ssh_key = os.environ["PRIVATE_SSH_KEY"].split(" ")
     ssh_key = ["-----BEGIN RSA PRIVATE KEY-----"]

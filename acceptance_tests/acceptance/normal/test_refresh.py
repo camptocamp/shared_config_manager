@@ -38,7 +38,7 @@ def _trigger(app_connection: Connection, url: str, json: Dict[str, Any], headers
             **{
                 "X-Hub-Signature-256": "sha256="
                 + hmac.new(
-                    key="changeme".encode("utf-8"),
+                    key=b"changeme",
                     msg=json,
                     digestmod=hashlib.sha256,
                 ).hexdigest(),

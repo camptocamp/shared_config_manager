@@ -1,5 +1,4 @@
 import mako.template
-
 from shared_config_manager.configuration import TemplateEnginesConfig
 from shared_config_manager.template_engines.base import BaseEngine
 

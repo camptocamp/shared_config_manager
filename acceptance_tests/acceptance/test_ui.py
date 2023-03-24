@@ -1,9 +1,9 @@
 import os
 import subprocess
 
+from c2cwsgiutils.acceptance.image import check_image
 import pytest
 import skimage.io
-from c2cwsgiutils.acceptance.image import check_image
 
 REGENERATE = False
 
