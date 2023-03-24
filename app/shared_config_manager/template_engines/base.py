@@ -3,7 +3,6 @@ import os
 from typing import Dict, List, cast
 
 from c2cwsgiutils import stats
-
 from shared_config_manager.configuration import TemplateEnginesConfig, TemplateEnginesStatus
 
 LOG = logging.getLogger(__name__)

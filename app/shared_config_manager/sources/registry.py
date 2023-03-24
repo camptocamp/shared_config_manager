@@ -10,10 +10,9 @@ from c2cwsgiutils import broadcast
 import inotify.adapters
 from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
 import pyramid.request
-import yaml
-
 from shared_config_manager.configuration import Config, SourceConfig, SourceStatus
 from shared_config_manager.sources import base, git, mode, rclone, rsync
+import yaml
 
 _LOG = logging.getLogger(__name__)
 _ENGINES = {"git": git.GitSource, "rsync": rsync.RsyncSource, "rclone": rclone.RcloneSource}

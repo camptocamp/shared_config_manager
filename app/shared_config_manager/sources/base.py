@@ -12,7 +12,6 @@ from pyramid.httpexceptions import HTTPForbidden
 import pyramid.request
 from pyramid.security import Allowed
 import requests
-
 from shared_config_manager import template_engines
 from shared_config_manager.configuration import SourceConfig, SourceStatus
 from shared_config_manager.sources import mode

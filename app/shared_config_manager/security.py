@@ -7,7 +7,6 @@ from typing import Optional, Union
 import c2cwsgiutils.auth
 import pyramid.request
 from pyramid.security import Allowed, Denied
-
 from shared_config_manager.configuration import SourceConfig
 
 _LOG = logging.getLogger(__name__)
