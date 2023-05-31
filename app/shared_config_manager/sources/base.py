@@ -20,6 +20,8 @@ from shared_config_manager.sources import mode
 LOG = logging.getLogger(__name__)
 TARGET = os.environ.get("TARGET", "/config")
 MASTER_TARGET = os.environ.get("MASTER_TARGET", "/master_config")
+_RETRY_NUMBER = int(os.environ.get("SCM_RETRY_NUMBER", 3))
+_RETRY_DELAY = int(os.environ.get("SCM_RETRY_DELAY", 1))
 
 
 class BaseSource:
@@ -87,7 +89,8 @@ class BaseSource:
     def _do_fetch(self) -> None:
         path = self.get_path()
         url = mode.get_fetch_url(self.get_id())
-        while True:
+
+        for i in list(range(_RETRY_NUMBER))[::-1]:
             try:
                 LOG.info("Doing a fetch of %s", self.get_id())
                 response = requests.get(url, headers={"X-Scm-Secret": os.environ["SCM_SECRET"]}, stream=True)
@@ -114,12 +117,17 @@ class BaseSource:
                 return
             except Exception as exception:
                 stats.increment_counter(["source", self.get_id(), "fetch_error"])
+                retry_message = f" (will retry in {_RETRY_DELAY}s)" if i else " (failed)"
                 LOG.warning(
-                    "Error fetching the source %s from the master (will retry in 1s): %s",
+                    "Error fetching the source %s from the master%s: %s",
                     self.get_id(),
+                    retry_message,
                     str(exception),
                 )
-                time.sleep(1)
+                if i:
+                    time.sleep(_RETRY_DELAY)
+                else:
+                    raise
 
     def _copy(self, source: str, excludes: Optional[List[str]] = None) -> None:
         os.makedirs(self.get_path(), exist_ok=True)
