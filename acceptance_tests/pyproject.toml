@@ -6,9 +6,9 @@ authors = []
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.11"
-pytest-cov = "4.0.0"
-prospector = "1.9.0"
-typing-extensions = "4.5.0"
+pytest-cov = "4.1.0"
+prospector = "1.10.2"
+typing-extensions = "4.6.2"
 c2cwsgiutils = { version = "5.2.2", extras = ["standard", "test_images"] }
 requests = "2.31.0"
 boltons = "23.0.0"
