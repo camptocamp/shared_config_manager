@@ -89,7 +89,6 @@ class BaseSource:
     def _do_fetch(self) -> None:
         path = self.get_path()
         url = mode.get_fetch_url(self.get_id())
-
         for i in list(range(_RETRY_NUMBER))[::-1]:
             try:
                 LOG.info("Doing a fetch of %s", self.get_id())
