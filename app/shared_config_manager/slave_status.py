@@ -1,4 +1,5 @@
 from c2cwsgiutils import broadcast
+
 from shared_config_manager.configuration import SlaveStatus, SourceStatus
 from shared_config_manager.sources import registry
 

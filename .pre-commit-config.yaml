@@ -82,6 +82,8 @@ repos:
     rev: 23.3.0
     hooks:
       - id: black
+        args:
+          - --line-length=110
 ci:
   autoupdate_schedule: quarterly
   skip:

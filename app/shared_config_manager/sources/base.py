@@ -7,20 +7,41 @@ import subprocess
 import time
 from typing import Any, Dict, List, Optional, cast
 
-from c2cwsgiutils import stats
+from prometheus_client import Counter, Gauge, Summary
 from pyramid.httpexceptions import HTTPForbidden
 import pyramid.request
 from pyramid.security import Allowed
 import requests
+
 from shared_config_manager import template_engines
 from shared_config_manager.configuration import SourceConfig, SourceStatus
 from shared_config_manager.sources import mode
 
-LOG = logging.getLogger(__name__)
-TARGET = os.environ.get("TARGET", "/config")
-MASTER_TARGET = os.environ.get("MASTER_TARGET", "/master_config")
+_LOG = logging.getLogger(__name__)
+_TARGET = os.environ.get("TARGET", "/config")
+_MASTER_TARGET = os.environ.get("MASTER_TARGET", "/master_config")
 _RETRY_NUMBER = int(os.environ.get("SCM_RETRY_NUMBER", 3))
 _RETRY_DELAY = int(os.environ.get("SCM_RETRY_DELAY", 1))
+
+_REFRESH_SUMMARY = Summary("sharedconfigmanager_source_refresh", "Number of source refreshes", ["source"])
+_REFRESH_ERROR_COUNTER = Counter(
+    "sharedconfigmanager_source_refresh_error_counter", "Number of source errors", ["source"]
+)
+_REFRESH_ERROR_GAUGE = Gauge(
+    "sharedconfigmanager_source_refresh_error_status", "Sources in error", ["source"]
+)
+_TEMPLATE_SUMMARY = Summary(
+    "sharedconfigmanager_source_template", "Number of template evaluations", ["source", "type"]
+)
+_FETCH_SUMMARY = Summary("sharedconfigmanager_source_fetch", "Number of source fetches", ["source"])
+_FETCH_ERROR_COUNTER = Counter(
+    "sharedconfigmanager_source_fetch_error_counter", "Number of source errors", ["source"]
+)
+_FETCH_ERROR_GAUGE = Gauge("sharedconfigmanager_source_fetch_error_status", "Sources in error", ["source"])
+_DO_FETCH_ERROR_COUNTER = Counter(
+    "sharedconfigmanager_source_do_fetch_error", "Number of source fetch errors", ["source"]
+)
+_COPY_SUMMARY = Summary("sharedconfigmanager_source_copy", "Number of source copies", ["source"])
 
 
 class BaseSource:
@@ -41,15 +62,17 @@ class BaseSource:
             self.fetch()
 
     def refresh(self) -> None:
-        LOG.info("Doing a refresh of %s", self.get_id())
+        _LOG.info("Doing a refresh of %s", self.get_id())
         try:
             self._is_loaded = False
-            with stats.timer_context(["source", self.get_id(), "refresh"]):
+            with _REFRESH_SUMMARY.labels(self.get_id()).time():
                 self._do_refresh()
             self._eval_templates()
+            _REFRESH_ERROR_GAUGE.labels(self.get_id()).set(0)
         except Exception:
-            LOG.exception("Error with source %s", self.get_id())
-            stats.increment_counter(["source", self.get_id(), "error"])
+            _LOG.exception("Error with source %s", self.get_id())
+            _REFRESH_ERROR_COUNTER.labels(self.get_id()).inc()
+            _REFRESH_ERROR_GAUGE.labels(self.get_id()).set(1)
             raise
         finally:
             self._is_loaded = True
@@ -66,18 +89,21 @@ class BaseSource:
         files = [os.path.relpath(str(p), root_dir) for p in pathlib.Path(root_dir).glob("**/*")]
 
         for engine in self._template_engines:
-            with stats.timer_context(["source", self.get_id(), "template", engine.get_type()]):
+            with _TEMPLATE_SUMMARY.labels(self.get_id(), engine.get_type()).time():
                 engine.evaluate(root_dir, files)
 
     def fetch(self) -> None:
         try:
             self._is_loaded = False
-            with stats.timer_context(["source", self.get_id(), "fetch"]):
+            with _FETCH_SUMMARY.labels(self.get_id()).time(), _FETCH_ERROR_COUNTER.labels(
+                self.get_id()
+            ).count_exceptions():
                 self._do_fetch()
             self._eval_templates()
+            _FETCH_ERROR_GAUGE.labels(self.get_id()).set(0)
         except Exception:
-            LOG.exception("Error with source %s", self.get_id())
-            stats.increment_counter(["source", self.get_id(), "error"])
+            _LOG.exception("Error with source %s", self.get_id())
+            _FETCH_ERROR_GAUGE.labels(self.get_id()).set(1)
             raise
         finally:
             self._is_loaded = True
@@ -91,7 +117,7 @@ class BaseSource:
 
         for i in list(range(_RETRY_NUMBER))[::-1]:
             try:
-                LOG.info("Doing a fetch of %s", self.get_id())
+                _LOG.info("Doing a fetch of %s", self.get_id())
                 response = requests.get(url, headers={"X-Scm-Secret": os.environ["SCM_SECRET"]}, stream=True)
                 response.raise_for_status()
                 if os.path.exists(path):
@@ -115,9 +141,9 @@ class BaseSource:
                     assert tar.wait() == 0
                 return
             except Exception as exception:
-                stats.increment_counter(["source", self.get_id(), "fetch_error"])
+                _DO_FETCH_ERROR_COUNTER.labels(self.get_id()).inc()
                 retry_message = f" (will retry in {_RETRY_DELAY}s)" if i else " (failed)"
-                LOG.warning(
+                _LOG.warning(
                     "Error fetching the source %s from the master%s: %s",
                     self.get_id(),
                     retry_message,
@@ -145,12 +171,12 @@ class BaseSource:
         if "excludes" in self._config:
             cmd += ["--exclude=" + exclude for exclude in self._config["excludes"]]
         cmd += [source + "/", self.get_path()]
-        with stats.timer_context(["source", self.get_id(), "copy"]):
+        with _COPY_SUMMARY.labels(self.get_id()).time():
             self._exec(*cmd)
 
     def delete_target_dir(self) -> None:
         dest = self.get_path()
-        LOG.info("Deleting target dir %s", dest)
+        _LOG.info("Deleting target dir %s", dest)
         if os.path.isdir(dest):
             shutil.rmtree(dest)
 
@@ -160,9 +186,9 @@ class BaseSource:
             if target_dir.startswith("/"):
                 return target_dir
             else:
-                return os.path.join(MASTER_TARGET if self._is_master else TARGET, target_dir)
+                return os.path.join(_MASTER_TARGET if self._is_master else _TARGET, target_dir)
         else:
-            return os.path.join(MASTER_TARGET if self._is_master else TARGET, self.get_id())
+            return os.path.join(_MASTER_TARGET if self._is_master else _TARGET, self.get_id())
 
     def get_id(self) -> str:
         return self._id
@@ -200,7 +226,7 @@ class BaseSource:
     def _exec(*args: Any, **kwargs: Any) -> str:
         try:
             args_ = list(map(str, args))
-            LOG.debug("Running: %s", " ".join(args_))
+            _LOG.debug("Running: %s", " ".join(args_))
             output: str = (
                 subprocess.run(
                     args_,
@@ -214,10 +240,10 @@ class BaseSource:
                 .strip()
             )
             if output:
-                LOG.debug(output)
+                _LOG.debug(output)
             return output
         except subprocess.CalledProcessError as exception:
-            LOG.error(exception.output.decode("utf-8").strip())
+            _LOG.error(exception.output.decode("utf-8").strip())
             raise
 
     def is_loaded(self) -> bool:
