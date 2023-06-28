@@ -8,6 +8,7 @@ from c2cwsgiutils import services
 from pyramid.httpexceptions import HTTPNotFound, HTTPServerError
 import pyramid.request
 import pyramid.response
+
 from shared_config_manager import slave_status
 from shared_config_manager.configuration import BroadcastObject, SourceStatus
 from shared_config_manager.sources import git, registry

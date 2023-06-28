@@ -9,6 +9,7 @@ from types import FrameType
 from typing import Optional
 
 import c2cwsgiutils.setup_process
+
 from shared_config_manager import slave_status  # noqa: F401, pylint: disable=unused-import
 from shared_config_manager.sources import registry
 

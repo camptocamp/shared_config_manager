@@ -6,6 +6,7 @@ import c2cwsgiutils.pyramid
 from pyramid.config import Configurator
 import pyramid.request
 import pyramid.response
+
 import shared_config_manager.security
 from shared_config_manager.sources import registry
 import shared_config_manager.views

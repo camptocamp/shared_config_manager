@@ -11,6 +11,7 @@ import pyramid.response
 from pyramid.security import Allowed
 from pyramid.view import view_config
 import requests
+
 from shared_config_manager import slave_status
 from shared_config_manager.configuration import SourceStatus
 from shared_config_manager.sources import registry
