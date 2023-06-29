@@ -5,7 +5,7 @@ description = "Not used"
 authors = []
 
 [tool.poetry.dependencies]
-python = ">=3.10,<3.11"
+python = ">=3.8,<3.11"
 pytest-cov = "4.1.0"
 prospector = "1.10.2"
 typing-extensions = "4.6.3"
