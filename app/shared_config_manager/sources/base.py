@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Optional, cast
 
 import pyramid.request
 import requests
+from c2cwsgiutils import broadcast
 from prometheus_client import Counter, Gauge, Summary
 from pyramid.httpexceptions import HTTPForbidden
 from pyramid.security import Allowed
@@ -68,7 +69,7 @@ class BaseSource:
             with _REFRESH_SUMMARY.labels(self.get_id()).time():
                 self._do_refresh()
             self._eval_templates()
-            _REFRESH_ERROR_GAUGE.labels(self.get_id()).set(0)
+            _set_refresh_success(self.get_id())
         except Exception:
             _LOG.exception("Error with source %s", self.get_id())
             _REFRESH_ERROR_COUNTER.labels(self.get_id()).inc()
@@ -100,7 +101,7 @@ class BaseSource:
             ).count_exceptions():
                 self._do_fetch()
             self._eval_templates()
-            _FETCH_ERROR_GAUGE.labels(self.get_id()).set(0)
+            _set_fetch_success(self.get_id())
         except Exception:
             _LOG.exception("Error with source %s", self.get_id())
             _FETCH_ERROR_GAUGE.labels(self.get_id()).set(1)
@@ -257,3 +258,17 @@ class BaseSource:
             k = key.upper()
             if "KEY" in k or "PASSWORD" in k or "SECRET" in k:
                 data[key] = "•••"
+
+
+@broadcast.decorator(expect_answers=False)
+def _set_refresh_success(source: str) -> None:
+    """Set refresh in success in all process."""
+
+    _REFRESH_ERROR_GAUGE.labels(source=source).set(0)
+
+
+@broadcast.decorator(expect_answers=False)
+def _set_fetch_success(source: str) -> None:
+    """Set fetch in success in all process."""
+
+    _FETCH_ERROR_GAUGE.labels(source=source).set(0)
