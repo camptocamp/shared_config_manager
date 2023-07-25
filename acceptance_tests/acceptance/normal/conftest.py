@@ -1,10 +1,10 @@
 import logging
 import os
 
-from c2cwsgiutils.acceptance import utils
-from c2cwsgiutils.acceptance.connection import Connection
 import pytest
 import requests
+from c2cwsgiutils.acceptance import utils
+from c2cwsgiutils.acceptance.connection import Connection
 
 LOG = logging.getLogger(__name__)
 
