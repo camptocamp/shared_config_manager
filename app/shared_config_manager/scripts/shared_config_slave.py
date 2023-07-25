@@ -9,6 +9,7 @@ from types import FrameType
 from typing import Optional
 
 import c2cwsgiutils.setup_process
+import prometheus_client
 
 from shared_config_manager import slave_status  # noqa: F401, pylint: disable=unused-import
 from shared_config_manager.sources import registry
@@ -20,6 +21,9 @@ def main() -> None:
     args = parser.parse_args()
 
     os.environ["IS_SLAVE"] = "true"
+
+    if os.environ.get("C2C_PROMETHEUS_PORT") is not None:
+        prometheus_client.start_http_server(int(os.environ["C2C_PROMETHEUS_PORT"]))
 
     signal.signal(signal.SIGTERM, _sig_term)
 
