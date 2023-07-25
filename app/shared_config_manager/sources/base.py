@@ -69,7 +69,7 @@ class BaseSource:
             with _REFRESH_SUMMARY.labels(self.get_id()).time():
                 self._do_refresh()
             self._eval_templates()
-            _set_refresh_success(self.get_id())
+            _set_refresh_success(source=self.get_id())
         except Exception:
             _LOG.exception("Error with source %s", self.get_id())
             _REFRESH_ERROR_COUNTER.labels(self.get_id()).inc()
@@ -101,7 +101,7 @@ class BaseSource:
             ).count_exceptions():
                 self._do_fetch()
             self._eval_templates()
-            _set_fetch_success(self.get_id())
+            _set_fetch_success(source=self.get_id())
         except Exception:
             _LOG.exception("Error with source %s", self.get_id())
             _FETCH_ERROR_GAUGE.labels(self.get_id()).set(1)

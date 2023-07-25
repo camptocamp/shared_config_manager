@@ -2,7 +2,6 @@ import logging
 import os
 from typing import Dict, List, cast
 
-from c2cwsgiutils import broadcast
 from prometheus_client import Counter, Gauge
 
 from shared_config_manager.configuration import TemplateEnginesConfig, TemplateEnginesStatus
