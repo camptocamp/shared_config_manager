@@ -78,13 +78,16 @@ RUN --mount=type=cache,target=/root/.cache \
 ENV OTHER_LOG_LEVEL=WARN \
     GUNICORN_LOG_LEVEL=WARN \
     C2CWSGIUTILS_LOG_LEVEL=WARN \
-    GUNICORN_ACCESS_LOG_LEVEL=WARN \
     SQL_LOG_LEVEL=WARN \
     LOG_LEVEL=INFO \
     LOG_TYPE=json \
     C2C_BROADCAST_PREFIX=broadcast_scm_ \
     GUNICORN_WORKERS=1 \
     GUNICORN_THREADS=10
+
+RUN mkdir -p /prometheus-metrics \
+    && chmod a+rwx /prometheus-metrics
+ENV PROMETHEUS_MULTIPROC_DIR=/prometheus-metrics
 
 CMD ["gunicorn", "--paste=/app/production.ini"]
 

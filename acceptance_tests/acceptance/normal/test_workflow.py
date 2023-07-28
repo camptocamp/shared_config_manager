@@ -4,10 +4,10 @@ import os
 import subprocess
 import time
 
-from acceptance import get_hash, wait_sync
-from c2cwsgiutils.acceptance.connection import Connection
 import pytest
 import requests
+from acceptance import get_hash, wait_sync
+from c2cwsgiutils.acceptance.connection import Connection
 
 
 @pytest.fixture()

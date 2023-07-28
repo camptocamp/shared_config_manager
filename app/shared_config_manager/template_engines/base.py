@@ -2,7 +2,7 @@ import logging
 import os
 from typing import Dict, List, cast
 
-from prometheus_client import Counter
+from prometheus_client import Counter, Gauge
 
 from shared_config_manager.configuration import TemplateEnginesConfig, TemplateEnginesStatus
 
@@ -11,6 +11,7 @@ _ENV_PREFIXES = os.environ.get("SCM_ENV_PREFIXES", "MUTUALIZED_").split(":")
 _ERROR_COUNTER = Counter(
     "sharedconfigmanager_template_error_counter", "Number of template errors", ["source", "type"]
 )
+_ERROR_GAUGE = Gauge("sharedconfigmanager_template_error_status", "Template in error", ["source", "type"])
 
 
 class BaseEngine:
@@ -43,11 +44,13 @@ class BaseEngine:
                 _LOG.debug("Evaluating template: %s -> %s", src_path, dest_path)
                 try:
                     self._evaluate_file(src_path, dest_path)
+                    _ERROR_GAUGE.labels(source=self._source_id, type=self.get_type()).set(0)
                 except Exception:
                     _LOG.warning(
                         "Failed applying the %s template: %s", self._config["type"], src_path, exc_info=True
                     )
                     _ERROR_COUNTER.labels(source=self._source_id, type=self.get_type()).inc()
+                    _ERROR_GAUGE.labels(source=self._source_id, type=self.get_type()).set(1)
             elif src_path != dest_path and not os.path.isdir(src_path) and not os.path.exists(dest_path):
                 os.link(src_path, dest_path)
 

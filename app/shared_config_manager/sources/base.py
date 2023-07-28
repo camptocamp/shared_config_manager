@@ -7,11 +7,11 @@ import subprocess
 import time
 from typing import Any, Dict, List, Optional, cast
 
+import pyramid.request
+import requests
 from prometheus_client import Counter, Gauge, Summary
 from pyramid.httpexceptions import HTTPForbidden
-import pyramid.request
 from pyramid.security import Allowed
-import requests
 
 from shared_config_manager import template_engines
 from shared_config_manager.configuration import SourceConfig, SourceStatus

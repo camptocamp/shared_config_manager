@@ -1,8 +1,8 @@
 import os
 
+import pytest
 from c2cwsgiutils.acceptance import utils
 from c2cwsgiutils.acceptance.connection import Connection
-import pytest
 
 
 @pytest.fixture(scope="package")
