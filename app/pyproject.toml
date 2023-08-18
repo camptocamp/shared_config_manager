@@ -16,7 +16,7 @@ authors = []
 python = ">=3.10,<3.11"
 PyYAML = "6.0.1"
 inotify = "0.2.10"
-c2cwsgiutils = { version = "6.0.0.dev142", extras = ["broadcast", "standard", "oauth2"] }
+c2cwsgiutils = { version = "6.0.0.dev151", extras = ["broadcast", "standard", "oauth2"] }
 pyramid-mako = "1.1.0"
 
 [tool.poetry.dev-dependencies]
