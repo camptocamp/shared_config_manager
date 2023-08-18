@@ -9,7 +9,7 @@ python = ">=3.8,<3.11"
 pytest-cov = "4.1.0"
 prospector = "1.10.2"
 typing-extensions = "4.7.1"
-c2cwsgiutils = { version = "6.0.0.dev142", extras = ["standard", "test_images"] }
+c2cwsgiutils = { version = "6.0.0.dev151", extras = ["standard", "test_images"] }
 requests = "2.31.0"
 boltons = "23.0.0"
 netifaces = "0.11.0"
