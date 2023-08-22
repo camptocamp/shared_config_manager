@@ -27,6 +27,14 @@
     <title>Shared config manager</title>
   </head>
   <body style="padding-bottom: 1rem;">
+    <script>
+      (() => {
+        'use strict'
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          document.documentElement.setAttribute('data-bs-theme', 'dark');
+        }
+      })()
+    </script>
     <div class="container-fluid">
       <h1>Shared config manager</h1>
 
