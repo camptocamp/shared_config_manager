@@ -28,6 +28,14 @@
     <title>Shared config manager - ${source.get_config().get("name", source.get_id()) | h}</title>
   </head>
   <body style="padding-bottom: 1rem;">
+    <script>
+      (() => {
+        'use strict'
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          document.documentElement.setAttribute('data-bs-theme', 'dark');
+        }
+      })()
+    </script>
     <div class="container-fluid">
       <div style="position: absolute; right: 1rem;">
         <p style="text-align: right;">
