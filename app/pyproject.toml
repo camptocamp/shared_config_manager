@@ -1,5 +1,5 @@
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.9"
 ignore_missing_imports = true
 warn_redundant_casts = true
 warn_unused_ignores = true
@@ -13,7 +13,7 @@ description = "Not used"
 authors = []
 
 [tool.poetry.dependencies]
-python = ">=3.10,<3.11"
+python = ">=3.9,<3.11"
 PyYAML = "6.0.1"
 inotify = "0.2.10"
 c2cwsgiutils = { version = "6.0.0.dev153", extras = ["broadcast", "standard", "oauth2"] }

@@ -1,7 +1,7 @@
 import hashlib
 import hmac
 import json as json_module
-from typing import Any, Dict
+from typing import Any
 
 from c2cwsgiutils.acceptance.connection import CacheExpected, Connection
 
@@ -29,7 +29,7 @@ def test_bad_id(app_connection: Connection):
     )
 
 
-def _trigger(app_connection: Connection, url: str, json: Dict[str, Any], headers: Dict[str, str]):
+def _trigger(app_connection: Connection, url: str, json: dict[str, Any], headers: dict[str, str]):
     json = json_module.dumps(json).encode("utf-8")
     return app_connection.post_json(
         url,

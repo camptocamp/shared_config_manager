@@ -3,7 +3,7 @@ import math
 import os.path
 import re
 import subprocess
-from typing import Any, Dict, List, Tuple, Union, cast
+from typing import Any, Union, cast
 
 import pyramid.request
 import pyramid.response
@@ -20,7 +20,7 @@ _LOG = logging.getLogger(__name__)
 
 
 @view_config(route_name="ui_index", renderer="./templates/index.html.mako")  # type: ignore
-def _ui_index(request: pyramid.request.Request) -> Dict[str, Any]:
+def _ui_index(request: pyramid.request.Request) -> dict[str, Any]:
     permission = request.has_permission("all", {})
     is_admin = isinstance(permission, Allowed)
 
@@ -39,7 +39,7 @@ def _ui_index(request: pyramid.request.Request) -> Dict[str, Any]:
 
 
 @view_config(route_name="ui_source", renderer="./templates/source.html.mako")  # type: ignore
-def _ui_source(request: pyramid.request.Request) -> Dict[str, Any]:
+def _ui_source(request: pyramid.request.Request) -> dict[str, Any]:
     def key_format(key: str) -> str:
         return key[0].upper() + key[1:].replace("_", " ")
 
@@ -57,14 +57,14 @@ def _ui_source(request: pyramid.request.Request) -> Dict[str, Any]:
 
     slaves = slave_status.get_source_status(id_=id_)
     assert slaves is not None
-    statuses: List[SourceStatus] = []
+    statuses: list[SourceStatus] = []
     for slave in slaves:
         if slave is None or slave.get("filtered", False):
             continue
         if slave not in statuses:
             statuses.append(slave)
 
-    attributes: List[Tuple[str, Union[str, bool]]] = []
+    attributes: list[tuple[str, Union[str, bool]]] = []
     if source.is_master():
         attributes.append(("ID", f"{source.get_id()} (Master)"))
     else:
@@ -74,13 +74,13 @@ def _ui_source(request: pyramid.request.Request) -> Dict[str, Any]:
 
     for key, value in source.get_config().items():
         if key == "tags":
-            attributes.append(("Tags", ", ".join(cast(List[str], value))))
+            attributes.append(("Tags", ", ".join(cast(list[str], value))))
         elif key == "template_engines":
             continue
         else:
             attributes.append((key_format(key), str(value)))
 
-    attributes4: List[Tuple[str, Union[str, bool], str, Union[str, bool]]] = []
+    attributes4: list[tuple[str, Union[str, bool], str, Union[str, bool]]] = []
     attributes4_height = math.ceil(len(attributes) / 2)
     for index in range(attributes4_height):
         if index + attributes4_height < len(attributes):
@@ -95,7 +95,7 @@ def _ui_source(request: pyramid.request.Request) -> Dict[str, Any]:
         else:
             attributes4.append((attributes[index][0], attributes[index][1], "", ""))
 
-    _slave_status: List[Tuple[SourceStatus, List[Union[str, Tuple[str, str]]]]] = []
+    _slave_status: list[tuple[SourceStatus, list[Union[str, tuple[str, str]]]]] = []
     _repo_re = re.compile(r"^git@github.com:(.*).git$")
     for slave in statuses:
         try:
@@ -110,7 +110,7 @@ def _ui_source(request: pyramid.request.Request) -> Dict[str, Any]:
                 )
                 commit_response.raise_for_status()
                 commit_json = commit_response.json()
-                commit_details: List[Union[str, Tuple[str, str]]] = [
+                commit_details: list[Union[str, tuple[str, str]]] = [
                     (commit_json["html_url"], commit_json["sha"]),
                     f"Author: {commit_json['commit']['author']['name']}",
                     f"Date: {commit_json['commit']['author']['date']}",
@@ -133,7 +133,7 @@ def _ui_source(request: pyramid.request.Request) -> Dict[str, Any]:
             _LOG.warning("Unable to get the commit status for %s", slave.get("hash"), exc_info=True)
             _slave_status.append((slave, []))
 
-    def _get_sort_key(elem: Tuple[SourceStatus, List[str]]) -> str:
+    def _get_sort_key(elem: tuple[SourceStatus, list[str]]) -> str:
         return elem[0].get("hostname", "")
 
     return {

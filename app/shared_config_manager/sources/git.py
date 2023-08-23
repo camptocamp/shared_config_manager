@@ -3,7 +3,6 @@ import json
 import logging
 import os
 import tempfile
-from typing import List
 
 from shared_config_manager.configuration import SourceStatus
 from shared_config_manager.sources import mode
@@ -74,7 +73,7 @@ class GitSource(SshBaseSource):
     def _get_hash(self) -> str:
         return self._exec("git", "rev-parse", "HEAD", cwd=self._clone_dir())
 
-    def _get_tags(self) -> List[str]:
+    def _get_tags(self) -> list[str]:
         out = self._exec("git", "tag", "--points-at", "HEAD", cwd=self._clone_dir())
         if out == "":
             return []

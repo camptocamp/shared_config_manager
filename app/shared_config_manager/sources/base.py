@@ -5,7 +5,7 @@ import pathlib
 import shutil
 import subprocess
 import time
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, Optional, cast
 
 import pyramid.request
 import requests
@@ -155,7 +155,7 @@ class BaseSource:
                 else:
                     raise
 
-    def _copy(self, source: str, excludes: Optional[List[str]] = None) -> None:
+    def _copy(self, source: str, excludes: Optional[list[str]] = None) -> None:
         os.makedirs(self.get_path(), exist_ok=True)
         cmd = [
             "rsync",
@@ -251,7 +251,7 @@ class BaseSource:
         return self._is_loaded
 
     @staticmethod
-    def _hide_sensitive(data: Optional[Dict[str, str]]) -> None:
+    def _hide_sensitive(data: Optional[dict[str, str]]) -> None:
         if data is None:
             return
         for key in list(data.keys()):
