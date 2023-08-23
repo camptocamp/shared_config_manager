@@ -58,7 +58,7 @@
       <h1 style="margin-bottom: 4rem;">${source.get_config().get("name", source.get_id()) | h}</h1>
 
       <h3>Config</h3>
-      <dl class="border rounded row mx-1 bg-light">
+      <dl class="border rounded row mx-1">
         %for c1, c2, c3, c4 in attributes:
         <dt class="col-lg-2">${c1 | h}</dt>
         <dd class="col-lg-4">${c2 | h}</dd>
