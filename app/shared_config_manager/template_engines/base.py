@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Dict, List, cast
+from typing import cast
 
 from prometheus_client import Counter, Gauge
 
@@ -20,12 +20,12 @@ class BaseEngine:
         self._config = config
         self._extension = extension
         if self._config.get("environment_variables", False):
-            self._data = _filter_env(cast(Dict[str, str], os.environ))
+            self._data = _filter_env(cast(dict[str, str], os.environ))
             self._data.update(config.get("data", {}))
         else:
             self._data = config.get("data", {})
 
-    def evaluate(self, root_dir: str, files: List[str]) -> None:
+    def evaluate(self, root_dir: str, files: list[str]) -> None:
         extension_len = len(self._extension) + 1
         dest_dir = self._get_dest_dir(root_dir)
         _LOG.info(
@@ -68,10 +68,10 @@ class BaseEngine:
 
     def get_stats(self, stats: TemplateEnginesStatus) -> None:
         if self._config.get("environment_variables", False):
-            stats["environment_variables"] = _filter_env(cast(Dict[str, str], os.environ))
+            stats["environment_variables"] = _filter_env(cast(dict[str, str], os.environ))
 
 
-def _filter_env(env: Dict[str, str]) -> Dict[str, str]:
+def _filter_env(env: dict[str, str]) -> dict[str, str]:
     result = {}
     for key, value in env.items():
         if any(key.startswith(i) for i in _ENV_PREFIXES):

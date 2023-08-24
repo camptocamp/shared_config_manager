@@ -3,8 +3,9 @@ import os
 import pathlib
 import subprocess
 import tempfile
+from collections.abc import Mapping
 from threading import Thread
-from typing import Dict, Mapping, Optional, Tuple
+from typing import Optional
 
 import inotify.adapters
 import pyramid.request
@@ -19,7 +20,7 @@ _LOG = logging.getLogger(__name__)
 _ENGINES = {"git": git.GitSource, "rsync": rsync.RsyncSource, "rclone": rclone.RcloneSource}
 _MASTER_ID = "master"
 MASTER_SOURCE: Optional[base.BaseSource] = None
-_SOURCES: Dict[str, base.BaseSource] = {}
+_SOURCES: dict[str, base.BaseSource] = {}
 FILTERED_SOURCES: Mapping[str, base.BaseSource] = {}
 _TAG_FILTER = os.environ.get("TAG_FILTER")
 
@@ -149,8 +150,8 @@ def _delete_source(id_: str) -> None:
 
 
 def _filter_sources(
-    source_configs: Dict[str, SourceConfig]
-) -> Tuple[Dict[str, SourceConfig], Dict[str, SourceConfig]]:
+    source_configs: dict[str, SourceConfig]
+) -> tuple[dict[str, SourceConfig], dict[str, SourceConfig]]:
     if _TAG_FILTER is None or mode.is_master():
         return source_configs, {}
     result = {}
@@ -196,7 +197,7 @@ def _slave_fetch(id_: str) -> None:
 
 def get_source_check_auth(
     id_: str, request: Optional[pyramid.request.Request]
-) -> Tuple[Optional[base.BaseSource], bool]:
+) -> tuple[Optional[base.BaseSource], bool]:
     filtered = False
     source = get_source(id_)
     if source is None:
@@ -216,7 +217,7 @@ def get_source(id_: str) -> Optional[base.BaseSource]:
         return _SOURCES.get(id_)
 
 
-def get_stats() -> Dict[str, SourceStatus]:
+def get_stats() -> dict[str, SourceStatus]:
     return (
         {
             id_: source.get_stats()

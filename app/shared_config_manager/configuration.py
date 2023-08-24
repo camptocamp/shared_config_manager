@@ -1,4 +1,4 @@
-from typing import Dict, List, TypedDict
+from typing import TypedDict
 
 from c2cwsgiutils.auth import AuthConfig
 
@@ -6,8 +6,8 @@ from c2cwsgiutils.auth import AuthConfig
 class _SourceBase(TypedDict, total=False):
     type: str
     target_dir: str
-    excludes: List[str]
-    tags: List[str]
+    excludes: list[str]
+    tags: list[str]
     # git
     branch: str
     repo: str
@@ -24,19 +24,19 @@ class TemplateEnginesConfig(TypedDict, total=False):
     type: str
     dest_sub_dir: str
     environment_variables: bool
-    data: Dict[str, str]
+    data: dict[str, str]
 
 
 class SourceConfig(_SourceBase, total=False):
     name: str
     auth: AuthConfig
-    template_engines: List[TemplateEnginesConfig]
+    template_engines: list[TemplateEnginesConfig]
 
 
 class TemplateEnginesStatus(TypedDict, total=False):
     type: str
-    environment_variables: Dict[str, str]
-    data: Dict[str, str]
+    environment_variables: dict[str, str]
+    data: dict[str, str]
 
 
 class BroadcastObject(TypedDict, total=False):
@@ -46,13 +46,13 @@ class BroadcastObject(TypedDict, total=False):
 
 class SourceStatus(_SourceBase, BroadcastObject, total=False):
     filtered: bool
-    template_engines: List[TemplateEnginesStatus]
+    template_engines: list[TemplateEnginesStatus]
     hash: str
 
 
 class SlaveStatus(BroadcastObject, total=False):
-    sources: Dict[str, SourceStatus]
+    sources: dict[str, SourceStatus]
 
 
 class Config(TypedDict, total=False):
-    sources: Dict[str, SourceConfig]
+    sources: dict[str, SourceConfig]

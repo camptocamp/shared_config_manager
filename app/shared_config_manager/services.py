@@ -2,7 +2,8 @@ import logging
 import os.path
 import re
 import subprocess
-from typing import Any, Dict, Iterable, List, Optional, Union, cast
+from collections.abc import Iterable
+from typing import Any, Optional, Union, cast
 
 import pyramid.request
 import pyramid.response
@@ -25,7 +26,7 @@ __BRANCH_NAME_SANITIZER = re.compile(r"[^0-9a-zA-z-_]")
 
 
 @_refresh_service.get()  # type: ignore
-def _refresh_view(request: pyramid.request.Request) -> Dict[str, Any]:
+def _refresh_view(request: pyramid.request.Request) -> dict[str, Any]:
     id_ = request.matchdict["id"]
     source, _ = registry.get_source_check_auth(id_=id_, request=request)
     if source is None:
@@ -34,7 +35,7 @@ def _refresh_view(request: pyramid.request.Request) -> Dict[str, Any]:
 
 
 @_refresh_service.post()  # type: ignore
-def _refresh_webhook(request: pyramid.request.Request) -> Dict[str, Any]:
+def _refresh_webhook(request: pyramid.request.Request) -> dict[str, Any]:
     id_ = request.matchdict["id"]
     source, _ = registry.get_source_check_auth(id_=id_, request=request)
     if source is None:
@@ -64,13 +65,13 @@ def _refresh_webhook(request: pyramid.request.Request) -> Dict[str, Any]:
     return _refresh(request)
 
 
-def _refresh(request: pyramid.request.Request) -> Dict[str, Any]:
+def _refresh(request: pyramid.request.Request) -> dict[str, Any]:
     registry.refresh(id_=request.matchdict["id"], request=request)
     return {"status": 200}
 
 
 @_refresh_all_service.get()  # type: ignore
-def _refresh_all(request: pyramid.request.Request) -> Dict[str, Any]:
+def _refresh_all(request: pyramid.request.Request) -> dict[str, Any]:
     if not registry.MASTER_SOURCE:
         raise HTTPServerError("Master source not initialized")
     registry.MASTER_SOURCE.validate_auth(request)
@@ -82,7 +83,7 @@ def _refresh_all(request: pyramid.request.Request) -> Dict[str, Any]:
 
 
 @_refresh_all_service.post()  # type: ignore
-def _refresh_all_webhook(request: pyramid.request.Request) -> Dict[str, Any]:
+def _refresh_all_webhook(request: pyramid.request.Request) -> dict[str, Any]:
     if not registry.MASTER_SOURCE:
         raise HTTPServerError("Master source not initialized")
     registry.MASTER_SOURCE.validate_auth(request=request)
@@ -117,7 +118,7 @@ def _refresh_all_webhook(request: pyramid.request.Request) -> Dict[str, Any]:
 
 
 @_status_service.get()  # type: ignore
-def _stats(request: pyramid.request.Request) -> Dict[str, Any]:
+def _stats(request: pyramid.request.Request) -> dict[str, Any]:
     if not registry.MASTER_SOURCE:
         return {"slaves": {}}
     registry.MASTER_SOURCE.validate_auth(request=request)
@@ -128,14 +129,14 @@ def _stats(request: pyramid.request.Request) -> Dict[str, Any]:
 
 
 @_source_stats_service.get()  # type: ignore
-def _source_stats(request: pyramid.request.Request) -> Dict[str, Any]:
+def _source_stats(request: pyramid.request.Request) -> dict[str, Any]:
     id_ = request.matchdict["id"]
     source, _ = registry.get_source_check_auth(id_=id_, request=request)
     if source is None:
         raise HTTPNotFound(f"Unknown id {id_}")
-    slaves: Optional[List[SourceStatus]] = slave_status.get_source_status(id_=id_)
+    slaves: Optional[list[SourceStatus]] = slave_status.get_source_status(id_=id_)
     assert slaves is not None
-    statuses: List[SourceStatus] = []
+    statuses: list[SourceStatus] = []
     for slave in slaves:
         if slave is None or slave.get("filtered", False):
             continue
