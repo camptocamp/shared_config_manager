@@ -1314,14 +1314,14 @@ diagrams = ["jinja2", "railroad-diagrams"]
 
 [[package]]
 name = "pyramid"
-version = "2.0"
+version = "2.0.2"
 description = "The Pyramid Web Framework, a Pylons project"
 category = "main"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "pyramid-2.0-py3-none-any.whl", hash = "sha256:de7f097fa2fa43bead1f690761e56594d24954ae7dc7cbf69a5d84bb75c5a099"},
-    {file = "pyramid-2.0.tar.gz", hash = "sha256:45431b387587ed0fac6213b54d6e9f0936f0cc85238a8f5af7852fc9484c5c77"},
+    {file = "pyramid-2.0.2-py3-none-any.whl", hash = "sha256:2e6585ac55c147f0a51bc00dadf72075b3bdd9a871b332ff9e5e04117ccd76fa"},
+    {file = "pyramid-2.0.2.tar.gz", hash = "sha256:372138a738e4216535cc76dcce6eddd5a1aaca95130f2354fb834264c06f18de"},
 ]
 
 [package.dependencies]
@@ -2197,4 +2197,4 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.11"
-content-hash = "1ce8a707aabc4bedca04080d83b4c4ce00e6c41479453327ce45c823312277b9"
+content-hash = "4dc60feeef399e91901a91f44c3fd436e166eab9a053426e5933cb9880402b74"
