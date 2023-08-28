@@ -30,6 +30,7 @@ c2cwsgiutils = { version = "5.1.6", extras = ["broadcast", "standard"] }
 sentry-sdk = "1.14.0"
 pyramid-mako = "1.1.0"
 certifi = "2023.7.22"
+pyramid = "2.0.2"
 
 [tool.poetry.dev-dependencies]
 prospector = { extras = ["with_mypy", "with_bandit"], version = "1.8.4" }
