@@ -9,7 +9,7 @@ python = ">=3.10,<3.11"
 pytest-cov = "4.0.0"
 prospector = "1.8.4"
 typing-extensions = "4.4.0"
-c2cwsgiutils = { version = "5.1.6", extras = ["standard", "test_images"] }
+c2cwsgiutils = { version = "5.1.7", extras = ["standard", "test_images"] }
 sentry-sdk = "1.14.0"
 requests = "2.31.0"
 boltons = "21.0.0"
