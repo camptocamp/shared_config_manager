@@ -101,7 +101,6 @@ def _handle_master_config(config: Config) -> None:
     to_deletes = set(_SOURCES.keys()) - set(new_sources.keys())
     for to_delete in to_deletes:
         _delete_source(to_delete)
-    errors = 0
     for id_, source_config in new_sources.items():
         prev_source = _SOURCES.get(id_)
         if prev_source is None:
@@ -118,8 +117,7 @@ def _handle_master_config(config: Config) -> None:
             _SOURCES[id_].refresh_or_fetch()
         except Exception:
             _LOG.error("Cannot load the %s config", id_, exc_info=True)
-            errors += 1
-    _update_flag("READY" if errors == 0 else "ERROR")
+    _update_flag("READY")
 
 
 def _update_flag(value: str) -> None:
