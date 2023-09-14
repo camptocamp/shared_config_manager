@@ -91,13 +91,15 @@ def reload_master_config() -> None:
             _handle_master_config(config)
 
 
-def _handle_master_config(config: Config) -> None:
+def _do_handle_master_config(config: Config) -> tuple[int, int]:
     global FILTERED_SOURCES  # pylint: disable=global-statement
-    _LOG.info("Reading the master config")
-    if _MASTER_ID in config["sources"]:
-        raise HTTPBadRequest(f'A source cannot have the "{_MASTER_ID}" id')
+
+    success = 0
+    errors = 0
+
     new_sources, filtered = _filter_sources(config["sources"])
     FILTERED_SOURCES = {id_: _create_source(id_, config) for id_, config in filtered.items()}
+
     to_deletes = set(_SOURCES.keys()) - set(new_sources.keys())
     for to_delete in to_deletes:
         _delete_source(to_delete)
@@ -115,9 +117,26 @@ def _handle_master_config(config: Config) -> None:
         try:
             _SOURCES[id_] = _create_source(id_, source_config)
             _SOURCES[id_].refresh_or_fetch()
+            success += 1
         except Exception:
             _LOG.error("Cannot load the %s config", id_, exc_info=True)
-    _update_flag("READY")
+            errors += 1
+    return success, errors
+
+
+def _handle_master_config(config: Config) -> None:
+    _LOG.info("Reading the master config")
+    if _MASTER_ID in config["sources"]:
+        raise HTTPBadRequest(f'A source cannot have the "{_MASTER_ID}" id')
+    success, errors = _do_handle_master_config(config)
+    if errors != 0:
+        if success != 0:
+            success, errors = _do_handle_master_config(config)
+            _update_flag("READY")
+        else:
+            _update_flag("ERROR")
+    else:
+        _update_flag("READY")
 
 
 def _update_flag(value: str) -> None:
