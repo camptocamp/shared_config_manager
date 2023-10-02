@@ -71,47 +71,50 @@ yaml = ["PyYAML"]
 
 [[package]]
 name = "c2cwsgiutils"
-version = "6.0.0.dev162"
+version = "6.0.2"
 description = "Common utilities for Camptocamp WSGI applications"
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "c2cwsgiutils-6.0.0.dev162-py3-none-any.whl", hash = "sha256:bfdb3a15c0b84828e8464a53af6a72ed4f9947a591639811131ac90befb1d43e"},
-    {file = "c2cwsgiutils-6.0.0.dev162.tar.gz", hash = "sha256:b4f19fe5c77e4877174656db27b756ab0d387f0962d9a9ac618509a1c2abc0a4"},
+    {file = "c2cwsgiutils-6.0.2-py3-none-any.whl", hash = "sha256:2da638f4a6ff68f38fa63317e11ee2b61f6a561d2e5a75afe9ef69e5573e5dc1"},
+    {file = "c2cwsgiutils-6.0.2.tar.gz", hash = "sha256:42813ddc8ff22acb8308147d239ac7423cd4615a016a50948dfd4cab3836ab44"},
 ]
 
 [package.dependencies]
-alembic = {version = "*", optional = true, markers = "extra == \"standard\" or extra == \"all\""}
-cee_syslog_handler = {version = "*", optional = true, markers = "extra == \"standard\" or extra == \"all\""}
+alembic = {version = "*", optional = true, markers = "extra == \"standard\" or extra == \"alembic\" or extra == \"all\""}
+cee_syslog_handler = "*"
 certifi = "*"
-cornice = {version = "*", optional = true, markers = "extra == \"standard\" or extra == \"all\""}
-gunicorn = {version = "*", optional = true, markers = "extra == \"standard\" or extra == \"all\""}
-objgraph = {version = "*", optional = true, markers = "extra == \"standard\" or extra == \"all\""}
+cornice = "*"
+gunicorn = {version = "*", optional = true, markers = "extra == \"standard\" or extra == \"webserver\" or extra == \"all\""}
 prometheus-client = "*"
-psycopg2 = {version = "*", optional = true, markers = "extra == \"standard\" or extra == \"all\""}
-pyjwt = {version = "*", optional = true, markers = "extra == \"oauth2\" or extra == \"all\""}
-pyramid = {version = "*", optional = true, markers = "extra == \"standard\" or extra == \"all\""}
+psycopg2 = "*"
+pyjwt = {version = "*", optional = true, markers = "extra == \"standard\" or extra == \"oauth2\" or extra == \"all\""}
+pyramid = "*"
 pyramid_mako = "*"
-pyramid-tm = {version = "*", optional = true, markers = "extra == \"standard\" or extra == \"all\""}
+pyramid-tm = "*"
 pyyaml = "*"
 redis = {version = "*", optional = true, markers = "extra == \"standard\" or extra == \"broadcast\" or extra == \"all\""}
 requests = "*"
-requests-oauthlib = {version = "*", optional = true, markers = "extra == \"oauth2\" or extra == \"all\""}
-sentry-sdk = {version = "*", optional = true, markers = "extra == \"standard\" or extra == \"all\""}
-SQLAlchemy = {version = ">=1.4.0,<3.0.0", optional = true, markers = "extra == \"standard\" or extra == \"all\""}
-SQLAlchemy-Utils = {version = "*", optional = true, markers = "extra == \"standard\" or extra == \"all\""}
-ujson = {version = "*", optional = true, markers = "extra == \"standard\" or extra == \"all\""}
-"zope.interface" = {version = "*", optional = true, markers = "extra == \"standard\" or extra == \"all\""}
-"zope.sqlalchemy" = {version = "*", optional = true, markers = "extra == \"standard\" or extra == \"all\""}
+requests-oauthlib = {version = "*", optional = true, markers = "extra == \"standard\" or extra == \"oauth2\" or extra == \"all\""}
+sentry-sdk = {version = "*", optional = true, markers = "extra == \"standard\" or extra == \"sentry\" or extra == \"all\""}
+SQLAlchemy = "*"
+SQLAlchemy-Utils = "*"
+ujson = "*"
+"zope.interface" = "*"
+"zope.sqlalchemy" = "*"
 
 [package.extras]
-all = ["SQLAlchemy (>=1.4.0,<3.0.0)", "SQLAlchemy-Utils", "alembic", "boltons", "cee_syslog_handler", "cornice", "gunicorn", "lxml", "objgraph", "psycopg2", "pyjwt", "pyramid", "pyramid-tm", "redis", "requests-oauthlib", "sentry-sdk", "ujson", "waitress", "zope.interface", "zope.sqlalchemy"]
+alembic = ["alembic"]
+all = ["alembic", "boltons", "gunicorn", "lxml", "objgraph", "pyjwt", "redis", "requests-oauthlib", "sentry-sdk", "waitress"]
 broadcast = ["redis"]
+debug = ["objgraph"]
 dev = ["waitress"]
 oauth2 = ["pyjwt", "requests-oauthlib"]
-standard = ["SQLAlchemy (>=1.4.0,<3.0.0)", "SQLAlchemy-Utils", "alembic", "cee_syslog_handler", "cornice", "gunicorn", "objgraph", "psycopg2", "pyramid", "pyramid-tm", "redis", "sentry-sdk", "ujson", "zope.interface", "zope.sqlalchemy"]
+sentry = ["sentry-sdk"]
+standard = ["alembic", "gunicorn", "pyjwt", "redis", "requests-oauthlib", "sentry-sdk"]
 test-images = ["scikit-image"]
-tests = ["boltons", "lxml", "scikit-image"]
+tests = ["boltons", "lxml"]
+webserver = ["gunicorn"]
 
 [[package]]
 name = "cee-syslog-handler"
@@ -855,20 +858,6 @@ files = [
 rsa = ["cryptography (>=3.0.0)"]
 signals = ["blinker (>=1.4.0)"]
 signedtoken = ["cryptography (>=3.0.0)", "pyjwt (>=2.0.0,<3)"]
-
-[[package]]
-name = "objgraph"
-version = "3.6.0"
-description = "Draws Python object reference graphs with graphviz"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "objgraph-3.6.0-py2.py3-none-any.whl", hash = "sha256:7c4aa57754c41bdd4ba67a8edfb44e45e248a1474444d0b9adca3cfd2717c485"},
-    {file = "objgraph-3.6.0.tar.gz", hash = "sha256:369567c37b4f2f928160b6f6ededcbea8fc7e929831877fd1056c78a900c17d3"},
-]
-
-[package.extras]
-ipython = ["graphviz"]
 
 [[package]]
 name = "packaging"
@@ -1768,39 +1757,28 @@ docs = ["Sphinx (>=1.3.1)", "docutils", "pylons-sphinx-themes"]
 
 [[package]]
 name = "types-pyyaml"
-version = "6.0.12.11"
+version = "6.0.12.12"
 description = "Typing stubs for PyYAML"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-PyYAML-6.0.12.11.tar.gz", hash = "sha256:7d340b19ca28cddfdba438ee638cd4084bde213e501a3978738543e27094775b"},
-    {file = "types_PyYAML-6.0.12.11-py3-none-any.whl", hash = "sha256:a461508f3096d1d5810ec5ab95d7eeecb651f3a15b71959999988942063bf01d"},
+    {file = "types-PyYAML-6.0.12.12.tar.gz", hash = "sha256:334373d392fde0fdf95af5c3f1661885fa10c52167b14593eb856289e1855062"},
+    {file = "types_PyYAML-6.0.12.12-py3-none-any.whl", hash = "sha256:c05bc6c158facb0676674b7f11fe3960db4f389718e19e62bd2b84d6205cfd24"},
 ]
 
 [[package]]
 name = "types-requests"
-version = "2.31.0.2"
+version = "2.31.0.7"
 description = "Typing stubs for requests"
 optional = false
-python-versions = "*"
+python-versions = ">=3.7"
 files = [
-    {file = "types-requests-2.31.0.2.tar.gz", hash = "sha256:6aa3f7faf0ea52d728bb18c0a0d1522d9bfd8c72d26ff6f61bfc3d06a411cf40"},
-    {file = "types_requests-2.31.0.2-py3-none-any.whl", hash = "sha256:56d181c85b5925cbc59f4489a57e72a8b2166f18273fd8ba7b6fe0c0b986f12a"},
+    {file = "types-requests-2.31.0.7.tar.gz", hash = "sha256:4d930dcabbc2452e3d70728e581ac4ac8c2d13f62509ad9114673f542af8cb4e"},
+    {file = "types_requests-2.31.0.7-py3-none-any.whl", hash = "sha256:39844effefca88f4f824dcdc4127b813d3b86a56b2248d3d1afa58832040d979"},
 ]
 
 [package.dependencies]
-types-urllib3 = "*"
-
-[[package]]
-name = "types-urllib3"
-version = "1.26.25.14"
-description = "Typing stubs for urllib3"
-optional = false
-python-versions = "*"
-files = [
-    {file = "types-urllib3-1.26.25.14.tar.gz", hash = "sha256:229b7f577c951b8c1b92c1bc2b2fdb0b49847bd2af6d1cc2a2e3dd340f3bda8f"},
-    {file = "types_urllib3-1.26.25.14-py3-none-any.whl", hash = "sha256:9683bbb7fb72e32bfe9d2be6e04875fbe1b3eeec3cbb4ea231435aa7fd6b4f0e"},
-]
+urllib3 = ">=2"
 
 [[package]]
 name = "typing-extensions"
@@ -2103,4 +2081,4 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.11"
-content-hash = "5b42b5b9ca6981fe659d42af95af08a0dea4c36aa22a992baa243f136615ac90"
+content-hash = "20228fadf3d6447ab836f1b27d7e0794e1efa91f4dd2d8a48067a2130893e65d"
