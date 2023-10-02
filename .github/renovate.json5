@@ -75,5 +75,11 @@
       matchBaseBranches: ['/[1-9]\\..*/', '/release_.*/'],
       schedule: ['on the 1st day of the month'],
     },
+    /** Disable upgrading the supported Python version */
+    {
+      matchFileNames: ['pyproject.toml'],
+      matchPackageNames: ['python'],
+      enabled: false,
+    },
   ],
 }
