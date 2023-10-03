@@ -7,7 +7,7 @@
   separateMinorPatch: true,
   prHourlyLimit: 0,
   prConcurrentLimit: 0,
-  baseBranches: ['master', '3.3', 'release_2'],
+  baseBranches: ['release_2', '3.4', 'master'],
   'pre-commit': { enabled: true },
   html: {
     fileMatch: ['\\.html?$', '\\.html?.mako$'],

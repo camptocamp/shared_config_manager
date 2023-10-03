@@ -14,8 +14,8 @@ jobs:
       fail-fast: false
       matrix:
         branch:
-          - release_2
-          - '3.3'
+          - 'release_2'
+          - '3.4'
 
     steps:
       # Remove Python packages with wriong version
