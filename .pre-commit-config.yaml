@@ -84,6 +84,11 @@ repos:
       - id: black
         args:
           - --line-length=110
+  - repo: https://github.com/sbrunner/jsonschema-validator
+    rev: 0.1.0
+    hooks:
+      - id: jsonschema-validator
+        files: ^ci/config\.yaml$
 ci:
   autoupdate_schedule: quarterly
   skip:
@@ -91,3 +96,4 @@ ci:
     - poetry-check
     - poetry-lock
     - ripsecrets
+    - jsonschema-validator
