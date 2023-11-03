@@ -21,10 +21,10 @@ pyramid-mako = "1.1.0"
 urllib3 = "2.0.7"
 
 [tool.poetry.dev-dependencies]
-prospector = { extras = ["with_mypy", "with_bandit"], version = "1.10.2" }
+prospector = { extras = ["with_mypy", "with_bandit"], version = "1.10.3" }
 pytest-cov = "4.1.0"
 types-pyyaml = "6.0.12.12"
-types-requests = "2.31.0.7"
+types-requests = "2.31.0.10"
 typing-extensions = "4.8.0"
 
 [tool.poetry.scripts]
