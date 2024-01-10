@@ -105,17 +105,25 @@ def _ui_source(request: pyramid.request.Request) -> dict[str, Any]:
                 if "GITHUB_TOKEN" in os.environ:
                     headers["Authorization"] = f"token {os.environ['GITHUB_TOKEN']}"
 
-                commit_response = requests.get(
-                    f"https://api.github.com/repos/{match.group(1)}/commits/{slave['hash']}", headers=headers
-                )
-                commit_response.raise_for_status()
-                commit_json = commit_response.json()
-                commit_details: list[Union[str, tuple[str, str]]] = [
-                    (commit_json["html_url"], commit_json["sha"]),
-                    f"Author: {commit_json['commit']['author']['name']}",
-                    f"Date: {commit_json['commit']['author']['date']}",
-                    f"Message: {commit_json['commit']['message']}",
-                ]
+                if "hash" not in slave:
+                    _slave_status.append((slave, ["No provided hash"]))
+                else:
+                    commit_response = requests.get(
+                        f"https://api.github.com/repos/{match.group(1)}/commits/{slave['hash']}",
+                        headers=headers,
+                    )
+                    if not commit_response.ok:
+                        _slave_status.append(
+                            (slave, [f"Unable to get the commit status: {commit_response.reason}"])
+                        )
+                    else:
+                        commit_json = commit_response.json()
+                        commit_details: list[Union[str, tuple[str, str]]] = [
+                            (commit_json["html_url"], commit_json["sha"]),
+                            f"Author: {commit_json['commit']['author']['name']}",
+                            f"Date: {commit_json['commit']['author']['date']}",
+                            f"Message: {commit_json['commit']['message']}",
+                        ]
 
             else:
                 commit_details = (
