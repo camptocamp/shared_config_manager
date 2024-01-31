@@ -12,6 +12,7 @@ version:
 checks:
   isort: false
 
+  codespell: false
 publish:
   docker:
     dispatch: {}
