@@ -71,13 +71,13 @@ yaml = ["PyYAML"]
 
 [[package]]
 name = "c2cwsgiutils"
-version = "6.0.6"
+version = "6.0.7"
 description = "Common utilities for Camptocamp WSGI applications"
 optional = false
-python-versions = ">=3.9,<3.12"
+python-versions = ">=3.9"
 files = [
-    {file = "c2cwsgiutils-6.0.6-py3-none-any.whl", hash = "sha256:35512c91d9e56a53392120481ede3c14e72630944f3e6aa631c934c9fe821be9"},
-    {file = "c2cwsgiutils-6.0.6.tar.gz", hash = "sha256:1986c73557aa795deb217246bef9c18d8fd01eaf46f225176e40e7b42d10c2f9"},
+    {file = "c2cwsgiutils-6.0.7-py3-none-any.whl", hash = "sha256:adfc2c9bf3aef5cc8fc2c990f91806c96f39526a7306b2c9f465b4b1484d505f"},
+    {file = "c2cwsgiutils-6.0.7.tar.gz", hash = "sha256:f16bf681c179c2fba6a701235bcdc2b3fed3af6b38b61b868fba9ca732cb328a"},
 ]
 
 [package.dependencies]
@@ -1963,13 +1963,13 @@ files = [
 
 [[package]]
 name = "types-requests"
-version = "2.31.0.20231231"
+version = "2.31.0.20240125"
 description = "Typing stubs for requests"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "types-requests-2.31.0.20231231.tar.gz", hash = "sha256:0f8c0c9764773384122813548d9eea92a5c4e1f33ed54556b508968ec5065cee"},
-    {file = "types_requests-2.31.0.20231231-py3-none-any.whl", hash = "sha256:2e2230c7bc8dd63fa3153c1c0ae335f8a368447f0582fc332f17d54f88e69027"},
+    {file = "types-requests-2.31.0.20240125.tar.gz", hash = "sha256:03a28ce1d7cd54199148e043b2079cdded22d6795d19a2c2a6791a4b2b5e2eb5"},
+    {file = "types_requests-2.31.0.20240125-py3-none-any.whl", hash = "sha256:9592a9a4cb92d6d75d9b491a41477272b710e021011a2a3061157e2fb1f1a5d1"},
 ]
 
 [package.dependencies]
@@ -2276,4 +2276,4 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.11"
-content-hash = "86ff7e2c49172c159e02e6d35020d3b3b62c9f45044e77919da921a235d529ba"
+content-hash = "491756754368215adc53cf58cc7937c60c9e25eb6636d27b0dc26735db4ed74f"
