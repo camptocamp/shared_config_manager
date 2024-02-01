@@ -96,9 +96,10 @@ class BaseSource:
     def fetch(self) -> None:
         try:
             self._is_loaded = False
-            with _FETCH_SUMMARY.labels(self.get_id()).time(), _FETCH_ERROR_COUNTER.labels(
-                self.get_id()
-            ).count_exceptions():
+            with (
+                _FETCH_SUMMARY.labels(self.get_id()).time(),
+                _FETCH_ERROR_COUNTER.labels(self.get_id()).count_exceptions(),
+            ):
                 self._do_fetch()
             self._eval_templates()
             _set_fetch_success(source=self.get_id())
