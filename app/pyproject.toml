@@ -24,7 +24,7 @@ prospector = { extras = ["with_mypy", "with_bandit"], version = "1.10.3" }
 pytest-cov = "4.1.0"
 types-pyyaml = "6.0.12.12"
 types-requests = "2.31.0.20240218"
-typing-extensions = "4.9.0"
+typing-extensions = "4.10.0"
 
 [tool.poetry.scripts]
 shared-config-slave = "shared_config_manager.scripts.shared_config_slave:main"
