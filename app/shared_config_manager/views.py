@@ -100,6 +100,7 @@ def _ui_source(request: pyramid.request.Request) -> dict[str, Any]:
     for slave in statuses:
         try:
             match = _repo_re.match(source.get_config().get("repo", ""))
+            commit_details: list[Union[str, tuple[str, str]]] = []
             if match is not None:
                 headers = {"Accept": "application/vnd.github+json"}
                 if "GITHUB_TOKEN" in os.environ:
@@ -118,7 +119,7 @@ def _ui_source(request: pyramid.request.Request) -> dict[str, Any]:
                         )
                     else:
                         commit_json = commit_response.json()
-                        commit_details: list[Union[str, tuple[str, str]]] = [
+                        commit_details = [
                             (commit_json["html_url"], commit_json["sha"]),
                             f"Author: {commit_json['commit']['author']['name']}",
                             f"Date: {commit_json['commit']['author']['date']}",
