@@ -37,6 +37,7 @@ six = "==1.15.0"
 snowballstemmer = "==2.0.0"
 toml = "==0.10.2"
 wrapt = "==1.12.1"
+pylint = "==2.6.1"
 
 [requires]
 python_version = "3.8"
