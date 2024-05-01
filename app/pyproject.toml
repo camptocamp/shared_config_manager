@@ -16,14 +16,14 @@ authors = []
 python = ">=3.9,<3.11"
 PyYAML = "6.0.1"
 inotify = "0.2.10"
-c2cwsgiutils = { version = "6.0.7", extras = ["broadcast", "standard", "oauth2", "debug"] }
+c2cwsgiutils = { version = "6.0.8", extras = ["broadcast", "standard", "oauth2", "debug"] }
 pyramid-mako = "1.1.0"
 
 [tool.poetry.dev-dependencies]
 prospector = { extras = ["with_mypy", "with_bandit"], version = "1.10.3" }
 pytest-cov = "5.0.0"
 types-pyyaml = "6.0.12.20240311"
-types-requests = "2.31.0.20240311"
+types-requests = "2.31.0.20240406"
 typing-extensions = "4.11.0"
 
 [tool.poetry.scripts]
