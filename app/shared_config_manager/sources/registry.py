@@ -55,7 +55,7 @@ def init(slave: bool) -> None:
             inotify_ = inotify.adapters.Inotify()
             inotify_.add_watch("/etc/shared_config_manager/config.yaml")
             for _, type_names, path, filename in inotify_.event_gen(yield_nones=False):
-                _LOG.debug("Inotify envent: %s / %s: [%s]", path, filename, ",".join(type_names))
+                _LOG.debug("Inotify event: %s / %s: [%s]", path, filename, ",".join(type_names))
                 if (
                     "IN_CLOSE_WRITE" in type_names or "IN_IGNORED" in type_names
                 ):  # the IN_IGNORED it for move file on this one
