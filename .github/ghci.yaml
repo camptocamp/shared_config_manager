@@ -1,0 +1,8 @@
+# yaml-language-server: $schema=https://geoservices-int.camptocamp.com/github/schema.json
+
+audit:
+  version-mapping: &version-mapping
+    '2': release_2
+
+versions:
+  version-mapping: *version-mapping
