@@ -86,6 +86,9 @@ jobs:
       - run: c2cciutils-docker-logs
         if: failure()
 
+      - name: Publish
+        run: c2cciutils-publish
+        if: env.HAS_SECRETS == 'HAS_SECRETS'
       - run: git diff --exit-code --patch > /tmp/dpkg-versions.patch || true
         if: failure()
       - uses: actions/upload-artifact@v4
@@ -94,6 +97,3 @@ jobs:
           path: /tmp/dpkg-versions.patch
           retention-days: 1
         if: failure()
-      - name: Publish
-        run: c2cciutils-publish
-        if: env.HAS_SECRETS == 'HAS_SECRETS'
