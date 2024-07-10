@@ -6,3 +6,9 @@ target-version = ["py39"]
 profile = "black"
 line_length = 110
 known_first_party = "shared_config_manager"
+
+[tool.poetry]
+name = "shared-config-manager"
+version = "0.0.0"
+description = "Shared Config Manager"
+authors = ["Camptocamp <info@camptocamp.com>"]
