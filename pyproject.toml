@@ -2,3 +2,9 @@
 line-length = 110
 target-version = ['py38']
 exclude = '.*'
+
+[tool.poetry]
+name = "shared_config_manager"
+version = "0.0.0"
+description = "Client server application used to distribute configuration files"
+authors = ["Camptocamp <info@camptocamp.com>"]
