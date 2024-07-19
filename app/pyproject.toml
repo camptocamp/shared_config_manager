@@ -24,6 +24,7 @@ idna = "3.7"
 gunicorn = "22.0.0"
 requests = "2.32.3"
 certifi = "2024.7.4"
+sentry-sdk = "2.8.0"
 
 [tool.poetry.dev-dependencies]
 prospector = { extras = ["with_mypy", "with_bandit"], version = "1.10.3" }
