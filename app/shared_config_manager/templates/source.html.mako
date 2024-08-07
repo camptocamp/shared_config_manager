@@ -100,8 +100,8 @@
             <b>${key_format(key) | h}</b>: ${', '.join(value) | h}<br />
             %elif isinstance(value, dict):
             <b>${key_format(key) | h}</b>:<br />
-            %for k, v in value.items():
-            &nbsp;&nbsp;&nbsp;&nbsp;${k | h} = ${v | h}<br />
+            %for k in sorted(value.keys()):
+            &nbsp;&nbsp;&nbsp;&nbsp;${k | h} = ${value[k] | h}<br />
             %endfor
             %else:
             <b>${key_format(key) | h}</b>: ${value | h}<br />
