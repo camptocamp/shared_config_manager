@@ -39,17 +39,17 @@ build_acceptance:
 
 .PHONY: acceptance
 acceptance: build_acceptance build
-	docker-compose up -d
-	docker-compose exec -T tests py.test -vv --color=yes --junitxml /reports/acceptance.xml acceptance
-	docker-compose down
+	docker compose up -d
+	docker compose exec -T tests py.test -vv --color=yes --junitxml /reports/acceptance.xml acceptance
+	docker compose down
 
 .PHONY: run
 run: build
-	docker-compose stop && \
-	docker-compose rm -f && \
-	docker-compose up
+	docker compose stop && \
+	docker compose rm -f && \
+	docker compose up
 
 .PHONY: clean
 clean:
 	rm -rf reports .venv
-	docker-compose down
+	docker compose down
