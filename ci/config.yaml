@@ -13,6 +13,7 @@ checks:
   isort: False
   black: False
   required_workflows: False
+  print_versions: False
 
 publish:
   pypi:
