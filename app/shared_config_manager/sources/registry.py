@@ -207,7 +207,8 @@ def _slave_fetch(id_: str) -> None:
         _LOG.info("The reloading the %s config is filtered", id_)
         return
     _LOG.info("Reloading the %s config from event", id_)
-    source.fetch()
+    if not source.is_master() or os.environ.get("SCM_MASTER_DISPATCH", "TRUE").lower() in ["true", "1", "on"]:
+        source.fetch()
     if source.is_master() and (not MASTER_SOURCE or not MASTER_SOURCE.get_config().get("standalone", False)):
         reload_master_config()
 
