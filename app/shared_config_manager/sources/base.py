@@ -187,9 +187,9 @@ class BaseSource:
             if target_dir.startswith("/"):
                 return target_dir
             else:
-                return os.path.join(_MASTER_TARGET if self._is_master else _TARGET, target_dir)
+                return _MASTER_TARGET if self._is_master else os.path.join(_TARGET, target_dir)
         else:
-            return os.path.join(_MASTER_TARGET if self._is_master else _TARGET, self.get_id())
+            return _MASTER_TARGET if self._is_master else os.path.join(_TARGET, self.get_id())
 
     def get_id(self) -> str:
         return self._id
