@@ -45,7 +45,7 @@ class BaseEngine:
                 try:
                     self._evaluate_file(src_path, dest_path)
                     _ERROR_GAUGE.labels(source=self._source_id, type=self.get_type()).set(0)
-                except Exception:
+                except Exception:  # pylint: disable=broad-exception-caught
                     _LOG.warning(
                         "Failed applying the %s template: %s", self._config["type"], src_path, exc_info=True
                     )

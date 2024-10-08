@@ -77,7 +77,7 @@ def git_source(app_connection: Connection):
         assert not os.path.exists(os.path.join("/config", slave, "other"))
 
 
-def test_ok(app_connection, git_source):
+def test_ok(app_connection, git_source):  # pylint: disable=redefined-outer-name
     time.sleep(0.1)
 
     for slave in ("api", "slave"):
