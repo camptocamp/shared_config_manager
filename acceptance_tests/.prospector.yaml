@@ -1,13 +1,18 @@
----
-max-line-length: 110
+inherits:
+  - utils:base
+  - utils:no-design-checks
+  - utils:fix
+  - duplicated
 
 pylint:
   disable:
-    - wrong-import-order
-    - no-else-return
-    - broad-except
-    - unused-argument
-    - missing-timeout # Default timeout set by c2cwsgiutils
+    - missing-timeout # Done by c2cwsgiutils
 
-mccabe:
+mypy:
+  run: false
+
+bandit:
+  run: false
+
+pyroma:
   run: false

@@ -1,28 +1,13 @@
----
-strictness: veryhigh
-
-max-line-length: 110
+inherits:
+  - utils:base
+  - utils:no-design-checks
+  - utils:fix
+  - duplicated
 
 pylint:
   disable:
-    - too-many-locals
-    - too-many-branches
-    - too-many-arguments
-    - too-many-instance-attributes
-    - too-many-statements
-    - too-few-public-methods
-    - wrong-import-order
-    - no-else-return
-    - broad-except
-    - raising-format-tuple
-    - missing-timeout # Default timeout set by c2cwsgiutils
+    - missing-timeout # Done by c2cwsgiutils
 
-pyflakes:
-  disable:
-    - F401 # imported but unused, done by pylint
-
-mccabe:
-  run: false
-
-mypy:
-  run: true
+bandit:
+  options:
+    config: .bandit.yaml

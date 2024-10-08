@@ -10,6 +10,7 @@ def composition(request):
     """
     Fixture that will wait that the composition is started, used for all the tests.
     """
+    del request
     for slave in ("api",):
         path = os.path.join("/config", slave)
         os.makedirs(path, exist_ok=True)
@@ -20,8 +21,9 @@ def composition(request):
 
 
 @pytest.fixture
-def app_connection(composition):
+def app_connection(composition):  # pylint: disable=redefined-outer-name
     """
     Fixture that returns a connection to a running batch container.
     """
+    del composition
     return Connection(base_url="http://api_file:8080/scm/", origin="http://example.com/")

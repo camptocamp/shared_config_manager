@@ -2,7 +2,7 @@ import logging
 import math
 import os.path
 import re
-import subprocess
+import subprocess  # nosec
 from typing import Any, Union, cast
 
 import pyramid.request
@@ -128,7 +128,7 @@ def _ui_source(request: pyramid.request.Request) -> dict[str, Any]:
 
             else:
                 commit_details = (
-                    subprocess.run(  # type: ignore
+                    subprocess.run(  # type: ignore[assignment] # nosec
                         ["git", "show", "--quiet", slave["hash"]],
                         cwd=os.path.join("/repos", source.get_id()),
                         check=True,
@@ -138,7 +138,7 @@ def _ui_source(request: pyramid.request.Request) -> dict[str, Any]:
                     .split("\n")
                 )
             _slave_status.append((slave, commit_details))
-        except Exception:
+        except Exception:  # pylint: disable=broad-exception-caught
             _LOG.warning("Unable to get the commit status for %s", slave.get("hash"), exc_info=True)
             _slave_status.append((slave, []))
 

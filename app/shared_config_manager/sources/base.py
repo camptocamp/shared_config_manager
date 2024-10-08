@@ -3,7 +3,7 @@ import logging
 import os
 import pathlib
 import shutil
-import subprocess
+import subprocess  # nosec
 import time
 from typing import Any, Optional, cast
 
@@ -125,7 +125,7 @@ class BaseSource:
                 if os.path.exists(path):
                     shutil.rmtree(path)
                 os.makedirs(path, exist_ok=True)
-                with subprocess.Popen(
+                with subprocess.Popen(  # nosec
                     [
                         "tar",
                         "--extract",
@@ -142,7 +142,7 @@ class BaseSource:
                     tar.stdin.close()  # type: ignore
                     assert tar.wait() == 0
                 return
-            except Exception as exception:
+            except Exception as exception:  # pylint: disable=broad-exception-caught
                 _DO_FETCH_ERROR_COUNTER.labels(self.get_id()).inc()
                 retry_message = f" (will retry in {_RETRY_DELAY}s)" if i else " (failed)"
                 _LOG.warning(
@@ -230,7 +230,7 @@ class BaseSource:
             args_ = list(map(str, args))
             _LOG.debug("Running: %s", " ".join(args_))
             output: str = (
-                subprocess.run(
+                subprocess.run(  # nosec
                     args_,
                     check=True,
                     stdout=subprocess.PIPE,

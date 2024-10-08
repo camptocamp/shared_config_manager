@@ -1,7 +1,7 @@
 import logging
 import os
 import pathlib
-import subprocess
+import subprocess  # nosec
 import tempfile
 from collections.abc import Mapping
 from threading import Thread
@@ -118,7 +118,7 @@ def _do_handle_master_config(config: Config) -> tuple[int, int]:
             _SOURCES[id_] = _create_source(id_, source_config)
             _SOURCES[id_].refresh_or_fetch()
             success += 1
-        except Exception:
+        except Exception:  # pylint: disable=broad-exception-caught
             _LOG.error("Cannot load the %s config", id_, exc_info=True)
             errors += 1
     return success, errors
@@ -149,7 +149,7 @@ def _prepare_ssh() -> None:
     other_ssh = home.joinpath(".ssh2")
     if other_ssh.is_dir():
         ssh = home.joinpath(".ssh")
-        subprocess.check_call(
+        subprocess.check_call(  # nosec
             [
                 "rsync",
                 "--recursive",
