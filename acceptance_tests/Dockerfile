@@ -32,21 +32,15 @@ WORKDIR /acceptance_tests
 RUN --mount=type=cache,target=/var/lib/apt/lists \
     --mount=type=cache,target=/var/cache,sharing=locked \
     apt-get update \
-    && apt-get install --assume-yes --no-install-recommends git curl gnupg \
-        libglib2.0-0 libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 \
-        libxdamage1 libxfixes3 libxrandr2 libgbm1 libpango-1.0-0 libcairo2 liboss4-salsa-asound2
-
-COPY .nvmrc /tmp
-RUN --mount=type=cache,target=/var/lib/apt/lists \
-    --mount=type=cache,target=/var/cache,sharing=locked \
-    NODE_MAJOR="$(cat /tmp/.nvmrc)" \
-    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_MAJOR}.x nodistro main" > /etc/apt/sources.list.d/nodesource.list \
-    && curl --silent https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor --output=/etc/apt/keyrings/nodesource.gpg \
+    && apt-get install --assume-yes --no-install-recommends software-properties-common \
+    && add-apt-repository ppa:savoury1/pipewire \
+    && add-apt-repository ppa:savoury1/chromium \
     && apt-get update \
-    && apt-get install --assume-yes --no-install-recommends "nodejs=${NODE_MAJOR}.*"
+    && apt-get install --assume-yes --no-install-recommends chromium-browser npm git
 
 COPY package.json package-lock.json ./
-RUN npm install
+RUN npm install --ignore-scripts
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 RUN --mount=type=cache,target=/var/lib/apt/lists \
     --mount=type=cache,target=/var/cache,sharing=locked \
