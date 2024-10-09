@@ -13,7 +13,7 @@ description = "Not used"
 authors = []
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.11"
+python = ">=3.9,<3.13"
 PyYAML = "6.0.2"
 inotify = "0.2.10"
 c2cwsgiutils = { version = "6.0.8", extras = ["broadcast", "standard", "oauth2", "debug"] }
