@@ -7,7 +7,7 @@
   separateMinorPatch: true,
   prHourlyLimit: 0,
   prConcurrentLimit: 0,
-  baseBranches: ['release_2', '3.4', 'master'],
+  baseBranches: ['3.4', 'master'],
   'pre-commit': { enabled: true },
   html: {
     fileMatch: ['\\.html?$', '\\.html?.mako$'],
@@ -81,7 +81,7 @@
     },
     /** Accept only the patch on stabilization branches */
     {
-      matchBaseBranches: ['/^[0-9]+\\.[0-9]+$/', '/release_.*/'],
+      matchBaseBranches: ['/^[0-9]+\\.[0-9]+$/'],
       matchUpdateTypes: ['major', 'minor', 'pin', 'digest', 'lockFileMaintenance', 'rollback', 'bump'],
       enabled: false,
     },
@@ -104,7 +104,7 @@
     },
     /** Packages published very recently are not pushed to stabilization branches for security reasons */
     {
-      matchBaseBranches: ['/^[0-9]+\\.[0-9]+$/', '/release_.*/'],
+      matchBaseBranches: ['/^[0-9]+\\.[0-9]+$/'],
       minimumReleaseAge: '7 days',
     },
     /** Ungroup Python dependencies */
