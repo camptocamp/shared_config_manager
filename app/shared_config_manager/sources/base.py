@@ -5,7 +5,7 @@ import pathlib
 import shutil
 import subprocess  # nosec
 import time
-from typing import Any, Optional, cast
+from typing import Any, cast
 
 import pyramid.request
 import requests

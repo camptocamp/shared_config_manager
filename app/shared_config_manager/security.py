@@ -2,7 +2,6 @@ import hashlib
 import hmac
 import logging
 import os
-from typing import Optional, Union
 
 import c2cwsgiutils.auth
 import pyramid.request
