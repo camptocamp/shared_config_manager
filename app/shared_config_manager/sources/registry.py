@@ -5,7 +5,6 @@ import subprocess  # nosec
 import tempfile
 from collections.abc import Mapping
 from threading import Thread
-from typing import Optional
 
 import inotify.adapters
 import pyramid.request

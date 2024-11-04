@@ -3,7 +3,7 @@ import os.path
 import re
 import subprocess  # nosec
 from collections.abc import Iterable
-from typing import Any, Optional, Union, cast
+from typing import Any, cast
 
 import pyramid.request
 import pyramid.response

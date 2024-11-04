@@ -1,6 +1,5 @@
 import fileinput
 import os
-from typing import Optional
 
 from shared_config_manager.configuration import SourceConfig, SourceStatus
 from shared_config_manager.sources.base import BaseSource
