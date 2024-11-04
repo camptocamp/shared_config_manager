@@ -134,7 +134,7 @@ def _source_stats(request: pyramid.request.Request) -> dict[str, Any]:
     source, _ = registry.get_source_check_auth(id_=id_, request=request)
     if source is None:
         raise HTTPNotFound(f"Unknown id {id_}")
-    slaves: Optional[list[SourceStatus]] = slave_status.get_source_status(id_=id_)
+    slaves: list[SourceStatus] | None = slave_status.get_source_status(id_=id_)
     assert slaves is not None
     statuses: list[SourceStatus] = []
     for slave in slaves:
@@ -185,7 +185,7 @@ def _tarball(request: pyramid.request.Request) -> pyramid.response.Response:
     return response
 
 
-def _proc_iter(proc: subprocess.Popen[bytes]) -> Iterable[Union[bytes, Any]]:
+def _proc_iter(proc: subprocess.Popen[bytes]) -> Iterable[bytes | Any]:
     while True:
         block = proc.stdout.read(4096)  # type: ignore
         if not block:

@@ -25,7 +25,7 @@ class SshBaseSource(BaseSource):
         super().__init__(id_, config, is_master)
         self._setup_key(config.get("ssh_key"))
 
-    def _setup_key(self, ssh_key: Optional[str]) -> None:
+    def _setup_key(self, ssh_key: str | None) -> None:
         if ssh_key is None:
             return
         ssh_path = self._ssh_path()

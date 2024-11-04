@@ -15,22 +15,22 @@ _LOG = logging.getLogger(__name__)
 
 class User:
     auth_type: str
-    login: Optional[str]
-    name: Optional[str]
-    url: Optional[str]
+    login: str | None
+    name: str | None
+    url: str | None
     is_auth: bool
-    token: Optional[str]
+    token: str | None
     is_admin: bool
     request: pyramid.request.Request
 
     def __init__(
         self,
         auth_type: str,
-        login: Optional[str],
-        name: Optional[str],
-        url: Optional[str],
+        login: str | None,
+        name: str | None,
+        url: str | None,
         is_auth: bool,
-        token: Optional[str],
+        token: str | None,
         request: pyramid.request.Request,
     ) -> None:
         self.auth_type = auth_type
@@ -119,7 +119,7 @@ body:
 
         return request.user  # type: ignore
 
-    def authenticated_userid(self, request: pyramid.request.Request) -> Optional[str]:
+    def authenticated_userid(self, request: pyramid.request.Request) -> str | None:
         """Return a string ID for the user."""
 
         identity = self.identity(request)
@@ -131,7 +131,7 @@ body:
 
     def permits(
         self, request: pyramid.request.Request, context: SourceConfig, permission: str
-    ) -> Union[Allowed, Denied]:
+    ) -> Allowed | Denied:
         """Allow access to everything if signed in."""
 
         identity = self.identity(request)

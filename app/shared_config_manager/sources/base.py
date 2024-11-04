@@ -156,7 +156,7 @@ class BaseSource:
                 else:
                     raise
 
-    def _copy(self, source: str, excludes: Optional[list[str]] = None) -> None:
+    def _copy(self, source: str, excludes: list[str] | None = None) -> None:
         os.makedirs(self.get_path(), exist_ok=True)
         cmd = [
             "rsync",
@@ -252,7 +252,7 @@ class BaseSource:
         return self._is_loaded
 
     @staticmethod
-    def _hide_sensitive(data: Optional[dict[str, str]]) -> None:
+    def _hide_sensitive(data: dict[str, str] | None) -> None:
         if data is None:
             return
         for key in list(data.keys()):

@@ -64,7 +64,7 @@ def _ui_source(request: pyramid.request.Request) -> dict[str, Any]:
         if slave not in statuses:
             statuses.append(slave)
 
-    attributes: list[tuple[str, Union[str, bool]]] = []
+    attributes: list[tuple[str, str | bool]] = []
     if source.is_master():
         attributes.append(("ID", f"{source.get_id()} (Master)"))
     else:
@@ -80,7 +80,7 @@ def _ui_source(request: pyramid.request.Request) -> dict[str, Any]:
         else:
             attributes.append((key_format(key), str(value)))
 
-    attributes4: list[tuple[str, Union[str, bool], str, Union[str, bool]]] = []
+    attributes4: list[tuple[str, str | bool, str, str | bool]] = []
     attributes4_height = math.ceil(len(attributes) / 2)
     for index in range(attributes4_height):
         if index + attributes4_height < len(attributes):
@@ -95,12 +95,12 @@ def _ui_source(request: pyramid.request.Request) -> dict[str, Any]:
         else:
             attributes4.append((attributes[index][0], attributes[index][1], "", ""))
 
-    _slave_status: list[tuple[SourceStatus, list[Union[str, tuple[str, str]]]]] = []
+    _slave_status: list[tuple[SourceStatus, list[str | tuple[str, str]]]] = []
     _repo_re = re.compile(r"^git@github.com:(.*).git$")
     for slave in statuses:
         try:
             match = _repo_re.match(source.get_config().get("repo", ""))
-            commit_details: list[Union[str, tuple[str, str]]] = []
+            commit_details: list[str | tuple[str, str]] = []
             if match is not None:
                 headers = {"Accept": "application/vnd.github+json"}
                 if "GITHUB_TOKEN" in os.environ:

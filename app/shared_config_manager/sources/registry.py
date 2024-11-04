@@ -19,7 +19,7 @@ from shared_config_manager.sources import base, git, mode, rclone, rsync
 _LOG = logging.getLogger(__name__)
 _ENGINES = {"git": git.GitSource, "rsync": rsync.RsyncSource, "rclone": rclone.RcloneSource}
 _MASTER_ID = "master"
-MASTER_SOURCE: Optional[base.BaseSource] = None
+MASTER_SOURCE: base.BaseSource | None = None
 _SOURCES: dict[str, base.BaseSource] = {}
 FILTERED_SOURCES: Mapping[str, base.BaseSource] = {}
 _TAG_FILTER = os.environ.get("TAG_FILTER")
@@ -181,7 +181,7 @@ def _filter_sources(
     return result, filtered
 
 
-def refresh(id_: str, request: Optional[pyramid.request.Request]) -> None:
+def refresh(id_: str, request: pyramid.request.Request | None) -> None:
     """
     This is called from the web service to start a refresh.
     """
@@ -214,8 +214,8 @@ def _slave_fetch(id_: str) -> None:
 
 
 def get_source_check_auth(
-    id_: str, request: Optional[pyramid.request.Request]
-) -> tuple[Optional[base.BaseSource], bool]:
+    id_: str, request: pyramid.request.Request | None
+) -> tuple[base.BaseSource | None, bool]:
     filtered = False
     source = get_source(id_)
     if source is None:
@@ -228,7 +228,7 @@ def get_source_check_auth(
     return None, filtered
 
 
-def get_source(id_: str) -> Optional[base.BaseSource]:
+def get_source(id_: str) -> base.BaseSource | None:
     if MASTER_SOURCE and MASTER_SOURCE.get_id() == id_:
         return MASTER_SOURCE
     else:
