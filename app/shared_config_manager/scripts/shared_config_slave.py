@@ -34,7 +34,7 @@ def main() -> None:
         time.sleep(3600)
 
 
-def _sig_term(signum: int, frame: Optional[FrameType]) -> None:
+def _sig_term(signum: int, frame: FrameType | None) -> None:
     del signum, frame
     logging.getLogger("shared_config_slave").info("Got a SIGTERM, stopping the slave")
     sys.exit(0)
