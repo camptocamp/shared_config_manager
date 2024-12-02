@@ -2,8 +2,9 @@
 
 import os
 
-from acceptance import get_hash, wait_sync
 from c2cwsgiutils.acceptance.connection import Connection
+
+from acceptance import get_hash, wait_sync
 
 
 def test_ok(app_connection: Connection):

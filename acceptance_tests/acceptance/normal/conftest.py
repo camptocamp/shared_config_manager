@@ -10,6 +10,8 @@ LOG = logging.getLogger(__name__)
 
 
 def wait_slaves():
+    """Wait for the slaves to be up."""
+
     def what() -> bool:
         r = requests.get("http://api:8080/scm/1/status", headers={"X-Scm-Secret": "changeme"})
         if r.status_code == 200:
@@ -41,9 +43,7 @@ def wait_slaves():
 
 @pytest.fixture(scope="package")
 def composition(request):
-    """
-    Fixture that will wait that the composition is started, used for all the tests.
-    """
+    """Fixture that will wait that the composition is started, used for all the tests."""
     del request
     for slave in ("api", "slave", "slave-others"):
         path = os.path.join("/config", slave)
@@ -57,8 +57,6 @@ def composition(request):
 
 @pytest.fixture
 def app_connection(composition: None):  # pylint: disable=redefined-outer-name
-    """
-    Fixture that returns a connection to a running batch container.
-    """
+    """Fixture that returns a connection to a running batch container."""
     del composition
     return Connection(base_url="http://api:8080/scm/", origin="http://example.com/")

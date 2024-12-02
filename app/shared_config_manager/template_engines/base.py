@@ -4,7 +4,10 @@ from typing import cast
 
 from prometheus_client import Counter, Gauge
 
-from shared_config_manager.configuration import TemplateEnginesConfig, TemplateEnginesStatus
+from shared_config_manager.configuration import (
+    TemplateEnginesConfig,
+    TemplateEnginesStatus,
+)
 
 _LOG = logging.getLogger(__name__)
 _ENV_PREFIXES = os.environ.get("SCM_ENV_PREFIXES", "MUTUALIZED_").split(":")
@@ -15,6 +18,8 @@ _ERROR_GAUGE = Gauge("sharedconfigmanager_template_error_status", "Template in e
 
 
 class BaseEngine:
+    """Base class for template engines."""
+
     def __init__(self, source_id: str, config: TemplateEnginesConfig, extension: str) -> None:
         self._source_id = source_id
         self._config = config

@@ -76,7 +76,7 @@ def _refresh_all(request: pyramid.request.Request) -> dict[str, Any]:
         raise HTTPServerError("Master source not initialized")
     registry.MASTER_SOURCE.validate_auth(request)
     nb_refresh = 0
-    for id_ in registry.get_sources().keys():
+    for id_ in registry.get_sources():
         registry.refresh(id_=id_, request=request)
         nb_refresh += 1
     return {"status": 200, "nb_refresh": nb_refresh}

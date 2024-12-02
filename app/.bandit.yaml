@@ -1,3 +1,0 @@
-skips:
-  - B101 # Use of assert detected. The enclosed code will be removed when compiling to optimized byte code.
-  - B113 # Call to requests without timeout, done globally by c2cwsgiutils

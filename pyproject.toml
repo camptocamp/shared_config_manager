@@ -1,11 +1,5 @@
-[tool.black]
-line-length = 110
-target-version = ["py310"]
-
-[tool.isort]
-profile = "black"
-line_length = 110
-known_first_party = "shared_config_manager"
+[tool.ruff]
+target-version = "py310"
 
 [tool.poetry]
 name = "shared-config-manager"

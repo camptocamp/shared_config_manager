@@ -9,12 +9,11 @@ from types import FrameType
 
 import c2cwsgiutils.setup_process
 import prometheus_client
-
-from shared_config_manager import slave_status  # noqa: F401, pylint: disable=unused-import
 from shared_config_manager.sources import registry
 
 
 def main() -> None:
+    """Get the WSGI application."""
     parser = argparse.ArgumentParser(description="Run the shared config slave")
     c2cwsgiutils.setup_process.fill_arguments(parser)
     args = parser.parse_args()

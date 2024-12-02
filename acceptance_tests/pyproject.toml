@@ -7,9 +7,9 @@ authors = []
 [tool.poetry.dependencies]
 python = ">=3.10,<3.13"
 pytest-cov = "6.0.0"
-prospector = "1.13.3"
-prospector-profile-duplicated = "1.8.0"
-prospector-profile-utils = "1.13.0"
+prospector = { version = "1.13.3", extras = ["with_ruff"] }
+prospector-profile-duplicated = "1.8.1"
+prospector-profile-utils = "1.14.0"
 typing-extensions = "4.12.2"
 c2cwsgiutils = { version = "6.1.5", extras = ["standard", "test_images"] }
 requests = "2.32.3"

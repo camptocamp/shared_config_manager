@@ -6,6 +6,8 @@ from shared_config_manager.sources.base import BaseSource
 
 
 class RcloneSource(BaseSource):
+    """Source that get files with rclone."""
+
     def __init__(self, id_: str, config: SourceConfig, is_master: bool):
         super().__init__(id_, config, is_master)
         self._setup_config(config["config"])

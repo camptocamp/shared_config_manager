@@ -4,6 +4,8 @@ from c2cwsgiutils.acceptance import utils
 
 
 def wait_sync(app_connection, name, hash_):
+    """Wait for the sync to be done."""
+
     def what():
         status = app_connection.get_json("1/status", headers={"X-Scm-Secret": "changeme"})
         for slave_name, slave in status["slaves"].items():
@@ -39,4 +41,5 @@ def wait_sync(app_connection, name, hash_):
 
 
 def get_hash(cwd):
+    """Get the hash of the current git repository."""
     return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=cwd).decode("utf-8").strip()

@@ -13,6 +13,7 @@ from shared_config_manager.sources import registry
 
 
 def forbidden(request: pyramid.request.Request) -> pyramid.response.Response:
+    """Redirect to the login page if the user is not authenticated."""
     is_auth = c2cwsgiutils.auth.is_auth(request)
 
     if is_auth:
@@ -26,6 +27,7 @@ def forbidden(request: pyramid.request.Request) -> pyramid.response.Response:
 
 
 def main(_: Any, **settings: Any) -> Any:
+    """Get the WSGI application."""
     config = Configurator(settings=settings, route_prefix=os.environ.get("ROUTE_PREFIX", "/scm"))
 
     config.include(c2cwsgiutils.pyramid.includeme)

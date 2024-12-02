@@ -46,6 +46,8 @@ _COPY_SUMMARY = Summary("sharedconfigmanager_source_copy", "Number of source cop
 
 
 class BaseSource:
+    """Base class for sources."""
+
     def __init__(self, id_: str, config: SourceConfig, is_master: bool) -> None:
         self._id = id_
         self._config = config
@@ -207,7 +209,7 @@ class BaseSource:
         config_copy = copy.deepcopy(self._config)
         stats_ = cast(SourceStatus, config_copy)
         for template_stats, template_engine in zip(
-            stats_.get("template_engines", []), self._template_engines
+            stats_.get("template_engines", []), self._template_engines, strict=False
         ):
             template_engine.get_stats(template_stats)
 
@@ -264,12 +266,10 @@ class BaseSource:
 @broadcast.decorator(expect_answers=False)
 def _set_refresh_success(source: str) -> None:
     """Set refresh in success in all process."""
-
     _REFRESH_ERROR_GAUGE.labels(source=source).set(0)
 
 
 @broadcast.decorator(expect_answers=False)
 def _set_fetch_success(source: str) -> None:
     """Set fetch in success in all process."""
-
     _FETCH_ERROR_GAUGE.labels(source=source).set(0)

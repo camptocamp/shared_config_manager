@@ -5,6 +5,8 @@ from shared_config_manager.template_engines.base import BaseEngine
 
 
 class ShellEngine(BaseEngine):
+    """Shell template engine (envsubst)."""
+
     def __init__(self, source_id: str, config: TemplateEnginesConfig) -> None:
         super().__init__(source_id, config, "tmpl")
 
