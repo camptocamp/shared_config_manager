@@ -1,18 +1,5 @@
 inherits:
-  - utils:base
-  - utils:no-design-checks
+  - utils:base-less-strict
+  - utils:c2cwsgiutils
   - utils:fix
   - duplicated
-
-pylint:
-  disable:
-    - missing-timeout # Done by c2cwsgiutils
-
-mypy:
-  run: false
-
-bandit:
-  run: false
-
-pyroma:
-  run: false

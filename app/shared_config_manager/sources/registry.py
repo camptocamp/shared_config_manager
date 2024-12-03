@@ -30,12 +30,14 @@ def _create_source(id_: str, config: SourceConfig, is_master: bool = False) -> b
 
 
 def get_sources() -> Mapping[str, base.BaseSource]:
+    """Get all the sources."""
     copy = dict(_SOURCES.items())
     copy.update(FILTERED_SOURCES)
     return copy
 
 
 def init(slave: bool) -> None:
+    """Initialize the registry."""
     global MASTER_SOURCE  # pylint: disable=global-statement
     mode.init(slave)
     if slave:
@@ -82,6 +84,7 @@ def init(slave: bool) -> None:
 
 
 def reload_master_config() -> None:
+    """Reload the master config."""
     if MASTER_SOURCE:
         with open(
             os.path.join(MASTER_SOURCE.get_path(), "shared_config_manager.yaml"), encoding="utf-8"
@@ -166,7 +169,7 @@ def _delete_source(id_: str) -> None:
 
 
 def _filter_sources(
-    source_configs: dict[str, SourceConfig]
+    source_configs: dict[str, SourceConfig],
 ) -> tuple[dict[str, SourceConfig], dict[str, SourceConfig]]:
     if _TAG_FILTER is None or mode.is_master():
         return source_configs, {}
@@ -182,6 +185,8 @@ def _filter_sources(
 
 def refresh(id_: str, request: pyramid.request.Request | None) -> None:
     """
+    Do a refresh.
+
     This is called from the web service to start a refresh.
     """
     _LOG.info("Reloading the %s config", id_)
@@ -195,9 +200,7 @@ def refresh(id_: str, request: pyramid.request.Request | None) -> None:
 
 
 def _slave_fetch(id_: str) -> None:
-    """
-    This is run on every slave when a source needs a refresh.
-    """
+    """Do a refresh on the slave."""
     source, filtered = get_source_check_auth(id_, None)
     if source is None:
         _LOG.error("Unknown id %d", id_)
@@ -215,6 +218,7 @@ def _slave_fetch(id_: str) -> None:
 def get_source_check_auth(
     id_: str, request: pyramid.request.Request | None
 ) -> tuple[base.BaseSource | None, bool]:
+    """Get a source by id and check the auth."""
     filtered = False
     source = get_source(id_)
     if source is None:
@@ -228,6 +232,7 @@ def get_source_check_auth(
 
 
 def get_source(id_: str) -> base.BaseSource | None:
+    """Get a source by id."""
     if MASTER_SOURCE and MASTER_SOURCE.get_id() == id_:
         return MASTER_SOURCE
     else:
@@ -235,6 +240,7 @@ def get_source(id_: str) -> base.BaseSource | None:
 
 
 def get_stats() -> dict[str, SourceStatus]:
+    """Get the stats of all the sources."""
     return (
         {
             id_: source.get_stats()

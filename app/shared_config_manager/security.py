@@ -13,6 +13,8 @@ _LOG = logging.getLogger(__name__)
 
 
 class User:
+    """User object for the application."""
+
     auth_type: str
     login: str | None
     name: str | None
@@ -53,9 +55,10 @@ class User:
 
 
 class SecurityPolicy:
+    """Security policy for the application."""
+
     def identity(self, request: pyramid.request.Request) -> User:
         """Return app-specific user object."""
-
         if not hasattr(request, "user"):
             user = None
 
@@ -114,13 +117,12 @@ body:
                         request,
                     )
 
-            setattr(request, "user", user)
+            request.user = user
 
         return request.user  # type: ignore
 
     def authenticated_userid(self, request: pyramid.request.Request) -> str | None:
         """Return a string ID for the user."""
-
         identity = self.identity(request)
 
         if identity is None:
@@ -132,7 +134,6 @@ body:
         self, request: pyramid.request.Request, context: SourceConfig, permission: str
     ) -> Allowed | Denied:
         """Allow access to everything if signed in."""
-
         identity = self.identity(request)
 
         if identity is None:

@@ -2,12 +2,21 @@ inherits:
   - utils:base
   - utils:no-design-checks
   - utils:fix
+  - utils:unsafe
+  - utils:c2cwsgiutils
   - duplicated
 
-pylint:
-  disable:
-    - missing-timeout # Done by c2cwsgiutils
+ignore-paths:
+  - shared_config_manager/configuration.py
+  - app/shared_config_manager/configuration.py
+ignore-patterns:
+  - ^acceptance_tests/.*/test_.*\.py
 
-bandit:
+mypy:
   options:
-    config: .bandit.yaml
+    python_version: '3.10'
+
+ruff:
+  disable:
+    - D102 # Missing docstring in public method
+    - D107 # Missing docstring in `__init__`

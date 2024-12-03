@@ -20,6 +20,8 @@ if os.getuid() not in (33, 0):
 
 
 class SshBaseSource(BaseSource):
+    """Source to get files from SSH server."""
+
     def __init__(self, id_: str, config: SourceConfig, is_master: bool) -> None:
         super().__init__(id_, config, is_master)
         self._setup_key(config.get("ssh_key"))

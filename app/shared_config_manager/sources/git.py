@@ -13,6 +13,8 @@ LOG = logging.getLogger(__name__)
 
 
 class GitSource(SshBaseSource):
+    """Source that get files with git."""
+
     def _do_refresh(self) -> None:
         self._checkout()
         self._copy(self._copy_dir(), excludes=[".git"])

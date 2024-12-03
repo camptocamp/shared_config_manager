@@ -70,7 +70,7 @@ checks: prospector acceptance-prospector ## Run the checks
 .PHONY: acceptance-prospector
 acceptance-prospector: build-acceptance ## Run Prospector on acceptance
 	docker run --rm --volume=${PWD}/acceptance_tests:/acceptance_tests --volume=${PWD}/acceptance_tests:/acceptance_tests/acceptance_tests $(DOCKER_BASE)-acceptance:$(DOCKER_TAG) \
-		prospector --output=pylint --die-on-tool-error acceptance_tests
+		prospector --output=pylint --die-on-tool-error --without=ruff acceptance_tests
 
 .PHONY: prospector
 prospector: build-checker ## Run Prospector

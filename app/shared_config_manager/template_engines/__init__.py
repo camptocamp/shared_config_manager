@@ -5,5 +5,6 @@ ENGINES = {"mako": mako.MakoEngine, "shell": shell.ShellEngine}
 
 
 def create_engine(source_id: str, config: TemplateEnginesConfig) -> base.BaseEngine:
+    """Create a template engine."""
     type_ = config["type"]
     return ENGINES[type_](source_id, config)
