@@ -3,7 +3,6 @@ import subprocess
 import tempfile
 
 import pytest
-
 from shared_config_manager.sources import registry
 
 TEMP_DIR = tempfile.gettempdir()
