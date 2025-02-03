@@ -32,7 +32,7 @@ repos:
           - poetry==2.0.1 # pypi
         exclude: ^pyproject.toml$
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.3.0
+    rev: v2.4.1
     hooks:
       - id: codespell
         exclude: ^(.*/)?poetry\.lock$
@@ -71,7 +71,7 @@ repos:
         args:
           - --line-length=110
   - repo: https://github.com/PyCQA/prospector
-    rev: v1.13.3
+    rev: v1.14.1
     hooks:
       - id: prospector
         args:
@@ -81,7 +81,7 @@ repos:
           - --output-format=pylint
         additional_dependencies:
           - prospector-profile-duplicated==1.10.4 # pypi
-          - prospector-profile-utils==1.15.1 # pypi
+          - prospector-profile-utils==1.17.0 # pypi
           - ruff==0.9.4 # pypi
   - repo: https://github.com/sbrunner/jsonschema-validator
     rev: 1.0.0
@@ -89,6 +89,6 @@ repos:
       - id: jsonschema-validator
         files: ^ci/config\.yaml$
   - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 39.113.0
+    rev: 39.157.0
     hooks:
       - id: renovate-config-validator
