@@ -9,6 +9,7 @@ from types import FrameType
 
 import c2cwsgiutils.setup_process
 import prometheus_client
+
 from shared_config_manager.sources import registry
 
 
