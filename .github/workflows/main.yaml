@@ -86,6 +86,7 @@ jobs:
       - run: c2cciutils-docker-logs
         if: failure()
 
+      - run: git reset --hard
       - name: Publish
         run: c2cciutils-publish
         if: env.HAS_SECRETS == 'HAS_SECRETS'
