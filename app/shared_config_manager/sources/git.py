@@ -2,7 +2,9 @@ import base64
 import json
 import logging
 import os
+import subprocess
 import tempfile
+from pathlib import Path
 
 from shared_config_manager.configuration import SourceStatus
 from shared_config_manager.sources import mode
@@ -26,11 +28,17 @@ class GitSource(SshBaseSource):
         cwd = self._clone_dir()
         repo = self._get_repo()
         branch = self.get_branch()
-        if os.path.isdir(os.path.join(cwd, ".git")):
+        git_dir = Path(cwd) / ".git"
+        if git_dir.is_dir():
             LOG.info("Fetching a new version of %s", repo)
-            self._exec("git", "fetch", "--depth=1", "origin", branch, cwd=cwd)
-            self._exec("git", "checkout", branch, cwd=cwd)
-            self._exec("git", "reset", "--hard", f"origin/{branch}", cwd=cwd)
+            try:
+                self._exec("git", "fetch", "--depth=1", "origin", branch, cwd=cwd)
+                self._exec("git", "checkout", branch, cwd=cwd)
+                self._exec("git", "reset", "--hard", f"origin/{branch}", cwd=cwd)
+            except subprocess.CalledProcessError:
+                LOG.warning("Failed to fetch a new version of %s, retry checkout", repo)
+                self._exec("rm", "-rf", git_dir)
+                self._checkout()
         elif self._do_sparse():
             LOG.info("Cloning %s (sparse)", repo)
             self._exec("git-sparse-clone", repo, branch, cwd, self._config["sub_dir"], cwd=TEMP_DIR)
