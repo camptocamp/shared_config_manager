@@ -1,6 +1,3 @@
----
-version: '2'
-
 services:
   api:
     image: camptocamp/shared_config_manager:latest
