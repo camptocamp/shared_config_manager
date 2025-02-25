@@ -60,6 +60,8 @@ jobs:
 
       - name: Checks
         run: make checks
+      - run: git reset --hard
+        if: failure()
 
       - name: Tests
         run: make tests

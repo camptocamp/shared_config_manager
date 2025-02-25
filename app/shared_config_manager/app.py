@@ -1,4 +1,7 @@
+import logging
 import os
+import time
+from threading import Thread
 from typing import Any
 
 import c2cwsgiutils.pyramid
@@ -9,7 +12,10 @@ from pyramid.config import Configurator
 
 import shared_config_manager.security
 import shared_config_manager.views
+from shared_config_manager import slave_status
 from shared_config_manager.sources import registry
+
+_LOG = logging.getLogger(__name__)
 
 
 def forbidden(request: pyramid.request.Request) -> pyramid.response.Response:
@@ -26,9 +32,49 @@ def forbidden(request: pyramid.request.Request) -> pyramid.response.Response:
     )
 
 
+def _watch_source():
+    """Watch the source."""
+    while True:
+        try:
+            for key, source in registry.get_sources().items():
+                try:
+                    slaves = slave_status.get_source_status(id_=key)
+                    need_refresh = False
+                    hash_ = source.get_hash()
+                    for slave in slaves:
+                        if slave is None or slave.get("filtered", False):
+                            continue
+
+                        if "hash" not in slave:
+                            need_refresh = True
+                            _LOG.warning(
+                                "No hash in the slave '%s ' status for source '%s' -> refresh.",
+                                slave.get("hostname"),
+                                key,
+                            )
+
+                        if slave.get("hash") != hash_:
+                            need_refresh = True
+                            _LOG.warning(
+                                "The hash in the slave '%s' status for source '%s' is different -> refresh.",
+                                slave.get("hostname"),
+                                key,
+                            )
+
+                    if need_refresh:
+                        source.refresh()
+                except Exception:  # pylint: disable=broad-exception-caught
+                    _LOG.exception("Error while watching the source %s", key)
+        except Exception:  # pylint: disable=broad-exception-caught
+            _LOG.exception("Error while watching the sources")
+        time.sleep(int(os.environ.get("WATCH_SOURCE_INTERVAL", "600")))
+
+
 def main(_: Any, **settings: Any) -> Any:
     """Get the WSGI application."""
     config = Configurator(settings=settings, route_prefix=os.environ.get("ROUTE_PREFIX", "/scm"))
+
+    Thread(target=_watch_source, daemon=True).start()
 
     config.include(c2cwsgiutils.pyramid.includeme)
     config.include("pyramid_mako")
