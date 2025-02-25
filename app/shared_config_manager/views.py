@@ -15,8 +15,30 @@ from pyramid.view import view_config
 from shared_config_manager import slave_status
 from shared_config_manager.configuration import SourceStatus
 from shared_config_manager.sources import registry
+from shared_config_manager.sources.base import BaseSource
 
 _LOG = logging.getLogger(__name__)
+
+
+def _is_valid(source: BaseSource) -> bool:
+    if source is None:
+        return False
+
+    slaves = slave_status.get_source_status(id_=source.get_id())
+    if slaves is None:
+        return True
+    hash_ = ""
+    for slave in slaves:
+        if slave is None or slave.get("filtered", False):
+            continue
+        if "hash" not in slave:
+            return False
+        if hash_:
+            if slave.get("hash") != hash_:
+                return False
+        else:
+            hash_ = slave.get("hash")
+    return True
 
 
 @view_config(route_name="ui_index", renderer="./templates/index.html.mako")  # type: ignore
@@ -35,7 +57,7 @@ def _ui_index(request: pyramid.request.Request) -> dict[str, Any]:
             if isinstance(permission, Allowed):
                 sources_list.append(source)
 
-    return {"sources": sources_list}
+    return {"sources": sources_list, "is_valid": _is_valid}
 
 
 @view_config(route_name="ui_source", renderer="./templates/source.html.mako")  # type: ignore

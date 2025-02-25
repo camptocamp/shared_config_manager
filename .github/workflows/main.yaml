@@ -60,8 +60,6 @@ jobs:
 
       - name: Checks
         run: make checks
-      - run: git reset --hard
-        if: failure()
 
       - name: Tests
         run: make tests
@@ -89,6 +87,7 @@ jobs:
         if: failure()
 
       - run: git reset --hard
+        if: failure()
       - name: Publish
         run: tag-publish
         if: env.HAS_SECRETS == 'HAS_SECRETS'

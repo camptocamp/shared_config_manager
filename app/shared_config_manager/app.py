@@ -40,7 +40,7 @@ def _watch_source():
                 try:
                     slaves = slave_status.get_source_status(id_=key)
                     need_refresh = False
-                    hash_ = source.get_hash()
+                    hash_ = ""
                     for slave in slaves:
                         if slave is None or slave.get("filtered", False):
                             continue
@@ -53,13 +53,16 @@ def _watch_source():
                                 key,
                             )
 
-                        if slave.get("hash") != hash_:
-                            need_refresh = True
-                            _LOG.warning(
-                                "The hash in the slave '%s' status for source '%s' is different -> refresh.",
-                                slave.get("hostname"),
-                                key,
-                            )
+                        if hash_:
+                            if slave.get("hash") != hash_:
+                                need_refresh = True
+                                _LOG.warning(
+                                    "The hash in the slave '%s' status for source '%s' is different -> refresh.",
+                                    slave.get("hostname"),
+                                    key,
+                                )
+                        else:
+                            hash_ = slave.get("hash")
 
                     if need_refresh:
                         source.refresh()
