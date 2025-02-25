@@ -54,6 +54,11 @@
       <ul class="list-group">
         %for source in sources:
         <li class="list-group-item">
+          %if is_valid(source):
+          <span class="badge bg-success">✓</span>
+          %else:
+          <span class="badge bg-danger">✗</span>
+          %endif
           <a href="${request.route_url('ui_source', id=source.get_id())}"
             >${source.get_config().get("name", source.get_id()) | h}</a>
         </li>
