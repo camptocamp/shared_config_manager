@@ -33,7 +33,6 @@ shared-config-slave = "shared_config_manager.scripts.shared_config_slave:main"
 [tool.poetry.plugins."paste.app_factory"]
 main = "shared_config_manager.app:main"
 
-
 [tool.poetry-dynamic-versioning]
 enable = true
 vcs = "git"
@@ -50,6 +49,7 @@ format-jinja = """
 
 [tool.poetry-plugin-tweak-dependencies-version]
 default = "present"
+
 [build-system]
 requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning", "poetry-plugin-tweak-dependencies-version", "poetry-plugin-drop-python-upper-constraint"]
 build-backend = "poetry.core.masonry.api"
