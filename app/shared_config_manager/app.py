@@ -38,6 +38,9 @@ def _watch_source():
         try:
             for key, source in registry.get_sources().items():
                 try:
+                    if source.is_master():
+                        continue
+
                     slaves = slave_status.get_source_status(id_=key)
                     need_refresh = False
                     hash_ = ""
@@ -48,7 +51,7 @@ def _watch_source():
                         if "hash" not in slave:
                             need_refresh = True
                             _LOG.warning(
-                                "No hash in the slave '%s ' status for source '%s' -> refresh.",
+                                "No hash in the slave '%s' status for source '%s' -> refresh.",
                                 slave.get("hostname"),
                                 key,
                             )
