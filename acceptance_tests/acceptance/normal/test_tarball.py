@@ -13,7 +13,7 @@ def test_ok(app_connection: Connection) -> None:
         subprocess.check_call(["tar", "--test-label", "--verbose", "--file", temp.name])
 
 
-def test_bad_key(app_connection: Connection):
+def test_bad_key(app_connection: Connection) -> None:
     app_connection.get(
         "1/tarball/test_git",
         headers={"X-Scm-Secret": "bad"},
@@ -23,7 +23,7 @@ def test_bad_key(app_connection: Connection):
     )
 
 
-def test_bad_id(app_connection: Connection):
+def test_bad_id(app_connection: Connection) -> None:
     app_connection.get(
         "1/tarball/unknown",
         headers={"X-Scm-Secret": "changeme"},

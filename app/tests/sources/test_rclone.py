@@ -5,7 +5,7 @@ from shared_config_manager.sources import registry
 
 
 @pytest.mark.skip(reason="No more installer in the image")
-def test_rsync():
+def test_rsync() -> None:
     source = registry._create_source(
         "test_rclone",
         {

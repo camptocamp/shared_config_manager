@@ -9,11 +9,11 @@ ignore-paths:
   - shared_config_manager/configuration.py
   - app/shared_config_manager/configuration.py
 ignore-patterns:
-  - ^acceptance_tests/.*/test_.*\.py
+  - ^acceptance_tests/.*\.py
 
 mypy:
   options:
-    python_version: '3.10'
+    python-version: '3.10'
 
 ruff:
   disable:

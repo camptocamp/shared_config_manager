@@ -178,7 +178,10 @@ def _tarball(request: pyramid.request.Request) -> pyramid.response.Response:
         files.append(".gitstats")
 
     proc = subprocess.Popen(  # pylint: disable=consider-using-with # nosec
-        ["tar", "--create", "--gzip"] + files, cwd=path, bufsize=4096, stdout=subprocess.PIPE
+        ["tar", "--create", "--gzip", *files],
+        cwd=path,
+        bufsize=4096,
+        stdout=subprocess.PIPE,
     )
     response.content_type = "application/x-gtar"
     response.app_iter = _proc_iter(proc)

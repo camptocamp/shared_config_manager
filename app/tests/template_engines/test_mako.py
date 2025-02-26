@@ -4,7 +4,7 @@ import pathlib
 from shared_config_manager import template_engines
 
 
-def test_ok(temp_dir):
+def test_ok(temp_dir) -> None:
     engine = template_engines.create_engine("test", {"type": "mako", "data": {"param": "world"}})
 
     file_path = os.path.join(temp_dir, "file1")

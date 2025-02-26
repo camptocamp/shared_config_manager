@@ -65,18 +65,27 @@ repos:
         args:
           - --line-length=110
   - repo: https://github.com/PyCQA/prospector
-    rev: v1.14.1
+    rev: v1.15.0
     hooks:
       - id: prospector
         args:
-          - --profile=app/.prospector.yaml
-          - --tool=ruff
           - --die-on-tool-error
           - --output-format=pylint
+          - --profile=app/.prospector.yaml
+          - --profile=utils:pre-commit
         additional_dependencies:
           - prospector-profile-duplicated==1.10.4 # pypi
-          - prospector-profile-utils==1.20.2 # pypi
+          - prospector-profile-utils==1.21.1 # pypi
           - ruff==0.9.4 # pypi
+      - id: prospector
+        args:
+          - --die-on-tool-error
+          - --output-format=pylint
+          - --profile=utils:tests
+          - --profile=utils:pre-commit
+        additional_dependencies:
+          - prospector-profile-utils==1.21.1 # pypi
+          - ruff==0.9.6 # pypi
   - repo: https://github.com/sbrunner/jsonschema-validator
     rev: 1.0.0
     hooks:

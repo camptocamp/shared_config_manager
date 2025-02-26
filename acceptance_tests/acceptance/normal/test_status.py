@@ -3,7 +3,7 @@ from pprint import pformat
 from c2cwsgiutils.acceptance.connection import Connection
 
 
-def test_all(app_connection: Connection):
+def test_all(app_connection: Connection) -> None:
     stats = app_connection.get_json("1/status", headers={"X-Scm-Secret": "changeme"})
     print(f"stats={pformat(stats)}")
     assert len(stats["slaves"]) == 4, stats["slaves"].keys()
@@ -11,13 +11,13 @@ def test_all(app_connection: Connection):
     assert set(stats["slaves"]["slave-others"]["sources"].keys()) == {"master"}
 
 
-def test_master(app_connection: Connection):
+def test_master(app_connection: Connection) -> None:
     stats = app_connection.get_json("1/status/master", headers={"X-Scm-Secret": "changeme"})
     print(f"stats={pformat(stats)}")
     assert len(stats["statuses"]) == 1
 
 
-def test_other(app_connection: Connection):
+def test_other(app_connection: Connection) -> None:
     stats = app_connection.get_json("1/status/test_git", headers={"X-Scm-Secret": "changeme"})
     print(f"stats={pformat(stats)}")
     assert len(stats["statuses"]) == 2, stats["statuses"]

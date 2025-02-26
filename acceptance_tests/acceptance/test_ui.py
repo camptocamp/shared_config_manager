@@ -8,19 +8,19 @@ from c2cwsgiutils.acceptance.image import check_image
 REGENERATE = False
 
 
-def test_should_not_commit():
+def test_should_not_commit() -> None:
     assert REGENERATE is False
 
 
 @pytest.mark.parametrize(
-    "url,expected_file_name,height,width",
+    ("url", "expected_file_name", "height", "width"),
     [
         pytest.param("http://api:8080/scm/", "not-login", 120, 800, id="not-login"),
         pytest.param("http://api_test_user:8080/scm/", "index", 300, 800, id="index"),
         pytest.param("http://api_test_user:8080/scm/source/test_git", "source", 1050, 1050, id="source"),
     ],
 )
-def test_ui(url, expected_file_name, height, width):
+def test_ui(url, expected_file_name, height, width) -> None:
     subprocess.run(
         [
             "node",

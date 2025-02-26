@@ -9,7 +9,7 @@ from c2cwsgiutils.acceptance.connection import Connection
 LOG = logging.getLogger(__name__)
 
 
-def wait_slaves():
+def wait_slaves() -> None:
     """Wait for the slaves to be up."""
 
     def what() -> bool:
@@ -24,19 +24,17 @@ def wait_slaves():
                 if name == "slave-others":
                     if set(status["sources"].keys()) != {"master"}:
                         raise Exception(  # pylint: disable=broad-exception-raised
-                            f"Not seeing the 1 source on {name}"
+                            f"Not seeing the 1 source on {name}",
                         )
-                else:
-                    if set(status["sources"].keys()) != {"master", "test_git"}:
-                        raise Exception(  # pylint: disable=broad-exception-raised
-                            f"Not seeing the 2 sources on {name}: {status['sources'].keys()}",
-                        )
+                elif set(status["sources"].keys()) != {"master", "test_git"}:
+                    raise Exception(  # pylint: disable=broad-exception-raised
+                        f"Not seeing the 2 sources on {name}: {status['sources'].keys()}",
+                    )
             return True
-        else:
-            LOG.warning("%i, %s: %s", r.status_code, r.status, r.text)
-            raise Exception(  # pylint: disable=broad-exception-raised
-                f"Not having a 200 status: {r.status_code}"
-            )
+        LOG.warning("%i, %s: %s", r.status_code, r.status, r.text)
+        raise Exception(  # pylint: disable=broad-exception-raised
+            f"Not having a 200 status: {r.status_code}",
+        )
 
     utils.retry_timeout(what, timeout=10, interval=1)
 
@@ -51,8 +49,6 @@ def composition(request):
         os.chown(path, 33, 0)
     utils.wait_url("http://api:8080/scm/c2c/health_check?max_level=2")
     wait_slaves()
-
-    yield None
 
 
 @pytest.fixture

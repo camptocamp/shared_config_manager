@@ -4,10 +4,11 @@ import pathlib
 from shared_config_manager import template_engines
 
 
-def test_ok(temp_dir):
+def test_ok(temp_dir) -> None:
     os.environ["MUTUALIZED_TEST_ENV"] = "yall"
     engine = template_engines.create_engine(
-        "test", {"type": "shell", "environment_variables": True, "data": {"param": "world"}}
+        "test",
+        {"type": "shell", "environment_variables": True, "data": {"param": "world"}},
     )
 
     file_path = os.path.join(temp_dir, "file1")
@@ -21,7 +22,7 @@ def test_ok(temp_dir):
         assert input.read() == "Hello world yall\n"
 
 
-def test_dest_sub_dir(temp_dir):
+def test_dest_sub_dir(temp_dir) -> None:
     os.environ["MUTUALIZED_TEST_ENV"] = "yall"
     engine = template_engines.create_engine(
         "test",
