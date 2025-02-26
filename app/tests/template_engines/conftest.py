@@ -4,7 +4,7 @@ from tempfile import mkdtemp
 import pytest
 
 
-@pytest.fixture()
+@pytest.fixture
 def temp_dir():
     base_dir = str(mkdtemp())
     try:

@@ -15,7 +15,7 @@ def composition(request):
         os.chown(path, 33, 0)
     utils.wait_url("http://api_inline:8080/scm/c2c/health_check?max_level=2")
 
-    yield None
+    return None
 
 
 @pytest.fixture
