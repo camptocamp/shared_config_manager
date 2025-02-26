@@ -24,6 +24,9 @@ def _is_valid(source: BaseSource) -> bool:
     if source is None:
         return False
 
+    if source.is_master():
+        return True
+
     slaves = slave_status.get_source_status(id_=source.get_id())
     if slaves is None:
         return True
