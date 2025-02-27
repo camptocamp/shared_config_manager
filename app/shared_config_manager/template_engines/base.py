@@ -12,7 +12,7 @@ from shared_config_manager.configuration import (
 _LOG = logging.getLogger(__name__)
 _ENV_PREFIXES = os.environ.get("SCM_ENV_PREFIXES", "MUTUALIZED_").split(":")
 _ERROR_COUNTER = Counter(
-    "sharedconfigmanager_template_error_counter", "Number of template errors", ["source", "type"]
+    "sharedconfigmanager_template_error_counter", "Number of template errors", ["source", "type"],
 )
 _ERROR_GAUGE = Gauge("sharedconfigmanager_template_error_status", "Template in error", ["source", "type"])
 
@@ -52,7 +52,7 @@ class BaseEngine:
                     _ERROR_GAUGE.labels(source=self._source_id, type=self.get_type()).set(0)
                 except Exception:  # pylint: disable=broad-exception-caught
                     _LOG.warning(
-                        "Failed applying the %s template: %s", self._config["type"], src_path, exc_info=True
+                        "Failed applying the %s template: %s", self._config["type"], src_path, exc_info=True,
                     )
                     _ERROR_COUNTER.labels(source=self._source_id, type=self.get_type()).inc()
                     _ERROR_GAUGE.labels(source=self._source_id, type=self.get_type()).set(1)
@@ -62,8 +62,7 @@ class BaseEngine:
     def _get_dest_dir(self, root_dir: str) -> str:
         if "dest_sub_dir" in self._config:
             return os.path.join(root_dir, self._config["dest_sub_dir"])
-        else:
-            return root_dir
+        return root_dir
 
     def _evaluate_file(self, src_path: str, dst_path: str) -> None:
         pass

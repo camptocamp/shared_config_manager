@@ -56,11 +56,10 @@ class GitSource(SshBaseSource):
     def _clone_dir(self) -> str:
         if self._do_sparse():
             return os.path.join(TEMP_DIR, self.get_id())
-        else:
-            # The directory we clone into is not fct(id), but in function of the repository and the
-            # branch. That way, if two sources are other sub-dirs of the same repo, we clone it only once.
-            encoded_repo = base64.urlsafe_b64encode(self._get_repo().encode("utf-8")).decode("utf-8")
-            return os.path.join(TEMP_DIR, encoded_repo)
+        # The directory we clone into is not fct(id), but in function of the repository and the
+        # branch. That way, if two sources are other sub-dirs of the same repo, we clone it only once.
+        encoded_repo = base64.urlsafe_b64encode(self._get_repo().encode("utf-8")).decode("utf-8")
+        return os.path.join(TEMP_DIR, encoded_repo)
 
     def _do_sparse(self) -> bool:
         return "sub_dir" in self._config and self._config.get("sparse", True)
@@ -69,8 +68,7 @@ class GitSource(SshBaseSource):
         sub_dir = self._config.get("sub_dir")
         if sub_dir is None:
             return self._clone_dir()
-        else:
-            return os.path.join(self._clone_dir(), sub_dir)
+        return os.path.join(self._clone_dir(), sub_dir)
 
     def get_stats(self) -> SourceStatus:
         stats = super().get_stats()

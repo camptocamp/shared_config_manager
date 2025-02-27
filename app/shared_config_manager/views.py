@@ -115,7 +115,7 @@ def _ui_source(request: pyramid.request.Request) -> dict[str, Any]:
                     attributes[index][1],
                     attributes[attributes4_height + index][0],
                     attributes[attributes4_height + index][1],
-                )
+                ),
             )
         else:
             attributes4.append((attributes[index][0], attributes[index][1], "", ""))
@@ -140,7 +140,7 @@ def _ui_source(request: pyramid.request.Request) -> dict[str, Any]:
                     )
                     if not commit_response.ok:
                         _slave_status.append(
-                            (slave, [f"Unable to get the commit status: {commit_response.reason}"])
+                            (slave, [f"Unable to get the commit status: {commit_response.reason}"]),
                         )
                     else:
                         commit_json = commit_response.json()
