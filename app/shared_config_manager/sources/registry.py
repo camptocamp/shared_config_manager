@@ -87,7 +87,8 @@ def reload_master_config() -> None:
     """Reload the master config."""
     if MASTER_SOURCE:
         with open(
-            os.path.join(MASTER_SOURCE.get_path(), "shared_config_manager.yaml"), encoding="utf-8",
+            os.path.join(MASTER_SOURCE.get_path(), "shared_config_manager.yaml"),
+            encoding="utf-8",
         ) as config_file:
             config = yaml.load(config_file, Loader=yaml.SafeLoader)
             _handle_master_config(config)
@@ -216,7 +217,8 @@ def _slave_fetch(id_: str) -> None:
 
 
 def get_source_check_auth(
-    id_: str, request: pyramid.request.Request | None,
+    id_: str,
+    request: pyramid.request.Request | None,
 ) -> tuple[base.BaseSource | None, bool]:
     """Get a source by id and check the auth."""
     filtered = False

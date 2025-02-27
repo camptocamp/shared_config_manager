@@ -16,7 +16,6 @@ def composition(request):
     utils.wait_url("http://api_inline:8080/scm/c2c/health_check?max_level=2")
 
 
-
 @pytest.fixture
 def app_connection(composition):  # pylint: disable=redefined-outer-name
     """Fixture that returns a connection to a running batch container."""

@@ -26,21 +26,31 @@ _RETRY_DELAY = int(os.environ.get("SCM_RETRY_DELAY", 1))
 
 _REFRESH_SUMMARY = Summary("sharedconfigmanager_source_refresh", "Number of source refreshes", ["source"])
 _REFRESH_ERROR_COUNTER = Counter(
-    "sharedconfigmanager_source_refresh_error_counter", "Number of source errors", ["source"],
+    "sharedconfigmanager_source_refresh_error_counter",
+    "Number of source errors",
+    ["source"],
 )
 _REFRESH_ERROR_GAUGE = Gauge(
-    "sharedconfigmanager_source_refresh_error_status", "Sources in error", ["source"],
+    "sharedconfigmanager_source_refresh_error_status",
+    "Sources in error",
+    ["source"],
 )
 _TEMPLATE_SUMMARY = Summary(
-    "sharedconfigmanager_source_template", "Number of template evaluations", ["source", "type"],
+    "sharedconfigmanager_source_template",
+    "Number of template evaluations",
+    ["source", "type"],
 )
 _FETCH_SUMMARY = Summary("sharedconfigmanager_source_fetch", "Number of source fetches", ["source"])
 _FETCH_ERROR_COUNTER = Counter(
-    "sharedconfigmanager_source_fetch_error_counter", "Number of source errors", ["source"],
+    "sharedconfigmanager_source_fetch_error_counter",
+    "Number of source errors",
+    ["source"],
 )
 _FETCH_ERROR_GAUGE = Gauge("sharedconfigmanager_source_fetch_error_status", "Sources in error", ["source"])
 _DO_FETCH_ERROR_COUNTER = Counter(
-    "sharedconfigmanager_source_do_fetch_error", "Number of source fetch errors", ["source"],
+    "sharedconfigmanager_source_do_fetch_error",
+    "Number of source fetch errors",
+    ["source"],
 )
 _COPY_SUMMARY = Summary("sharedconfigmanager_source_copy", "Number of source copies", ["source"])
 
@@ -207,7 +217,9 @@ class BaseSource:
         config_copy = copy.deepcopy(self._config)
         stats_ = cast(SourceStatus, config_copy)
         for template_stats, template_engine in zip(
-            stats_.get("template_engines", []), self._template_engines, strict=False,
+            stats_.get("template_engines", []),
+            self._template_engines,
+            strict=False,
         ):
             template_engine.get_stats(template_stats)
 
