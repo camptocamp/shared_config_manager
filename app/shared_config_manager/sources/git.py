@@ -10,7 +10,7 @@ from shared_config_manager.configuration import SourceStatus
 from shared_config_manager.sources import mode
 from shared_config_manager.sources.ssh import SshBaseSource
 
-TEMP_DIR = tempfile.gettempdir()
+TEMP_DIR = Path(tempfile.gettempdir())
 LOG = logging.getLogger(__name__)
 
 
@@ -21,14 +21,14 @@ class GitSource(SshBaseSource):
         self._checkout()
         self._copy(self._copy_dir(), excludes=[".git"])
         stats = {"hash": self._get_hash(), "tags": self._get_tags()}
-        with open(os.path.join(self.get_path(), ".gitstats"), "w", encoding="utf-8") as gitstats:
+        with (self.get_path() / ".gitstats").open("w", encoding="utf-8") as gitstats:
             json.dump(stats, gitstats)
 
     def _checkout(self) -> None:
         cwd = self._clone_dir()
         repo = self._get_repo()
         branch = self.get_branch()
-        git_dir = Path(cwd) / ".git"
+        git_dir = cwd / ".git"
         if git_dir.is_dir():
             LOG.info("Fetching a new version of %s", repo)
             try:
@@ -44,37 +44,37 @@ class GitSource(SshBaseSource):
             self._exec("git-sparse-clone", repo, branch, cwd, self._config["sub_dir"], cwd=TEMP_DIR)
         else:
             LOG.info("Cloning %s", repo)
-            if os.path.exists(cwd):
+            if cwd.exists():
                 os.removedirs(cwd)
-            os.makedirs(os.path.dirname(cwd), exist_ok=True)
-            command = ["git", "clone", f"--branch={branch}", "--depth=1", repo, os.path.basename(cwd)]
+            cwd.parent.mkdir(parents=True, exist_ok=True)
+            command = ["git", "clone", f"--branch={branch}", "--depth=1", repo, cwd.name]
             self._exec(*command, cwd=TEMP_DIR)
 
     def _get_repo(self) -> str:
         return self._config["repo"]
 
-    def _clone_dir(self) -> str:
+    def _clone_dir(self) -> Path:
         if self._do_sparse():
-            return os.path.join(TEMP_DIR, self.get_id())
+            return TEMP_DIR / self.get_id()
         # The directory we clone into is not fct(id), but in function of the repository and the
         # branch. That way, if two sources are other sub-dirs of the same repo, we clone it only once.
         encoded_repo = base64.urlsafe_b64encode(self._get_repo().encode("utf-8")).decode("utf-8")
-        return os.path.join(TEMP_DIR, encoded_repo)
+        return TEMP_DIR / encoded_repo
 
     def _do_sparse(self) -> bool:
         return "sub_dir" in self._config and self._config.get("sparse", True)
 
-    def _copy_dir(self) -> str:
+    def _copy_dir(self) -> Path:
         sub_dir = self._config.get("sub_dir")
         if sub_dir is None:
             return self._clone_dir()
-        return os.path.join(self._clone_dir(), sub_dir)
+        return self._clone_dir() / sub_dir
 
     def get_stats(self) -> SourceStatus:
         stats = super().get_stats()
-        stats_path = os.path.join(self.get_path(), ".gitstats")
-        if os.path.isfile(stats_path):
-            with open(stats_path, encoding="utf-8") as gitstats:
+        stats_path = self.get_path() / ".gitstats"
+        if stats_path.is_file():
+            with stats_path.open(encoding="utf-8") as gitstats:
                 stats.update(json.load(gitstats))
         return stats
 
@@ -83,9 +83,7 @@ class GitSource(SshBaseSource):
 
     def _get_tags(self) -> list[str]:
         out = self._exec("git", "tag", "--points-at", "HEAD", cwd=self._clone_dir())
-        if out == "":
-            return []
-        return out.split("\n")
+        return out.split("\n") if out else []
 
     def get_branch(self) -> str:
         return str(self._config.get("branch", "master"))

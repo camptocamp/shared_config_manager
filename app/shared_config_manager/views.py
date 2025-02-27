@@ -3,6 +3,7 @@ import math
 import os.path
 import re
 import subprocess  # nosec
+from pathlib import Path
 from typing import Any, cast
 
 import pyramid.request
@@ -34,17 +35,18 @@ def _is_valid(source: BaseSource) -> bool:
     for slave in slaves:
         if slave is None or slave.get("filtered", False):
             continue
-        if "hash" not in slave:
+        slave_hash = slave.get("hash")
+        if slave_hash is None:
             return False
         if hash_:
-            if slave.get("hash") != hash_:
+            if slave_hash != hash_:
                 return False
         else:
-            hash_ = slave.get("hash")
+            hash_ = slave_hash
     return True
 
 
-@view_config(route_name="ui_index", renderer="./templates/index.html.mako")  # type: ignore
+@view_config(route_name="ui_index", renderer="./templates/index.html.mako")  # type: ignore[misc]
 def _ui_index(request: pyramid.request.Request) -> dict[str, Any]:
     permission = request.has_permission("all", {})
     is_admin = isinstance(permission, Allowed)
@@ -63,7 +65,7 @@ def _ui_index(request: pyramid.request.Request) -> dict[str, Any]:
     return {"sources": sources_list, "is_valid": _is_valid}
 
 
-@view_config(route_name="ui_source", renderer="./templates/source.html.mako")  # type: ignore
+@view_config(route_name="ui_source", renderer="./templates/source.html.mako")  # type: ignore[misc]
 def _ui_source(request: pyramid.request.Request) -> dict[str, Any]:
     def key_format(key: str) -> str:
         return key[0].upper() + key[1:].replace("_", " ")
@@ -74,11 +76,13 @@ def _ui_source(request: pyramid.request.Request) -> dict[str, Any]:
     id_ = request.matchdict["id"]
     source, filtered = registry.get_source_check_auth(id_=id_, request=request)
     if source is None:
-        raise HTTPNotFound(f"Unknown id {id_} or forbidden")
+        message = f"Unknown id {id_} or forbidden"
+        raise HTTPNotFound(message)
     if not is_admin:
         permission = request.has_permission(id_, source.get_config())
         if not isinstance(permission, Allowed):
-            raise HTTPNotFound(f"Unknown id {id_} or forbidden")
+            message = f"Unknown id {id_} or forbidden"
+            raise HTTPNotFound(message)
 
     slaves = slave_status.get_source_status(id_=id_)
     assert slaves is not None
@@ -155,7 +159,7 @@ def _ui_source(request: pyramid.request.Request) -> dict[str, Any]:
                 commit_details = (
                     subprocess.run(  # type: ignore[assignment] # nosec
                         ["git", "show", "--quiet", slave["hash"]],
-                        cwd=os.path.join("/repos", source.get_id()),
+                        cwd=str(Path("/repos") / source.get_id()),
                         check=True,
                         stdout=subprocess.PIPE,
                     )
@@ -163,7 +167,7 @@ def _ui_source(request: pyramid.request.Request) -> dict[str, Any]:
                     .split("\n")
                 )
             _slave_status.append((slave, commit_details))
-        except Exception:  # pylint: disable=broad-exception-caught
+        except Exception:  # pylint: disable=broad-exception-caught # noqa: PERF203
             _LOG.warning("Unable to get the commit status for %s", slave.get("hash"), exc_info=True)
             _slave_status.append((slave, []))
 

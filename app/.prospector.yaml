@@ -19,3 +19,4 @@ ruff:
   disable:
     - D102 # Missing docstring in public method
     - D107 # Missing docstring in `__init__`
+    - I001 # Import block is un-sorted or un-formatted, issue with the file: shared_config_manager/scripts/shared_config_slave.py

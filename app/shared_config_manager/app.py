@@ -41,7 +41,7 @@ def _watch_source() -> None:
                     if source.is_master():
                         continue
 
-                    slaves = slave_status.get_source_status(id_=key)
+                    slaves = slave_status.get_source_status(id_=key) or []
                     need_refresh = False
                     hash_ = ""
                     for slave in slaves:

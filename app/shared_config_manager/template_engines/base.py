@@ -1,5 +1,6 @@
 import logging
 import os
+from pathlib import Path
 from typing import cast
 
 from prometheus_client import Counter, Gauge
@@ -32,8 +33,7 @@ class BaseEngine:
         else:
             self._data = config.get("data", {})
 
-    def evaluate(self, root_dir: str, files: list[str]) -> None:
-        extension_len = len(self._extension) + 1
+    def evaluate(self, root_dir: Path, files: list[Path]) -> None:
         dest_dir = self._get_dest_dir(root_dir)
         _LOG.info(
             "Evaluating templates %s -> %s with data keys: %s",
@@ -43,11 +43,11 @@ class BaseEngine:
         )
 
         for sub_path in files:
-            src_path = os.path.join(root_dir, sub_path)
-            dest_path = os.path.join(dest_dir, sub_path)
-            os.makedirs(os.path.dirname(dest_path), exist_ok=True)
-            if src_path.endswith("." + self._extension):
-                dest_path = dest_path[:-extension_len]
+            src_path = root_dir / sub_path
+            dest_path = dest_dir / sub_path
+            dest_path.parent.mkdir(parents=True, exist_ok=True)
+            if src_path.suffix == "." + self._extension:
+                dest_path = dest_path.parent / dest_path.stem
                 _LOG.debug("Evaluating template: %s -> %s", src_path, dest_path)
                 try:
                     self._evaluate_file(src_path, dest_path)
@@ -61,15 +61,15 @@ class BaseEngine:
                     )
                     _ERROR_COUNTER.labels(source=self._source_id, type=self.get_type()).inc()
                     _ERROR_GAUGE.labels(source=self._source_id, type=self.get_type()).set(1)
-            elif src_path != dest_path and not os.path.isdir(src_path) and not os.path.exists(dest_path):
+            elif src_path != dest_path and not src_path.is_dir() and not dest_path.exists():
                 os.link(src_path, dest_path)
 
-    def _get_dest_dir(self, root_dir: str) -> str:
+    def _get_dest_dir(self, root_dir: Path) -> Path:
         if "dest_sub_dir" in self._config:
-            return os.path.join(root_dir, self._config["dest_sub_dir"])
+            return root_dir / self._config["dest_sub_dir"]
         return root_dir
 
-    def _evaluate_file(self, src_path: str, dst_path: str) -> None:
+    def _evaluate_file(self, src_path: Path, dst_path: Path) -> None:
         pass
 
     def get_type(self) -> str:
@@ -81,8 +81,4 @@ class BaseEngine:
 
 
 def _filter_env(env: dict[str, str]) -> dict[str, str]:
-    result = {}
-    for key, value in env.items():
-        if any(key.startswith(i) for i in _ENV_PREFIXES):
-            result[key] = value
-    return result
+    return {key: value for key, value in env.items() if any(key.startswith(i) for i in _ENV_PREFIXES)}
