@@ -16,5 +16,4 @@ def get_source_status(id_: str) -> SourceStatus:
     source = registry.get_source(id_)
     if source is None:
         return {"filtered": id_ in registry.FILTERED_SOURCES}
-    else:
-        return source.get_stats()
+    return source.get_stats()

@@ -982,13 +982,13 @@ twisted = ["twisted"]
 
 [[package]]
 name = "prospector"
-version = "1.14.0"
+version = "1.15.0"
 description = "Prospector is a tool to analyse Python code by aggregating the result of other tools."
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "prospector-1.14.0-py3-none-any.whl", hash = "sha256:18771ee32ed9a35111c3ebcfdac24c8ac77301b14cebfffccad7906a3d983ab8"},
-    {file = "prospector-1.14.0.tar.gz", hash = "sha256:de493172fc6027bef384cb450db48f6ea6bb6b3c9160e75f4ab4ecdf502518d1"},
+    {file = "prospector-1.15.0-py3-none-any.whl", hash = "sha256:e5c3e046fa6a28c760054676d18169dee88ba93eb877eaa88e06516409c7728f"},
+    {file = "prospector-1.15.0.tar.gz", hash = "sha256:9a6669cf5eea935bfc66eb9b1b551c0cfbd735b215415c053603b31069718d9d"},
 ]
 
 [package.dependencies]
@@ -1035,13 +1035,13 @@ files = [
 
 [[package]]
 name = "prospector-profile-utils"
-version = "1.17.0"
+version = "1.20.2"
 description = "Some utility Prospector profiles."
 optional = false
-python-versions = "<4.0,>=3.9"
+python-versions = "*"
 files = [
-    {file = "prospector_profile_utils-1.17.0-py3-none-any.whl", hash = "sha256:0cb7fe9dfca2b49c21733bbc4d3aabd51c7c0890c5e636b8d2f7b81c342aef6e"},
-    {file = "prospector_profile_utils-1.17.0.tar.gz", hash = "sha256:ac75faf9b13a6b6c18173cad71e6879e6ac40c5f5fda57c69f064b8a955705bd"},
+    {file = "prospector_profile_utils-1.20.2-py2.py3-none-any.whl", hash = "sha256:f550758a67c401df6a293a3461120fb22d7f3da0e8f93f3b04dbc2c67cbdd05e"},
+    {file = "prospector_profile_utils-1.20.2.tar.gz", hash = "sha256:ac26adee6db3abfe931ea236b4202dd98f695405f25bd795121b2591262df66b"},
 ]
 
 [package.dependencies]
@@ -2177,4 +2177,4 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.13"
-content-hash = "4dad46b2c930f8c5742adec7858d950b62b494b91b764768523e32f7178b7dd9"
+content-hash = "891cd08f4bee71a6d80fd543a583a98e46616897cad55f9a9c68389ca7b4259d"

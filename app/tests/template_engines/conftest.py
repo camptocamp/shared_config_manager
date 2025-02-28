@@ -1,12 +1,13 @@
 import shutil
+from pathlib import Path
 from tempfile import mkdtemp
 
 import pytest
 
 
-@pytest.fixture()
+@pytest.fixture
 def temp_dir():
-    base_dir = str(mkdtemp())
+    base_dir = Path(mkdtemp())
     try:
         yield base_dir
     finally:

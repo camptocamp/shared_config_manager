@@ -28,11 +28,11 @@ def forbidden(request: pyramid.request.Request) -> pyramid.response.Response:
         location=request.route_url(
             "c2c_github_login",
             _query={"came_from": request.current_route_url()},
-        )
+        ),
     )
 
 
-def _watch_source():
+def _watch_source() -> None:
     """Watch the source."""
     while True:
         try:
@@ -41,7 +41,7 @@ def _watch_source():
                     if source.is_master():
                         continue
 
-                    slaves = slave_status.get_source_status(id_=key)
+                    slaves = slave_status.get_source_status(id_=key) or []
                     need_refresh = False
                     hash_ = ""
                     for slave in slaves:
@@ -65,7 +65,17 @@ def _watch_source():
                                     key,
                                 )
                         else:
-                            hash_ = slave.get("hash")
+                            new_hash = slave.get("hash")
+                            if isinstance(new_hash, str):
+                                hash_ = new_hash
+                            else:
+                                need_refresh = True
+                                _LOG.warning(
+                                    "The hash '%s', in the slave '%s' status for source '%s' is not a string -> refresh.",
+                                    new_hash,
+                                    slave.get("hostname"),
+                                    key,
+                                )
 
                     if need_refresh:
                         source.refresh()

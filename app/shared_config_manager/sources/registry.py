@@ -1,9 +1,9 @@
 import logging
 import os
-import pathlib
 import subprocess  # nosec
 import tempfile
 from collections.abc import Mapping
+from pathlib import Path
 from threading import Thread
 
 import inotify.adapters
@@ -49,7 +49,7 @@ def init(slave: bool) -> None:
         content = yaml.load(os.environ["MASTER_CONFIG"], Loader=yaml.SafeLoader)
     else:
         _LOG.info("Load the master config from config file")
-        with open("/etc/shared_config_manager/config.yaml", encoding="utf-8") as scm_file:
+        with Path("/etc/shared_config_manager/config.yaml").open(encoding="utf-8") as scm_file:
             content = yaml.load(scm_file, Loader=yaml.SafeLoader)
 
         def thread() -> None:
@@ -61,7 +61,7 @@ def init(slave: bool) -> None:
                     "IN_CLOSE_WRITE" in type_names or "IN_IGNORED" in type_names
                 ):  # the IN_IGNORED it for move file on this one
                     _LOG.info("Reload the master config from config file")
-                    with open("/etc/shared_config_manager/config.yaml", encoding="utf-8") as scm_file:
+                    with Path("/etc/shared_config_manager/config.yaml").open(encoding="utf-8") as scm_file:
                         config = yaml.load(scm_file, Loader=yaml.SafeLoader)
                     _handle_master_config(config)
 
@@ -86,8 +86,8 @@ def init(slave: bool) -> None:
 def reload_master_config() -> None:
     """Reload the master config."""
     if MASTER_SOURCE:
-        with open(
-            os.path.join(MASTER_SOURCE.get_path(), "shared_config_manager.yaml"), encoding="utf-8"
+        with (MASTER_SOURCE.get_path() / "shared_config_manager.yaml").open(
+            encoding="utf-8",
         ) as config_file:
             config = yaml.load(config_file, Loader=yaml.SafeLoader)
             _handle_master_config(config)
@@ -129,7 +129,8 @@ def _do_handle_master_config(config: Config) -> tuple[int, int]:
 def _handle_master_config(config: Config) -> None:
     _LOG.info("Reading the master config")
     if _MASTER_ID in config["sources"]:
-        raise HTTPBadRequest(f'A source cannot have the "{_MASTER_ID}" id')
+        message = f"A source cannot have the {_MASTER_ID} id"
+        raise HTTPBadRequest(message)
     success, errors = _do_handle_master_config(config)
     if errors != 0:
         if success != 0:
@@ -142,12 +143,12 @@ def _handle_master_config(config: Config) -> None:
 
 
 def _update_flag(value: str) -> None:
-    with open(os.path.join(tempfile.gettempdir(), "status"), "w", encoding="utf-8") as flag:
+    with (Path(tempfile.gettempdir()) / "status").open("w", encoding="utf-8") as flag:
         flag.write(value)
 
 
 def _prepare_ssh() -> None:
-    home = pathlib.Path.home()
+    home = Path.home()
     other_ssh = home.joinpath(".ssh2")
     if other_ssh.is_dir():
         ssh = home.joinpath(".ssh")
@@ -159,7 +160,7 @@ def _prepare_ssh() -> None:
                 "--chmod=D0700,F0600",
                 str(other_ssh) + "/",
                 str(ssh) + "/",
-            ]
+            ],
         )
 
 
@@ -192,7 +193,8 @@ def refresh(id_: str, request: pyramid.request.Request | None) -> None:
     _LOG.info("Reloading the %s config", id_)
     source, _ = get_source_check_auth(id_, request)
     if source is None:
-        raise HTTPNotFound(f"Unknown id {id_}")
+        message = f"Unknown id {id_}"
+        raise HTTPNotFound(message)
     source.refresh()
     if source.is_master() and (not MASTER_SOURCE or not MASTER_SOURCE.get_config().get("standalone", False)):
         reload_master_config()
@@ -216,7 +218,8 @@ def _slave_fetch(id_: str) -> None:
 
 
 def get_source_check_auth(
-    id_: str, request: pyramid.request.Request | None
+    id_: str,
+    request: pyramid.request.Request | None,
 ) -> tuple[base.BaseSource | None, bool]:
     """Get a source by id and check the auth."""
     filtered = False
@@ -235,8 +238,7 @@ def get_source(id_: str) -> base.BaseSource | None:
     """Get a source by id."""
     if MASTER_SOURCE and MASTER_SOURCE.get_id() == id_:
         return MASTER_SOURCE
-    else:
-        return _SOURCES.get(id_)
+    return _SOURCES.get(id_)
 
 
 def get_stats() -> dict[str, SourceStatus]:

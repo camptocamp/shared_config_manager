@@ -8,7 +8,7 @@ from c2cwsgiutils.acceptance.connection import Connection
 from acceptance import get_hash, wait_sync
 
 
-def test_ok(app_connection: Connection):
+def test_ok(app_connection: Connection) -> None:
     test_git_hash = get_hash("/repos/test_git")
 
     # Be sure that we have the initial config (empty)
@@ -17,8 +17,8 @@ def test_ok(app_connection: Connection):
             yaml.dump(
                 {
                     "sources": {},
-                }
-            )
+                },
+            ),
         )
 
     # Wait that's applied
@@ -38,10 +38,10 @@ def test_ok(app_connection: Connection):
                             "repo": "/repos/test_git",
                             "tags": ["test"],
                             "template_engines": [{"type": "shell", "environment_variables": True}],
-                        }
+                        },
                     },
-                }
-            )
+                },
+            ),
         )
 
     # Wait that's applied

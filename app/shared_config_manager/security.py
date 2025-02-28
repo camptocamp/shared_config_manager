@@ -27,13 +27,14 @@ class User:
     def __init__(
         self,
         auth_type: str,
-        login: str | None,
-        name: str | None,
-        url: str | None,
-        is_auth: bool,
-        token: str | None,
-        request: pyramid.request.Request,
+        login: str | None = None,
+        name: str | None = None,
+        url: str | None = None,
+        is_auth: bool = False,
+        token: str | None = None,
+        request: pyramid.request.Request | None = None,
     ) -> None:
+        assert request is not None
         self.auth_type = auth_type
         self.login = login
         self.name = name
@@ -79,9 +80,10 @@ class SecurityPolicy:
                     digestmod=hashlib.sha256,
                 ).hexdigest()
                 if hmac.compare_digest(
-                    our_signature, request.headers["X-Hub-Signature-256"].split("=", 1)[1]
+                    our_signature,
+                    request.headers["X-Hub-Signature-256"].split("=", 1)[1],
                 ):
-                    user = User("github_webhook", None, None, None, True, None, request)
+                    user = User("github_webhook", is_auth=True, request=request)
                 else:
                     _LOG.warning("Invalid GitHub signature")
                     _LOG.debug(
@@ -100,7 +102,7 @@ body:
 
             elif "X-Scm-Secret" in request.headers and "SCM_SECRET" in os.environ:
                 if request.headers["X-Scm-Secret"] == os.environ["SCM_SECRET"]:
-                    user = User("scm_internal", None, None, None, True, None, request)
+                    user = User("scm_internal", is_auth=True, request=request)
                 else:
                     _LOG.warning("Invalid SCM secret")
 
@@ -119,7 +121,7 @@ body:
 
             request.user = user
 
-        return request.user  # type: ignore
+        return request.user  # type: ignore[no-any-return]
 
     def authenticated_userid(self, request: pyramid.request.Request) -> str | None:
         """Return a string ID for the user."""
@@ -131,7 +133,10 @@ body:
         return identity.login
 
     def permits(
-        self, request: pyramid.request.Request, context: SourceConfig, permission: str
+        self,
+        request: pyramid.request.Request,
+        context: SourceConfig,
+        permission: str,
     ) -> Allowed | Denied:
         """Allow access to everything if signed in."""
         identity = self.identity(request)

@@ -1,3 +1,4 @@
+# noqa: INP001
 ###
 # app configuration
 # https://docs.gunicorn.org/en/stable/settings.html
@@ -62,7 +63,7 @@ logconfig_dict = {
             "format": "%(asctime)s [%(process)d] [%(levelname)-5.5s] %(message)s",
             "datefmt": "[%Y-%m-%d %H:%M:%S %z]",
             "class": "logging.Formatter",
-        }
+        },
     },
 }
 

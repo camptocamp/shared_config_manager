@@ -1,22 +1,9 @@
 import fileinput
 import os
+from pathlib import Path
 
 from shared_config_manager.configuration import SourceConfig, SourceStatus
 from shared_config_manager.sources.base import BaseSource
-
-
-def _patch_openshift() -> None:
-    os.environ["HOME"] = "/var/www"
-    try:
-        with open("/etc/passwd", "a", encoding="utf-8") as passwd:
-            passwd.write(f"www-data2:x:{os.getuid()}:0:www-data:/var/www:/usr/sbin/nologin\n")
-    except PermissionError:
-        pass  # ignored
-
-
-# hack to work around an OpenShift "security"
-if os.getuid() not in (33, 0):
-    _patch_openshift()
 
 
 class SshBaseSource(BaseSource):
@@ -30,20 +17,19 @@ class SshBaseSource(BaseSource):
         if ssh_key is None:
             return
         ssh_path = self._ssh_path()
-        os.makedirs(ssh_path, exist_ok=True)
-        key_path = os.path.join(ssh_path, self.get_id()) + ".key"
-        was_here = os.path.isfile(key_path)
-        with open(key_path, "w", encoding="utf-8") as ssh_key_file:
-            ssh_key_file.write(ssh_key)
-        os.chmod(key_path, 0o700)
+        ssh_path.mkdir(parents=True, exist_ok=True)
+        key_path = ssh_path / f"{self.get_id()}.key"
+        was_here = key_path.is_file()
+        key_path.write_text(ssh_key, encoding="utf-8")
+        key_path.chmod(0o700)
 
         if not was_here:
-            with open(os.path.join(ssh_path, "config"), "a", encoding="utf-8") as config:
+            with (ssh_path / "config").open("a", encoding="utf-8") as config:
                 config.write(f"IdentityFile {key_path}\n")
 
     @staticmethod
-    def _ssh_path() -> str:
-        return os.path.join(os.environ["HOME"], ".ssh")
+    def _ssh_path() -> Path:
+        return Path(os.environ["HOME"]) / ".ssh"
 
     def get_stats(self) -> SourceStatus:
         stats = super().get_stats()
@@ -56,10 +42,10 @@ class SshBaseSource(BaseSource):
         ssh_key = self._config.get("ssh_key")
         if ssh_key is not None:
             ssh_path = self._ssh_path()
-            key_path = os.path.join(ssh_path, self.get_id()) + ".key"
-            if os.path.isfile(key_path):
-                os.remove(key_path)
-                with fileinput.input(os.path.join(ssh_path, "config"), inplace=True) as config:
+            key_path = ssh_path / (self.get_id() + ".key")
+            if key_path.is_file():
+                key_path.unlink()
+                with fileinput.input(ssh_path / "config", inplace=True) as config:
                     for line in config:
                         if line != f"IdentityFile {key_path}\n":
                             print(line, end="")

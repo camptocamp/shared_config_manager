@@ -8,7 +8,7 @@ from shared_config_manager.sources import registry
 TEMP_DIR = tempfile.gettempdir()
 
 
-@pytest.fixture()
+@pytest.fixture
 def repo():
     repo_path = os.path.join(TEMP_DIR, "repo")
     subprocess.check_call(
@@ -36,7 +36,7 @@ def repo():
     subprocess.check_call(["rm", "-rf", repo_path], stderr=subprocess.STDOUT)
 
 
-def test_git(repo):
+def test_git(repo) -> None:
     git = registry._create_source("test_git", {"type": "git", "repo": repo})
     assert not git._do_sparse()
     git.refresh()
@@ -65,7 +65,7 @@ def test_git(repo):
         git.delete()
 
 
-def test_git_sub_dir(repo):
+def test_git_sub_dir(repo) -> None:
     git = registry._create_source("test_git", {"type": "git", "repo": repo, "sub_dir": "toto"})
     assert git._do_sparse()
     git.refresh()
@@ -94,9 +94,10 @@ def test_git_sub_dir(repo):
         git.delete()
 
 
-def test_git_sub_dir_no_sparse(repo):
+def test_git_sub_dir_no_sparse(repo) -> None:
     git = registry._create_source(
-        "test_git", {"type": "git", "repo": repo, "sub_dir": "toto", "sparse": False}
+        "test_git",
+        {"type": "git", "repo": repo, "sub_dir": "toto", "sparse": False},
     )
     assert not git._do_sparse()
     git.refresh()
@@ -126,14 +127,14 @@ def test_git_sub_dir_no_sparse(repo):
 
 
 @pytest.mark.skipif(os.environ.get("PRIVATE_SSH_KEY") is not None, reason="We needs to have the key")
-def test_git_with_key():
+def test_git_with_key() -> None:
     ssh_key = os.environ["PRIVATE_SSH_KEY"].split(" ")
     ssh_key = ["-----BEGIN RSA PRIVATE KEY-----"]
     ssh_key += os.environ["PRIVATE_SSH_KEY"].split(" ")[4:-4]
     ssh_key += ["-----END RSA PRIVATE KEY-----"]
     ssh_key = [k for k in ssh_key if k != ""]
 
-    git = sources._create_source(
+    git = registry._create_source(
         "test_key",
         {
             "type": "git",

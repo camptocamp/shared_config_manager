@@ -2,7 +2,6 @@ inherits:
   - utils:base
   - utils:no-design-checks
   - utils:fix
-  - utils:unsafe
   - utils:c2cwsgiutils
   - duplicated
 
@@ -10,13 +9,14 @@ ignore-paths:
   - shared_config_manager/configuration.py
   - app/shared_config_manager/configuration.py
 ignore-patterns:
-  - ^acceptance_tests/.*/test_.*\.py
+  - ^acceptance_tests/.*\.py
 
 mypy:
   options:
-    python_version: '3.10'
+    python-version: '3.10'
 
 ruff:
   disable:
     - D102 # Missing docstring in public method
     - D107 # Missing docstring in `__init__`
+    - I001 # Import block is un-sorted or un-formatted, issue with the file: shared_config_manager/scripts/shared_config_slave.py

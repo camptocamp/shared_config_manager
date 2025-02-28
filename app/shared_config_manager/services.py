@@ -25,24 +25,27 @@ _LOG = logging.getLogger(__name__)
 __BRANCH_NAME_SANITIZER = re.compile(r"[^0-9a-zA-z-_]")
 
 
-@_refresh_service.get()  # type: ignore
+@_refresh_service.get()  # type: ignore[misc]
 def _refresh_view(request: pyramid.request.Request) -> dict[str, Any]:
     id_ = request.matchdict["id"]
     source, _ = registry.get_source_check_auth(id_=id_, request=request)
     if source is None:
-        raise HTTPNotFound(f"Unknown id {id_}")
+        message = f"Unknown id {id_}"
+        raise HTTPNotFound(message)
     return _refresh(request)
 
 
-@_refresh_service.post()  # type: ignore
+@_refresh_service.post()  # type: ignore[misc]
 def _refresh_webhook(request: pyramid.request.Request) -> dict[str, Any]:
     id_ = request.matchdict["id"]
     source, _ = registry.get_source_check_auth(id_=id_, request=request)
     if source is None:
-        raise HTTPNotFound(f"Unknown id {id_}")
+        message = f"Unknown id {id_}"
+        raise HTTPNotFound(message)
 
     if source.get_type() != "git":
-        raise HTTPServerError(f"Non GIT source {id_} cannot be refreshed by a webhook")
+        message = f"Non GIT source {id_} cannot be refreshed by a webhook"
+        raise HTTPServerError(message)
 
     source_git = cast(git.GitSource, source)
 
@@ -52,7 +55,8 @@ def _refresh_webhook(request: pyramid.request.Request) -> dict[str, Any]:
 
     ref = request.json.get("ref")
     if ref is None:
-        raise HTTPServerError(f"Webhook for {id_} is missing the ref")
+        message = "Webhook for {id_} is missing the ref"
+        raise HTTPServerError(message)
     if ref != "refs/heads/" + source_git.get_branch():
         _LOG.info(
             "Ignoring webhook notif for non-matching branch %s on %s",
@@ -70,10 +74,11 @@ def _refresh(request: pyramid.request.Request) -> dict[str, Any]:
     return {"status": 200}
 
 
-@_refresh_all_service.get()  # type: ignore
+@_refresh_all_service.get()  # type: ignore[misc]
 def _refresh_all(request: pyramid.request.Request) -> dict[str, Any]:
     if not registry.MASTER_SOURCE:
-        raise HTTPServerError("Master source not initialized")
+        message = "Master source not initialized"
+        raise HTTPServerError(message)
     registry.MASTER_SOURCE.validate_auth(request)
     nb_refresh = 0
     for id_ in registry.get_sources():
@@ -82,10 +87,11 @@ def _refresh_all(request: pyramid.request.Request) -> dict[str, Any]:
     return {"status": 200, "nb_refresh": nb_refresh}
 
 
-@_refresh_all_service.post()  # type: ignore
+@_refresh_all_service.post()  # type: ignore[misc]
 def _refresh_all_webhook(request: pyramid.request.Request) -> dict[str, Any]:
     if not registry.MASTER_SOURCE:
-        raise HTTPServerError("Master source not initialized")
+        message = "Master source not initialized"
+        raise HTTPServerError(message)
     registry.MASTER_SOURCE.validate_auth(request=request)
 
     if request.headers.get("X-GitHub-Event") != "push":
@@ -94,7 +100,8 @@ def _refresh_all_webhook(request: pyramid.request.Request) -> dict[str, Any]:
 
     ref = request.json.get("ref")
     if ref is None:
-        raise HTTPServerError("Webhook is missing the ref")
+        message = "Webhook is missing the ref"
+        raise HTTPServerError(message)
 
     nb_refresh = 0
     for id_, source in registry.get_sources().items():
@@ -117,7 +124,7 @@ def _refresh_all_webhook(request: pyramid.request.Request) -> dict[str, Any]:
     return {"status": 200, "nb_refresh": nb_refresh}
 
 
-@_status_service.get()  # type: ignore
+@_status_service.get()  # type: ignore[misc]
 def _stats(request: pyramid.request.Request) -> dict[str, Any]:
     if not registry.MASTER_SOURCE:
         return {"slaves": {}}
@@ -128,12 +135,13 @@ def _stats(request: pyramid.request.Request) -> dict[str, Any]:
     return {"slaves": slaves}
 
 
-@_source_stats_service.get()  # type: ignore
+@_source_stats_service.get()  # type: ignore[misc]
 def _source_stats(request: pyramid.request.Request) -> dict[str, Any]:
     id_ = request.matchdict["id"]
     source, _ = registry.get_source_check_auth(id_=id_, request=request)
     if source is None:
-        raise HTTPNotFound(f"Unknown id {id_}")
+        message = f"Unknown id {id_}"
+        raise HTTPNotFound(message)
     slaves: list[SourceStatus] | None = slave_status.get_source_status(id_=id_)
     assert slaves is not None
     statuses: list[SourceStatus] = []
@@ -154,20 +162,23 @@ def _cleanup_slave_status(status: BroadcastObject) -> BroadcastObject:
     return result
 
 
-@_tarball_service.get()  # type: ignore
+@_tarball_service.get()  # type: ignore[misc]
 def _tarball(request: pyramid.request.Request) -> pyramid.response.Response:
     id_ = request.matchdict["id"]
     source, filtered = registry.get_source_check_auth(id_=id_, request=request)
     if source is None:
-        raise HTTPNotFound(f"Unknown id {id_}")
+        message = f"Unknown id {id_}"
+        raise HTTPNotFound(message)
     if not source.is_loaded():
-        raise HTTPNotFound("Not loaded yet")
+        message = "Not loaded yet"
+        raise HTTPNotFound(message)
     assert not filtered
     path = source.get_path()
 
-    if not os.path.isdir(path):
+    if not path.is_dir():
         _LOG.error("The path %s does not exists or is not a path, for the source %s.", path, source.get_id())
-        raise HTTPNotFound("Not loaded yet: path didn't exists")
+        message = "Not loaded yet: path didn't exists"
+        raise HTTPNotFound(message)
 
     response: pyramid.response.Response = request.response
 
@@ -178,7 +189,10 @@ def _tarball(request: pyramid.request.Request) -> pyramid.response.Response:
         files.append(".gitstats")
 
     proc = subprocess.Popen(  # pylint: disable=consider-using-with # nosec
-        ["tar", "--create", "--gzip"] + files, cwd=path, bufsize=4096, stdout=subprocess.PIPE
+        ["tar", "--create", "--gzip", *files],
+        cwd=path,
+        bufsize=4096,
+        stdout=subprocess.PIPE,
     )
     response.content_type = "application/x-gtar"
     response.app_iter = _proc_iter(proc)
@@ -187,9 +201,10 @@ def _tarball(request: pyramid.request.Request) -> pyramid.response.Response:
 
 def _proc_iter(proc: subprocess.Popen[bytes]) -> Iterable[bytes | Any]:
     while True:
-        block = proc.stdout.read(4096)  # type: ignore
+        block = proc.stdout.read(4096)  # type: ignore[union-attr]
         if not block:
             break
         yield block
     if proc.wait() != 0:
-        raise HTTPServerError("Error building the tarball")
+        message = "Error building the tarball"
+        raise HTTPServerError(message)

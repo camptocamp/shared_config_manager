@@ -1,10 +1,10 @@
 import copy
 import logging
 import os
-import pathlib
 import shutil
 import subprocess  # nosec
 import time
+from pathlib import Path
 from typing import Any, cast
 
 import pyramid.request
@@ -19,28 +19,38 @@ from shared_config_manager.configuration import SourceConfig, SourceStatus
 from shared_config_manager.sources import mode
 
 _LOG = logging.getLogger(__name__)
-_TARGET = os.environ.get("TARGET", "/config")
-_MASTER_TARGET = os.environ.get("MASTER_TARGET", "/master_config")
+_TARGET = Path(os.environ.get("TARGET", "/config"))
+_MASTER_TARGET = Path(os.environ.get("MASTER_TARGET", "/master_config"))
 _RETRY_NUMBER = int(os.environ.get("SCM_RETRY_NUMBER", 3))
 _RETRY_DELAY = int(os.environ.get("SCM_RETRY_DELAY", 1))
 
 _REFRESH_SUMMARY = Summary("sharedconfigmanager_source_refresh", "Number of source refreshes", ["source"])
 _REFRESH_ERROR_COUNTER = Counter(
-    "sharedconfigmanager_source_refresh_error_counter", "Number of source errors", ["source"]
+    "sharedconfigmanager_source_refresh_error_counter",
+    "Number of source errors",
+    ["source"],
 )
 _REFRESH_ERROR_GAUGE = Gauge(
-    "sharedconfigmanager_source_refresh_error_status", "Sources in error", ["source"]
+    "sharedconfigmanager_source_refresh_error_status",
+    "Sources in error",
+    ["source"],
 )
 _TEMPLATE_SUMMARY = Summary(
-    "sharedconfigmanager_source_template", "Number of template evaluations", ["source", "type"]
+    "sharedconfigmanager_source_template",
+    "Number of template evaluations",
+    ["source", "type"],
 )
 _FETCH_SUMMARY = Summary("sharedconfigmanager_source_fetch", "Number of source fetches", ["source"])
 _FETCH_ERROR_COUNTER = Counter(
-    "sharedconfigmanager_source_fetch_error_counter", "Number of source errors", ["source"]
+    "sharedconfigmanager_source_fetch_error_counter",
+    "Number of source errors",
+    ["source"],
 )
 _FETCH_ERROR_GAUGE = Gauge("sharedconfigmanager_source_fetch_error_status", "Sources in error", ["source"])
 _DO_FETCH_ERROR_COUNTER = Counter(
-    "sharedconfigmanager_source_do_fetch_error", "Number of source fetch errors", ["source"]
+    "sharedconfigmanager_source_do_fetch_error",
+    "Number of source fetch errors",
+    ["source"],
 )
 _COPY_SUMMARY = Summary("sharedconfigmanager_source_copy", "Number of source copies", ["source"])
 
@@ -89,7 +99,7 @@ class BaseSource:
         # all the files that are created by template engines (see the --delete rsync flag in
         # BaseSource._copy).
         root_dir = self.get_path()
-        files = [os.path.relpath(str(p), root_dir) for p in pathlib.Path(root_dir).glob("**/*")]
+        files = [p.relative_to(root_dir) for p in root_dir.glob("**/*")]
 
         for engine in self._template_engines:
             with _TEMPLATE_SUMMARY.labels(self.get_id(), engine.get_type()).time():
@@ -124,9 +134,9 @@ class BaseSource:
                 _LOG.info("Doing a fetch of %s", self.get_id())
                 response = requests.get(url, headers={"X-Scm-Secret": os.environ["SCM_SECRET"]}, stream=True)
                 response.raise_for_status()
-                if os.path.exists(path):
+                if path.exists():
                     shutil.rmtree(path)
-                os.makedirs(path, exist_ok=True)
+                path.mkdir(parents=True, exist_ok=True)
                 with subprocess.Popen(  # nosec
                     [
                         "tar",
@@ -140,11 +150,11 @@ class BaseSource:
                     cwd=path,
                     stdin=subprocess.PIPE,
                 ) as tar:
-                    shutil.copyfileobj(response.raw, tar.stdin)  # type: ignore
-                    tar.stdin.close()  # type: ignore
+                    if tar.stdin is not None:
+                        shutil.copyfileobj(response.raw, tar.stdin)
+                        tar.stdin.close()
                     assert tar.wait() == 0
-                return
-            except Exception as exception:  # pylint: disable=broad-exception-caught
+            except Exception as exception:  # pylint: disable=broad-exception-caught # noqa: PERF203
                 _DO_FETCH_ERROR_COUNTER.labels(self.get_id()).inc()
                 retry_message = f" (will retry in {_RETRY_DELAY}s)" if i else " (failed)"
                 _LOG.warning(
@@ -157,9 +167,11 @@ class BaseSource:
                     time.sleep(_RETRY_DELAY)
                 else:
                     raise
+            else:
+                return
 
-    def _copy(self, source: str, excludes: list[str] | None = None) -> None:
-        os.makedirs(self.get_path(), exist_ok=True)
+    def _copy(self, source: Path, excludes: list[str] | None = None) -> None:
+        self.get_path().mkdir(parents=True, exist_ok=True)
         cmd = [
             "rsync",
             "--recursive",
@@ -174,25 +186,23 @@ class BaseSource:
             cmd += ["--exclude=" + exclude for exclude in excludes]
         if "excludes" in self._config:
             cmd += ["--exclude=" + exclude for exclude in self._config["excludes"]]
-        cmd += [source + "/", self.get_path()]
+        cmd += [str(source) + "/", str(self.get_path())]
         with _COPY_SUMMARY.labels(self.get_id()).time():
             self._exec(*cmd)
 
     def delete_target_dir(self) -> None:
         dest = self.get_path()
         _LOG.info("Deleting target dir %s", dest)
-        if os.path.isdir(dest):
+        if dest.is_dir():
             shutil.rmtree(dest)
 
-    def get_path(self) -> str:
+    def get_path(self) -> Path:
         if "target_dir" in self._config:
             target_dir = self._config["target_dir"]
             if target_dir.startswith("/"):
-                return target_dir
-            else:
-                return _MASTER_TARGET if self._is_master else os.path.join(_TARGET, target_dir)
-        else:
-            return _MASTER_TARGET if self._is_master else os.path.join(_TARGET, self.get_id())
+                return Path(target_dir)
+            return _MASTER_TARGET if self._is_master else _TARGET / target_dir
+        return _MASTER_TARGET if self._is_master else _TARGET / self.get_id()
 
     def get_id(self) -> str:
         return self._id
@@ -200,7 +210,8 @@ class BaseSource:
     def validate_auth(self, request: pyramid.request.Request) -> None:
         permission = request.has_permission("all", self.get_config())
         if not isinstance(permission, Allowed):
-            raise HTTPForbidden("Not allowed to access this source")
+            message = "Not allowed to access this source"
+            raise HTTPForbidden(message)
 
     def is_master(self) -> bool:
         return self._is_master
@@ -209,7 +220,9 @@ class BaseSource:
         config_copy = copy.deepcopy(self._config)
         stats_ = cast(SourceStatus, config_copy)
         for template_stats, template_engine in zip(
-            stats_.get("template_engines", []), self._template_engines, strict=False
+            stats_.get("template_engines", []),
+            self._template_engines,
+            strict=False,
         ):
             template_engine.get_stats(template_stats)
 
@@ -245,10 +258,11 @@ class BaseSource:
             )
             if output:
                 _LOG.debug(output)
-            return output
         except subprocess.CalledProcessError as exception:
             _LOG.error(exception.output.decode("utf-8").strip())
             raise
+        else:
+            return output
 
     def is_loaded(self) -> bool:
         return self._is_loaded
