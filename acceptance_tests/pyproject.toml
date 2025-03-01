@@ -13,6 +13,6 @@ prospector-profile-utils = "1.21.7"
 typing-extensions = "4.12.2"
 c2cwsgiutils = { version = "6.1.7", extras = ["standard", "test_images"] }
 requests = "2.32.3"
-boltons = "24.1.0"
+boltons = "25.0.0"
 netifaces = "0.11.0"
 lxml = "5.3.1"
