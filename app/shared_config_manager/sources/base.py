@@ -154,7 +154,7 @@ class BaseSource:
                         shutil.copyfileobj(response.raw, tar.stdin)
                         tar.stdin.close()
                     assert tar.wait() == 0
-            except Exception as exception:  # pylint: disable=broad-exception-caught # noqa: PERF203
+            except Exception as exception:  # pylint: disable=broad-exception-caught
                 _DO_FETCH_ERROR_COUNTER.labels(self.get_id()).inc()
                 retry_message = f" (will retry in {_RETRY_DELAY}s)" if i else " (failed)"
                 _LOG.warning(
