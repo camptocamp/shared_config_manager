@@ -259,7 +259,7 @@ class BaseSource:
             if output:
                 _LOG.debug(output)
         except subprocess.CalledProcessError as exception:
-            _LOG.error(exception.output.decode("utf-8").strip())
+            _LOG.warning(exception.output.decode("utf-8").strip())
             raise
         else:
             return output
