@@ -35,8 +35,10 @@ def forbidden(request: pyramid.request.Request) -> pyramid.response.Response:
 def _watch_source() -> None:
     """Watch the source."""
     while True:
+        _LOG.debug("Watching the sources")
         try:
             for key, source in registry.get_sources().items():
+                _LOG.debug("Watching the source %s", key)
                 try:
                     if source.is_master():
                         continue
@@ -45,6 +47,11 @@ def _watch_source() -> None:
                     need_refresh = False
                     hash_ = ""
                     for slave in slaves:
+                        _LOG.debug(
+                            "Watching the slave %s, with hash %s",
+                            slave.get("hostname"),
+                            slave.get("hash"),
+                        )
                         if slave is None or slave.get("filtered", False):
                             continue
 
