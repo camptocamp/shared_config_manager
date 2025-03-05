@@ -47,13 +47,14 @@ def _watch_source() -> None:
                     need_refresh = False
                     hash_ = ""
                     for slave in slaves:
+                        if slave is None or slave.get("filtered", False):
+                            continue
+
                         _LOG.debug(
                             "Watching the slave %s, with hash %s",
                             slave.get("hostname"),
                             slave.get("hash"),
                         )
-                        if slave is None or slave.get("filtered", False):
-                            continue
 
                         if "hash" not in slave:
                             need_refresh = True
