@@ -188,8 +188,8 @@ def _tarball(request: pyramid.request.Request) -> pyramid.response.Response:
         files.remove(".gitstats")
         files.append(".gitstats")
 
-    proc = subprocess.Popen(  # pylint: disable=consider-using-with # nosec
-        ["tar", "--create", "--gzip", *files],
+    proc = subprocess.Popen(  # pylint: disable=consider-using-with # noqa: S603 # nosec
+        ["tar", "--create", "--gzip", *files],  # noqa: S607
         cwd=path,
         bufsize=4096,
         stdout=subprocess.PIPE,

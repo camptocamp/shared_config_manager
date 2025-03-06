@@ -137,8 +137,8 @@ class BaseSource:
                 if path.exists():
                     shutil.rmtree(path)
                 path.mkdir(parents=True, exist_ok=True)
-                with subprocess.Popen(  # nosec
-                    [
+                with subprocess.Popen(  # noqa: S603 # nosec
+                    [  # noqa: S607
                         "tar",
                         "--extract",
                         "--gzip",
@@ -245,7 +245,7 @@ class BaseSource:
             args_ = list(map(str, args))
             _LOG.debug("Running: %s", " ".join(args_))
             output: str = (
-                subprocess.run(  # nosec
+                subprocess.run(  # noqa: S603
                     args_,
                     check=True,
                     stdout=subprocess.PIPE,
