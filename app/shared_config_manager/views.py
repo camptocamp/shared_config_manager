@@ -157,8 +157,8 @@ def _ui_source(request: pyramid.request.Request) -> dict[str, Any]:
 
             else:
                 commit_details = (
-                    subprocess.run(  # type: ignore[assignment] # nosec
-                        ["git", "show", "--quiet", slave["hash"]],
+                    subprocess.run(  # type: ignore[assignment] # noqa: S603 # nosec
+                        ["git", "show", "--quiet", slave["hash"]],  # noqa: S607
                         cwd=str(Path("/repos") / source.get_id()),
                         check=True,
                         stdout=subprocess.PIPE,
@@ -167,7 +167,7 @@ def _ui_source(request: pyramid.request.Request) -> dict[str, Any]:
                     .split("\n")
                 )
             _slave_status.append((slave, commit_details))
-        except Exception:  # pylint: disable=broad-exception-caught # noqa: PERF203
+        except Exception:  # pylint: disable=broad-exception-caught
             _LOG.warning("Unable to get the commit status for %s", slave.get("hash"), exc_info=True)
             _slave_status.append((slave, []))
 
