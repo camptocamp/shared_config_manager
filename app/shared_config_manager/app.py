@@ -7,6 +7,7 @@ from typing import Any
 import c2cwsgiutils.pyramid
 import pyramid.request
 import pyramid.response
+from c2cwsgiutils import broadcast
 from c2cwsgiutils.health_check import HealthCheck
 from pyramid.config import Configurator
 
@@ -87,6 +88,8 @@ def _watch_source() -> None:
 
                     if need_refresh:
                         source.refresh()
+                        broadcast.broadcast("slave_fetch", params={"id_": key})
+
                 except Exception:  # pylint: disable=broad-exception-caught
                     _LOG.exception("Error while watching the source %s", key)
         except Exception:  # pylint: disable=broad-exception-caught
