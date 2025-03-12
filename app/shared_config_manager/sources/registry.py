@@ -151,8 +151,8 @@ def _prepare_ssh() -> None:
     other_ssh = home.joinpath(".ssh2")
     if other_ssh.is_dir():
         ssh = home.joinpath(".ssh")
-        subprocess.check_call(  # nosec
-            [
+        subprocess.check_call(  # noqa: S603,S607
+            [  # noqa: S607
                 "rsync",
                 "--recursive",
                 "--copy-links",

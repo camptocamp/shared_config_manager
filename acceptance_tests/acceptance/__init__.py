@@ -42,4 +42,4 @@ def wait_sync(app_connection, name, hash_):
 
 def get_hash(cwd):
     """Get the hash of the current git repository."""
-    return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=cwd).decode("utf-8").strip()
+    return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=cwd).decode("utf-8").strip()  # noqa: S603,S607

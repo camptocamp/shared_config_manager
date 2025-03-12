@@ -69,7 +69,7 @@ class BaseEngine:
         pass
 
     def get_type(self) -> str:
-        return self._config["type"]
+        return self._config["type"]  # type: ignore[no-any-return]
 
     def get_stats(self, stats: TemplateEnginesStatus) -> None:
         if self._config.get("environment_variables", False):
