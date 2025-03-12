@@ -12,4 +12,4 @@ class ShellEngine(BaseEngine):
 
     def _evaluate_file(self, src_path: str, dst_path: str) -> None:
         with open(src_path, encoding="utf-8") as input_, open(dst_path, "w", encoding="utf-8") as output:
-            subprocess.run(["envsubst"], stdin=input_, stdout=output, env=self._data, check=True)  # nosec
+            subprocess.run(["envsubst"], stdin=input_, stdout=output, env=self._data, check=True)  # noqa: S603,S607

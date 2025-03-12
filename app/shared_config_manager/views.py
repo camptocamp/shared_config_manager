@@ -128,8 +128,8 @@ def _ui_source(request: pyramid.request.Request) -> dict[str, Any]:
 
             else:
                 commit_details = (
-                    subprocess.run(  # type: ignore[assignment] # nosec
-                        ["git", "show", "--quiet", slave["hash"]],
+                    subprocess.run(  # type: ignore[assignment] # noqa: S603,S607
+                        ["git", "show", "--quiet", slave["hash"]],  # noqa: S607
                         cwd=os.path.join("/repos", source.get_id()),
                         check=True,
                         stdout=subprocess.PIPE,
@@ -143,7 +143,7 @@ def _ui_source(request: pyramid.request.Request) -> dict[str, Any]:
             _slave_status.append((slave, []))
 
     def _get_sort_key(elem: tuple[SourceStatus, list[str]]) -> str:
-        return elem[0].get("hostname", "")
+        return elem[0].get("hostname", "")  # type: ignore[no-any-return]
 
     return {
         "key_format": key_format,

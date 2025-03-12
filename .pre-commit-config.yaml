@@ -23,11 +23,7 @@ repos:
     rev: 1.2.1
     hooks:
       - id: copyright
-      - id: poetry-check
-        additional_dependencies:
-          - poetry==2.0.1 # pypi
-        exclude: ^pyproject.toml$
-      - id: poetry-lock
+      - id: poetry2-lock
         additional_dependencies:
           - poetry==2.0.1 # pypi
         exclude: ^pyproject.toml$
@@ -71,7 +67,7 @@ repos:
         args:
           - --line-length=110
   - repo: https://github.com/PyCQA/prospector
-    rev: v1.13.3
+    rev: v1.15.3
     hooks:
       - id: prospector
         args:
@@ -80,7 +76,7 @@ repos:
           - --die-on-tool-error
           - --output-format=pylint
         additional_dependencies:
-          - prospector-profile-duplicated==1.10.4 # pypi
+          - prospector-profile-duplicated==1.10.5 # pypi
           - prospector-profile-utils==1.15.1 # pypi
           - ruff==0.9.7 # pypi
   - repo: https://github.com/sbrunner/jsonschema-validator

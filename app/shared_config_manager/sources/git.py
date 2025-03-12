@@ -51,7 +51,7 @@ class GitSource(SshBaseSource):
             self._exec(*command, cwd=TEMP_DIR)
 
     def _get_repo(self) -> str:
-        return self._config["repo"]
+        return self._config["repo"]  # type: ignore[no-any-return]
 
     def _clone_dir(self) -> str:
         if self._do_sparse():

@@ -127,8 +127,8 @@ class BaseSource:
                 if os.path.exists(path):
                     shutil.rmtree(path)
                 os.makedirs(path, exist_ok=True)
-                with subprocess.Popen(  # nosec
-                    [
+                with subprocess.Popen(  # noqa: S603,S607
+                    [  # noqa: S607
                         "tar",
                         "--extract",
                         "--gzip",
@@ -188,7 +188,7 @@ class BaseSource:
         if "target_dir" in self._config:
             target_dir = self._config["target_dir"]
             if target_dir.startswith("/"):
-                return target_dir
+                return target_dir  # type: ignore[no-any-return]
             else:
                 return _MASTER_TARGET if self._is_master else os.path.join(_TARGET, target_dir)
         else:
@@ -221,7 +221,7 @@ class BaseSource:
         return self._config
 
     def get_type(self) -> str:
-        return self._config["type"]
+        return self._config["type"]  # type: ignore[no-any-return]
 
     def delete(self) -> None:
         self.delete_target_dir()
@@ -232,7 +232,7 @@ class BaseSource:
             args_ = list(map(str, args))
             _LOG.debug("Running: %s", " ".join(args_))
             output: str = (
-                subprocess.run(  # nosec
+                subprocess.run(  # noqa: S603
                     args_,
                     check=True,
                     stdout=subprocess.PIPE,
@@ -263,13 +263,13 @@ class BaseSource:
                 data[key] = "•••"
 
 
-@broadcast.decorator(expect_answers=False)
+@broadcast.decorator(expect_answers=False)  # type: ignore[misc]
 def _set_refresh_success(source: str) -> None:
     """Set refresh in success in all process."""
     _REFRESH_ERROR_GAUGE.labels(source=source).set(0)
 
 
-@broadcast.decorator(expect_answers=False)
+@broadcast.decorator(expect_answers=False)  # type: ignore[misc]
 def _set_fetch_success(source: str) -> None:
     """Set fetch in success in all process."""
     _FETCH_ERROR_GAUGE.labels(source=source).set(0)

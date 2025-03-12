@@ -99,4 +99,4 @@ def child_exit(server: gunicorn.arbiter.Arbiter, worker: gunicorn.workers.base.W
     """
     del server
 
-    multiprocess.mark_process_dead(worker.pid)  # type: ignore [no-untyped-call]
+    multiprocess.mark_process_dead(worker.pid)
