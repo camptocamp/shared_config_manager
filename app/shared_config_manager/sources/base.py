@@ -83,7 +83,7 @@ class BaseSource:
             self._eval_templates()
             _set_refresh_success(source=self.get_id())
         except Exception:
-            _LOG.exception("Error with source %s", self.get_id())
+            _LOG.warning("Error with source %s", self.get_id(), exc_info=True)
             _REFRESH_ERROR_COUNTER.labels(self.get_id()).inc()
             _REFRESH_ERROR_GAUGE.labels(self.get_id()).set(1)
             raise
@@ -116,7 +116,7 @@ class BaseSource:
             self._eval_templates()
             _set_fetch_success(source=self.get_id())
         except Exception:
-            _LOG.exception("Error with source %s", self.get_id())
+            _LOG.warning("Error with source %s", self.get_id(), exc_info=True)
             _FETCH_ERROR_GAUGE.labels(self.get_id()).set(1)
             raise
         finally:
