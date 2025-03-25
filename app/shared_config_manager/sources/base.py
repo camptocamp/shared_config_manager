@@ -21,8 +21,8 @@ from shared_config_manager.sources import mode
 _LOG = logging.getLogger(__name__)
 _TARGET = Path(os.environ.get("TARGET", "/config"))
 _MASTER_TARGET = Path(os.environ.get("MASTER_TARGET", "/master_config"))
-_RETRY_NUMBER = int(os.environ.get("SCM_RETRY_NUMBER", 3))
-_RETRY_DELAY = int(os.environ.get("SCM_RETRY_DELAY", 1))
+_RETRY_NUMBER = int(os.environ.get("SCM_RETRY_NUMBER", "3"))
+_RETRY_DELAY = int(os.environ.get("SCM_RETRY_DELAY", "1"))
 
 _REFRESH_SUMMARY = Summary("sharedconfigmanager_source_refresh", "Number of source refreshes", ["source"])
 _REFRESH_ERROR_COUNTER = Counter(

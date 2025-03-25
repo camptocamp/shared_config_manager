@@ -1,9 +1,8 @@
 import logging
-import os.path
 import re
 import subprocess  # nosec
 from collections.abc import Iterable
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import pyramid.request
 import pyramid.response
@@ -12,7 +11,10 @@ from pyramid.httpexceptions import HTTPNotFound, HTTPServerError
 
 from shared_config_manager import slave_status
 from shared_config_manager.configuration import BroadcastObject, SourceStatus
-from shared_config_manager.sources import git, registry
+from shared_config_manager.sources import registry
+
+if TYPE_CHECKING:
+    from shared_config_manager.sources import git
 
 _refresh_service = services.create("refresh", "/1/refresh/{id}")
 _refresh_all_service = services.create("refresh_all", "/1/refresh")
@@ -182,7 +184,7 @@ def _tarball(request: pyramid.request.Request) -> pyramid.response.Response:
 
     response: pyramid.response.Response = request.response
 
-    files = os.listdir(path)
+    files = [file.name for file in path.iterdir()]
     if ".gitstats" in files:
         # put .gitstats at the end, that way, it is updated last at the destination
         files.remove(".gitstats")
