@@ -103,7 +103,7 @@ def _ui_source(request: pyramid.request.Request) -> dict[str, Any]:
 
     for key, value in source.get_config().items():
         if key == "tags":
-            attributes.append(("Tags", ", ".join(cast(list[str], value))))
+            attributes.append(("Tags", ", ".join(cast("list[str]", value))))
         elif key == "template_engines":
             continue
         else:

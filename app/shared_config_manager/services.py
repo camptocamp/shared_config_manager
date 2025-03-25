@@ -47,7 +47,7 @@ def _refresh_webhook(request: pyramid.request.Request) -> dict[str, Any]:
         message = f"Non GIT source {id_} cannot be refreshed by a webhook"
         raise HTTPServerError(message)
 
-    source_git = cast(git.GitSource, source)
+    source_git = cast("git.GitSource", source)
 
     if request.headers.get("X-GitHub-Event") != "push":
         _LOG.info("Ignoring webhook notif for a non-push event on %s", id_)
@@ -108,7 +108,7 @@ def _refresh_all_webhook(request: pyramid.request.Request) -> dict[str, Any]:
         if not source or source.get_type() != "git":
             continue
 
-        source_git = cast(git.GitSource, source)
+        source_git = cast("git.GitSource", source)
 
         if ref != "refs/heads/" + source_git.get_branch():
             _LOG.info(
@@ -148,7 +148,7 @@ def _source_stats(request: pyramid.request.Request) -> dict[str, Any]:
     for slave in slaves:
         if slave is None or slave.get("filtered", False):
             continue
-        status = cast(SourceStatus, _cleanup_slave_status(slave))
+        status = cast("SourceStatus", _cleanup_slave_status(slave))
         if status not in statuses:
             statuses.append(status)
 
@@ -156,7 +156,7 @@ def _source_stats(request: pyramid.request.Request) -> dict[str, Any]:
 
 
 def _cleanup_slave_status(status: BroadcastObject) -> BroadcastObject:
-    result = cast(BroadcastObject, dict(status))
+    result = cast("BroadcastObject", dict(status))
     result.pop("hostname", None)
     result.pop("pid", None)
     return result

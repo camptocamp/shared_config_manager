@@ -218,7 +218,7 @@ class BaseSource:
 
     def get_stats(self) -> SourceStatus:
         config_copy = copy.deepcopy(self._config)
-        stats_ = cast(SourceStatus, config_copy)
+        stats_ = cast("SourceStatus", config_copy)
         for template_stats, template_engine in zip(
             stats_.get("template_engines", []),
             self._template_engines,

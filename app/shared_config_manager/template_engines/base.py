@@ -28,7 +28,7 @@ class BaseEngine:
         self._config = config
         self._extension = extension
         if self._config.get("environment_variables", False):
-            self._data = _filter_env(cast(dict[str, str], os.environ))
+            self._data = _filter_env(cast("dict[str, str]", os.environ))
             self._data.update(config.get("data", {}))
         else:
             self._data = config.get("data", {})
@@ -77,7 +77,7 @@ class BaseEngine:
 
     def get_stats(self, stats: TemplateEnginesStatus) -> None:
         if self._config.get("environment_variables", False):
-            stats["environment_variables"] = _filter_env(cast(dict[str, str], os.environ))
+            stats["environment_variables"] = _filter_env(cast("dict[str, str]", os.environ))
 
 
 def _filter_env(env: dict[str, str]) -> dict[str, str]:
