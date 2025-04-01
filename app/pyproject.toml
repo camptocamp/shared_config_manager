@@ -24,8 +24,8 @@ prospector = { version = "1.15.3", extras = ["with_mypy", "with_bandit", "with_p
 prospector-profile-duplicated = "1.10.5"
 prospector-profile-utils = "1.15.1"
 types-pyyaml = "6.0.12.20241230"
-types-requests = "2.32.0.20241016"
-pytest = "8.3.4"
+types-requests = "2.32.0.20250306"
+pytest = "8.3.5"
 
 [tool.poetry.scripts]
 shared-config-slave = "shared_config_manager.scripts.shared_config_slave:main"
