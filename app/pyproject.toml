@@ -23,8 +23,8 @@ pyramid-mako = "1.1.0"
 prospector = { version = "1.15.3", extras = ["with_mypy", "with_bandit", "with_pyroma", "with_ruff"] }
 prospector-profile-duplicated = "1.10.5"
 prospector-profile-utils = "1.15.1"
-types-pyyaml = "6.0.12.20241230"
-types-requests = "2.32.0.20250306"
+types-pyyaml = "6.0.12.20250402"
+types-requests = "2.32.0.20250328"
 pytest = "8.3.5"
 
 [tool.poetry.scripts]
