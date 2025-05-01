@@ -23,7 +23,7 @@ pyramid-mako = "1.1.0"
 prospector = { version = "1.16.1", extras = ["with_mypy", "with_bandit", "with_pyroma", "with_ruff"] }
 prospector-profile-duplicated = "1.10.5"
 prospector-profile-utils = "1.22.3"
-types-pyyaml = "6.0.12.20250326"
+types-pyyaml = "6.0.12.20250402"
 types-requests = "2.32.0.20250328"
 pytest = "8.3.5"
 
