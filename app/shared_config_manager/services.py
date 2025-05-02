@@ -1,7 +1,8 @@
 import logging
 import os.path
 import re
-import subprocess
+import shlex
+import subprocess  # nosec
 from collections.abc import Iterable
 from typing import Any, Optional, Union, cast
 
@@ -192,4 +193,8 @@ def _proc_iter(proc: subprocess.Popen[bytes]) -> Iterable[Union[bytes, Any]]:
             break
         yield block
     if proc.wait() != 0:
+        _LOG.error(
+            "Error building the tarball with '%s'",
+            shlex.join(proc.args),  # type: ignore[arg-type]
+        )
         raise HTTPServerError("Error building the tarball")
