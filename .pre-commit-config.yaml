@@ -69,13 +69,24 @@ repos:
     hooks:
       - id: prospector
         args:
+          - --profile=utils:pre-commit
           - --die-on-tool-error
           - --output-format=pylint
-          - --profile=utils:pre-commit
           - --profile=app/.prospector.yaml
         additional_dependencies:
           - prospector-profile-duplicated==1.10.5 # pypi
           - prospector-profile-utils==1.22.3 # pypi
+          - pylint[spelling]==3.3.6 # pypi
+          - ruff==0.9.9 # pypi
+        exclude: |-
+          (?x)(
+            ^tests?/?
+            |/tests?(/|$)
+            |.*/tests(/|$)
+            |(^|/)test_[_a-zA-Z0-9]+.py$
+            |(^|/)[_a-zA-Z0-9]+_tests?.py$
+            |(^|/)tests?.py$
+          )
       - id: prospector
         args:
           - --die-on-tool-error
@@ -97,3 +108,7 @@ repos:
     rev: 40.0.7
     hooks:
       - id: renovate-config-validator
+  - repo: https://github.com/sbrunner/python-versions-hook
+    rev: 0.8.0
+    hooks:
+      - id: python-versions
