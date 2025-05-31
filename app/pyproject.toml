@@ -18,14 +18,14 @@ PyYAML = "6.0.2"
 inotify = "0.2.10"
 c2cwsgiutils = { version = "6.1.7", extras = ["broadcast", "standard", "oauth2", "debug"] }
 pyramid-mako = "1.1.0"
-redis = "5.2.1"
+redis = "5.3.0"
 
 [tool.poetry.dev-dependencies]
 prospector = { version = "1.17.1", extras = ["with_mypy", "with_bandit", "with_pyroma", "with_ruff"] }
 prospector-profile-duplicated = "1.10.5"
 prospector-profile-utils = "1.22.3"
-types-pyyaml = "6.0.12.20250402"
-types-requests = "2.32.0.20250328"
+types-pyyaml = "6.0.12.20250516"
+types-requests = "2.32.0.20250515"
 pytest = "8.3.5"
 
 [tool.poetry.scripts]
