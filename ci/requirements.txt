@@ -3,3 +3,4 @@ pre-commit==4.0.1
 poetry-dynamic-versioning==1.7.1
 poetry-plugin-tweak-dependencies-version==1.5.2
 poetry-plugin-drop-python-upper-constraint==0.1.0
+requests>=2.32.4 # not directly required, pinned by Snyk to avoid a vulnerability
