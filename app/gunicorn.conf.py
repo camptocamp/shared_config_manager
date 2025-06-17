@@ -1,4 +1,3 @@
-# noqa: INP001
 ###
 # app configuration
 # https://docs.gunicorn.org/en/stable/settings.html
