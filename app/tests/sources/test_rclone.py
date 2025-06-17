@@ -1,6 +1,7 @@
 import os
 
 import pytest
+
 from shared_config_manager.sources import registry
 
 
