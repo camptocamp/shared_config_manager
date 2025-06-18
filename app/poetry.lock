@@ -1086,14 +1086,14 @@ prospector = ">=1.15.0"
 
 [[package]]
 name = "prospector-profile-utils"
-version = "1.22.3"
+version = "1.23.0"
 description = "Some utility Prospector profiles."
 optional = false
 python-versions = "*"
 groups = ["dev"]
 files = [
-    {file = "prospector_profile_utils-1.22.3-py2.py3-none-any.whl", hash = "sha256:56f10178f80c8f3c40fc1a68515d047bee3fddf32669753761d3ce9eb17792cf"},
-    {file = "prospector_profile_utils-1.22.3.tar.gz", hash = "sha256:f3e782787be6309a3c3574f4ec8f3785daddf736b1d2c2c2ee380cc789df2941"},
+    {file = "prospector_profile_utils-1.23.0-py2.py3-none-any.whl", hash = "sha256:c2cb6d2b7b94608391ad61764720500a7dc00e705f3f5d794c83922588a05b2e"},
+    {file = "prospector_profile_utils-1.23.0.tar.gz", hash = "sha256:efb7d0487d5ae999df6ad65100c21251dcca7050326f2dd3d09d6ca7a9769770"},
 ]
 
 [package.dependencies]
@@ -1113,6 +1113,7 @@ files = [
     {file = "psycopg2-2.9.10-cp311-cp311-win_amd64.whl", hash = "sha256:0435034157049f6846e95103bd8f5a668788dd913a7c30162ca9503fdf542cb4"},
     {file = "psycopg2-2.9.10-cp312-cp312-win32.whl", hash = "sha256:65a63d7ab0e067e2cdb3cf266de39663203d38d6a8ed97f5ca0cb315c73fe067"},
     {file = "psycopg2-2.9.10-cp312-cp312-win_amd64.whl", hash = "sha256:4a579d6243da40a7b3182e0430493dbd55950c493d8c68f4eec0b302f6bbf20e"},
+    {file = "psycopg2-2.9.10-cp313-cp313-win_amd64.whl", hash = "sha256:91fd603a2155da8d0cfcdbf8ab24a2d54bca72795b90d2a3ed2b6da8d979dee2"},
     {file = "psycopg2-2.9.10-cp39-cp39-win32.whl", hash = "sha256:9d5b3b94b79a844a986d029eee38998232451119ad653aea42bb9220a8c5066b"},
     {file = "psycopg2-2.9.10-cp39-cp39-win_amd64.whl", hash = "sha256:88138c8dedcbfa96408023ea2b0c369eda40fe5d75002c0964c78f46f11fa442"},
     {file = "psycopg2-2.9.10.tar.gz", hash = "sha256:12ec0b40b0273f95296233e8750441339298e6a572f7039da5b260e3c8b60e11"},
@@ -2267,4 +2268,4 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.13"
-content-hash = "a1a8dd6f3113f6d28405138bc8179c572d38d18c3b2a2aacda17d109b118fddb"
+content-hash = "0d3216517714106843adcc4fb4a67928290aa1f06b53dc4d03b1a7523d7d05e3"

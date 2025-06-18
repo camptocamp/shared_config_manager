@@ -22,7 +22,7 @@ main = "shared_config_manager.app:main"
 [tool.poetry.group.dev.dependencies]
 prospector = { version = "1.17.1", extras = ["with_mypy", "with_bandit", "with_pyroma", "with_ruff"] }
 prospector-profile-duplicated = "1.10.5"
-prospector-profile-utils = "1.22.3"
+prospector-profile-utils = "1.23.0"
 types-pyyaml = "6.0.12.20250516"
 types-requests = "2.32.0.20250515"
 pytest = "8.3.5"
