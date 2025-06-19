@@ -78,18 +78,18 @@ camptocamp/shared_config_manager:latest:
   ubuntu_24_04/libnghttp2-14: 1.59.0-1ubuntu0.2
   ubuntu_24_04/libnpth0t64: 1.6-3.1build1
   ubuntu_24_04/libp11-kit0: 0.25.3-4ubuntu2.1
-  ubuntu_24_04/libpam-modules: 1.5.3-5ubuntu5.1
-  ubuntu_24_04/libpam-modules-bin: 1.5.3-5ubuntu5.1
-  ubuntu_24_04/libpam-runtime: 1.5.3-5ubuntu5.1
-  ubuntu_24_04/libpam0g: 1.5.3-5ubuntu5.1
+  ubuntu_24_04/libpam-modules: 1.5.3-5ubuntu5.4
+  ubuntu_24_04/libpam-modules-bin: 1.5.3-5ubuntu5.4
+  ubuntu_24_04/libpam-runtime: 1.5.3-5ubuntu5.4
+  ubuntu_24_04/libpam0g: 1.5.3-5ubuntu5.4
   ubuntu_24_04/libpcre2-8-0: 10.42-4ubuntu2.1
   ubuntu_24_04/libperl5.38t64: 5.38.2-3.2ubuntu0.1
   ubuntu_24_04/libpopt0: 1.19+dfsg-1build1
   ubuntu_24_04/libproc2-0: 2:4.0.4-4ubuntu3.2
   ubuntu_24_04/libpsl5t64: 0.21.2-1.1build1
   ubuntu_24_04/libpython3-stdlib: 3.12.3-0ubuntu2
-  ubuntu_24_04/libpython3.12-minimal: 3.12.3-1ubuntu0.6
-  ubuntu_24_04/libpython3.12-stdlib: 3.12.3-1ubuntu0.6
+  ubuntu_24_04/libpython3.12-minimal: 3.12.3-1ubuntu0.7
+  ubuntu_24_04/libpython3.12-stdlib: 3.12.3-1ubuntu0.7
   ubuntu_24_04/libreadline8t64: 8.2-4build1
   ubuntu_24_04/librtmp1: 2.4+20151223.gitfa8646d.1-2build7
   ubuntu_24_04/libsasl2-2: 2.1.28+dfsg1-5ubuntu3.1
@@ -137,9 +137,9 @@ camptocamp/shared_config_manager:latest:
   ubuntu_24_04/python3-setuptools-whl: 68.1.2-2ubuntu1.2
   ubuntu_24_04/python3-venv: 3.12.3-0ubuntu2
   ubuntu_24_04/python3-wheel: 0.42.0-2
-  ubuntu_24_04/python3.12: 3.12.3-1ubuntu0.6
-  ubuntu_24_04/python3.12-minimal: 3.12.3-1ubuntu0.6
-  ubuntu_24_04/python3.12-venv: 3.12.3-1ubuntu0.6
+  ubuntu_24_04/python3.12: 3.12.3-1ubuntu0.7
+  ubuntu_24_04/python3.12-minimal: 3.12.3-1ubuntu0.7
+  ubuntu_24_04/python3.12-venv: 3.12.3-1ubuntu0.7
   ubuntu_24_04/readline-common: 8.2-4build1
   ubuntu_24_04/rsync: 3.2.7-1ubuntu1.2
   ubuntu_24_04/sed: 4.9-2build1
