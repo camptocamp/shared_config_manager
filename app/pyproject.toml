@@ -18,7 +18,7 @@ PyYAML = "6.0.2"
 inotify = "0.2.10"
 c2cwsgiutils = { version = "6.0.9", extras = ["broadcast", "standard", "oauth2", "debug"] }
 pyramid-mako = "1.1.0"
-urllib3 = "2.2.3"
+urllib3 = "2.5.0"
 pillow = "10.3.0"
 idna = "3.7"
 gunicorn = "23.0.0"
