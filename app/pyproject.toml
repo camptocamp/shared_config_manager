@@ -23,7 +23,7 @@ pillow = "10.3.0"
 idna = "3.7"
 gunicorn = "23.0.0"
 requests = "2.32.4"
-certifi = "2024.7.4"
+certifi = "2024.12.14"
 sentry-sdk = "2.8.0"
 webob = "1.8.9"
 
