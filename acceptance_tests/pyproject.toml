@@ -6,13 +6,13 @@ authors = []
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.13"
-pytest-cov = "6.1.1"
+pytest-cov = "6.2.1"
 prospector = { version = "1.17.2", extras = ["with_ruff"] }
 prospector-profile-duplicated = "1.10.5"
 prospector-profile-utils = "1.23.0"
-typing-extensions = "4.13.2"
+typing-extensions = "4.14.0"
 c2cwsgiutils = { version = "6.1.7", extras = ["standard", "test_images"] }
-requests = "2.32.3"
+requests = "2.32.4"
 boltons = "25.0.0"
 netifaces = "0.11.0"
 lxml = "5.4.0"
