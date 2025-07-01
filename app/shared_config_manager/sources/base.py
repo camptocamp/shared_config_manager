@@ -137,7 +137,7 @@ class BaseSource:
                 if path.exists():
                     shutil.rmtree(path)
                 path.mkdir(parents=True, exist_ok=True)
-                with subprocess.Popen(  # noqa: S603 # nosec
+                with subprocess.Popen(  # nosec
                     [  # noqa: S607
                         "tar",
                         "--extract",
