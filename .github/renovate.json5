@@ -15,7 +15,7 @@
   ],
   baseBranches: ['3.4', '3.5', 'master'],
   html: {
-    fileMatch: ['\\.html?$', '\\.html?.mako$'],
+    managerFilePatterns: ['/\\.html?$/', '/\\.html?.mako$/'],
   },
   packageRules: [
     /** Docker images versioning */
