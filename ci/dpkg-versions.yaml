@@ -18,8 +18,8 @@ camptocamp/shared_config_manager:latest:
   ubuntu_24_04/findutils: 4.9.0-5build1
   ubuntu_24_04/gcc-14-base: 14.2.0-4ubuntu2~24.04
   ubuntu_24_04/gettext-base: 0.21-14ubuntu2
-  ubuntu_24_04/git: 1:2.43.0-1ubuntu7.2
-  ubuntu_24_04/git-man: 1:2.43.0-1ubuntu7.2
+  ubuntu_24_04/git: 1:2.43.0-1ubuntu7.3
+  ubuntu_24_04/git-man: 1:2.43.0-1ubuntu7.3
   ubuntu_24_04/gpgv: 2.4.4-2ubuntu17.3
   ubuntu_24_04/grep: 3.11-4build1
   ubuntu_24_04/gzip: 1.12-1ubuntu3.1
