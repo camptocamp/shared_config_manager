@@ -10,7 +10,7 @@ pytest-cov = "6.2.1"
 prospector = { version = "1.17.2", extras = ["with_ruff"] }
 prospector-profile-duplicated = "1.10.5"
 prospector-profile-utils = "1.25.0"
-ruff = "0.12.1"
+ruff = "0.12.7"
 typing-extensions = "4.14.0"
 c2cwsgiutils = { version = "6.1.7", extras = ["standard", "test_images"] }
 requests = "2.32.4"
