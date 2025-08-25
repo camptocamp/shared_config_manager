@@ -17,3 +17,14 @@ requests = "2.32.4"
 boltons = "25.0.0"
 netifaces = "0.11.0"
 lxml = "6.0.0"
+
+[tool.ruff.lint]
+select = []
+ignore = ["C90", "D200", "D202", "D207", "D208", "I001", "PLR09", "PLR2004", "Q000", "S101", "S113", "SIM105", "W293"]
+extend-select = ["UP", "I", "S", "B"]
+
+[tool.ruff.lint.extend-per-file-ignores]
+"tests/**" = ["ANN", "ARG", "D", "E722", "INP001", "RET", "RUF012", "RUF100", "SLF"]
+"**/tests/**" = ["ANN", "ARG", "D", "E722", "INP001", "RET", "RUF012", "RUF100", "SLF"]
+"**/test_*.py" = ["ANN", "ARG", "D", "E722", "INP001", "RET", "RUF012", "RUF100", "SLF"]
+"**/*_test.py" = ["ANN", "ARG", "D", "E722", "INP001", "RET", "RUF012", "RUF100", "SLF"]
