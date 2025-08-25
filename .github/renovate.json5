@@ -13,7 +13,7 @@
     'github>camptocamp/gs-renovate-config-preset:own.json5#1.4.3',
     'github>camptocamp/gs-renovate-config-preset:security.json5#1.4.3',
   ],
-  baseBranches: ['3.4', '3.5', 'master'],
+  baseBranchPatterns: ['3.4', '3.5', 'master'],
   html: {
     managerFilePatterns: ['/\\.html?$/', '/\\.html?.mako$/'],
   },
