@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 from shared_config_manager.sources import registry
 
@@ -9,5 +9,5 @@ def test_rsync() -> None:
         {"type": "rsync", "source": "/app/tests/sources", "excludes": ["test_git.py"]},
     )
     source.refresh()
-    assert os.path.isfile("/config/test_rsync/test_rsync.py")
-    assert not os.path.isfile("/config/test_rsync/test_git.py")
+    assert Path("/config/test_rsync/test_rsync.py").is_file()
+    assert not Path("/config/test_rsync/test_git.py").is_file()

@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 import pytest
 
@@ -20,6 +20,6 @@ url = http://ftp.debian.org/debian/pool/main/p/p4est//
         },
     )
     source.refresh()
-    assert os.path.isfile("/config/test_rclone/p4est_1.1-5.dsc")
-    assert not os.path.isfile("/config/test_rclone/libp4est-sc-1.1_1.1-4_amd64.deb")
-    assert not os.path.isfile("/config/test_rclone/p4est_1.1.orig.tar.xz")
+    assert Path("/config/test_rclone/p4est_1.1-5.dsc").is_file()
+    assert not Path("/config/test_rclone/libp4est-sc-1.1_1.1-4_amd64.deb").is_file()
+    assert not Path("/config/test_rclone/p4est_1.1.orig.tar.xz").is_file()

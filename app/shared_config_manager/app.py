@@ -90,9 +90,9 @@ def _watch_source() -> None:
                         source.refresh()
                         broadcast.broadcast("slave_fetch", params={"id_": key})
 
-                except Exception:  # pylint: disable=broad-exception-caught
+                except Exception:  # noqa: BLE001
                     _LOG.warning("Error while watching the source %s", key, exc_info=True)
-        except Exception:  # pylint: disable=broad-exception-caught
+        except Exception:  # noqa: BLE001
             _LOG.exception("Error while watching the sources")
         time.sleep(int(os.environ.get("WATCH_SOURCE_INTERVAL", "600")))
 

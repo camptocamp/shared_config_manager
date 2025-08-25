@@ -38,7 +38,7 @@ def get_sources() -> Mapping[str, base.BaseSource]:
 
 def init(slave: bool) -> None:
     """Initialize the registry."""
-    global MASTER_SOURCE  # pylint: disable=global-statement
+    global MASTER_SOURCE  # noqa: PLW0603
     mode.init(slave)
     if slave:
         broadcast.subscribe("slave_fetch", _slave_fetch)
@@ -94,7 +94,7 @@ def reload_master_config() -> None:
 
 
 def _do_handle_master_config(config: Config) -> tuple[int, int]:
-    global FILTERED_SOURCES  # pylint: disable=global-statement
+    global FILTERED_SOURCES  # noqa: PLW0603
 
     success = 0
     errors = 0
@@ -120,7 +120,7 @@ def _do_handle_master_config(config: Config) -> tuple[int, int]:
             _SOURCES[id_] = _create_source(id_, source_config)
             _SOURCES[id_].refresh_or_fetch()
             success += 1
-        except Exception:  # pylint: disable=broad-exception-caught
+        except Exception:  # noqa: BLE001
             _LOG.error("Cannot load the %s config", id_, exc_info=True)
             errors += 1
     return success, errors
