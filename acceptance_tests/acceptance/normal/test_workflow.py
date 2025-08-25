@@ -27,7 +27,7 @@ def git_source(app_connection: Connection):
 """,
         )
 
-    subprocess.check_call(
+    subprocess.check_call(  # noqa: S602
         """
     set -eaux
     cd /repos
@@ -57,7 +57,7 @@ def git_source(app_connection: Connection):
 
     yield "/repos/other"
 
-    subprocess.check_call(
+    subprocess.check_call(  # noqa: S602
         """
     set -eaux
     cd /repos
@@ -88,7 +88,7 @@ def test_ok(app_connection, git_source) -> None:  # pylint: disable=redefined-ou
         with open(os.path.join("/config", slave, "other", "config.txt")) as config:
             assert config.read() == "content world"
 
-    subprocess.check_call(
+    subprocess.check_call(  # noqa: S602
         f"""
     set -eaux
     cd {git_source}

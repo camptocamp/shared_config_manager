@@ -5,7 +5,7 @@ API_BASE_URL = None
 
 def init(slave: bool) -> None:
     """Initialize the mode."""
-    global API_BASE_URL  # pylint: disable=global-statement
+    global API_BASE_URL  # noqa: PLW0603
     if slave:
         API_BASE_URL = os.environ["API_BASE_URL"]
         if API_BASE_URL is not None and not API_BASE_URL.endswith("/"):

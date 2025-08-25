@@ -167,7 +167,7 @@ def _ui_source(request: pyramid.request.Request) -> dict[str, Any]:
                     .split("\n")
                 )
             _slave_status.append((slave, commit_details))
-        except Exception:  # pylint: disable=broad-exception-caught
+        except Exception:  # noqa: BLE001
             _LOG.warning("Unable to get the commit status for %s", slave.get("hash"), exc_info=True)
             _slave_status.append((slave, []))
 
