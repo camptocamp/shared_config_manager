@@ -42,7 +42,7 @@ def init(slave: bool) -> None:
     mode.init(slave)
     if slave:
         broadcast.subscribe("slave_fetch", _slave_fetch)
-    _update_flag("LOADING")
+    update_flag("LOADING")
     _prepare_ssh()
     if os.environ.get("MASTER_CONFIG"):
         _LOG.info("Load the master config from environment variable")
@@ -135,14 +135,15 @@ def _handle_master_config(config: Config) -> None:
     if errors != 0:
         if success != 0:
             success, errors = _do_handle_master_config(config)
-            _update_flag("READY")
+            update_flag("READY")
         else:
-            _update_flag("ERROR")
+            update_flag("ERROR")
     else:
-        _update_flag("READY")
+        update_flag("READY")
 
 
-def _update_flag(value: str) -> None:
+def update_flag(value: str) -> None:
+    """Update the status flag."""
     with (Path(tempfile.gettempdir()) / "status").open("w", encoding="utf-8") as flag:
         flag.write(value)
 

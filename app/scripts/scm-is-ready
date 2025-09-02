@@ -9,6 +9,11 @@ status="$(cat /tmp/status)"
 echo "$status"
 
 if [[ $status == 'READY' ]]; then
+    # if /tmp/status older than WATCH_SOURCE_INTERVAL environment variable defaulted to 600 seconds, return 4
+    WATCH_SOURCE_INTERVAL=${WATCH_SOURCE_INTERVAL:-600}
+    if find /tmp/status -mmin +$((WATCH_SOURCE_INTERVAL / 60)) | grep -q .; then
+        exit 4
+    fi
     exit 0
 elif [[ $status == 'LOADING' ]]; then
     exit 1

@@ -38,6 +38,7 @@ def _watch_source() -> None:
     while True:
         _LOG.debug("Watching the sources")
         try:
+            has_error = False
             for key, source in registry.get_sources().items():
                 _LOG.debug("Watching the source %s", key)
                 try:
@@ -91,8 +92,13 @@ def _watch_source() -> None:
                         broadcast.broadcast("slave_fetch", params={"id_": key})
 
                 except Exception:  # noqa: BLE001
+                    registry.update_flag("SOURCE_ERROR")
                     _LOG.warning("Error while watching the source %s", key, exc_info=True)
+                    has_error = True
+            if not has_error:
+                registry.update_flag("READY")
         except Exception:  # noqa: BLE001
+            registry.update_flag("ERROR")
             _LOG.exception("Error while watching the sources")
         time.sleep(int(os.environ.get("WATCH_SOURCE_INTERVAL", "600")))
 
