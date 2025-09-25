@@ -23,7 +23,7 @@ version = "0.0.0"
 python = ">=3.10,<3.13"
 PyYAML = "6.0.2"
 inotify = "0.2.12"
-c2cwsgiutils = { version = "6.1.7", extras = ["broadcast", "standard", "oauth2", "debug"] }
+c2cwsgiutils = { version = "6.1.8", extras = ["broadcast", "standard", "oauth2", "debug"] }
 pyramid-mako = "1.1.0"
 redis = "6.2.0"
 
