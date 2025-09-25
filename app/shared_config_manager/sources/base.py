@@ -208,7 +208,7 @@ class BaseSource:
         return self._id
 
     def validate_auth(self, request: pyramid.request.Request) -> None:
-        permission = request.has_permission("all", self.get_config())
+        permission = request.has_permission(self._id, self.get_config())
         if not isinstance(permission, Allowed):
             message = "Not allowed to access this source"
             raise HTTPForbidden(message)
