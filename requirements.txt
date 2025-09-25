@@ -1,2 +1,2 @@
-c2cwsgiutils[broadcast,standard]==6.1.7
+c2cwsgiutils[broadcast,standard]==6.1.8
 yamllint==1.37.1
