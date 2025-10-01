@@ -17,14 +17,14 @@ authors = []
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.13"
-pytest-cov = "6.2.1"
+pytest-cov = "6.3.0"
 prospector = { version = "1.17.3", extras = ["with_ruff"] }
 prospector-profile-duplicated = "1.10.5"
 prospector-profile-utils = "1.26.5"
 ruff = "0.12.7"
-typing-extensions = "4.14.1"
+typing-extensions = "4.15.0"
 c2cwsgiutils = { version = "6.1.8", extras = ["standard", "test_images"] }
-requests = "2.32.4"
+requests = "2.32.5"
 boltons = "25.0.0"
 netifaces = "0.11.0"
-lxml = "6.0.0"
+lxml = "6.0.2"

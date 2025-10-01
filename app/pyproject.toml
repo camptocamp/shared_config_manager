@@ -21,11 +21,11 @@ version = "0.0.0"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.13"
-PyYAML = "6.0.2"
+PyYAML = "6.0.3"
 inotify = "0.2.12"
 c2cwsgiutils = { version = "6.1.8", extras = ["broadcast", "standard", "oauth2", "debug"] }
 pyramid-mako = "1.1.0"
-redis = "6.2.0"
+redis = "6.4.0"
 
 [tool.poetry.plugins."paste.app_factory"]
 main = "shared_config_manager.app:main"
@@ -35,9 +35,9 @@ prospector = { version = "1.17.3", extras = ["with_mypy", "with_bandit", "with_p
 prospector-profile-duplicated = "1.10.5"
 prospector-profile-utils = "1.26.5"
 ruff = "0.12.7"
-types-pyyaml = "6.0.12.20250516"
-types-requests = "2.32.4.20250611"
-pytest = "8.4.1"
+types-pyyaml = "6.0.12.20250915"
+types-requests = "2.32.4.20250913"
+pytest = "8.4.2"
 
 [tool.poetry-dynamic-versioning]
 enable = true
