@@ -11,7 +11,7 @@ prospector = { version = "1.15.3", extras = ["with_ruff"] }
 prospector-profile-duplicated = "1.10.5"
 prospector-profile-utils = "1.15.1"
 typing-extensions = "4.12.2"
-c2cwsgiutils = { version = "6.1.7", extras = ["standard", "test_images"] }
+c2cwsgiutils = { version = "6.1.8", extras = ["standard", "test_images"] }
 requests = "2.32.5"
 boltons = "24.1.0"
 netifaces = "0.11.0"
