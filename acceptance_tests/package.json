@@ -1,7 +1,7 @@
 {
   "dependencies": {
-    "commander": "14.0.1",
-    "puppeteer": "24.22.3"
+    "commander": "14.0.2",
+    "puppeteer": "24.27.0"
   },
   "type": "module"
 }
