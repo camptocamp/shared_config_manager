@@ -87,7 +87,7 @@ camptocamp/shared_config_manager:latest:
   ubuntu_24_04/libpopt0: 1.19+dfsg-1build1
   ubuntu_24_04/libproc2-0: 2:4.0.4-4ubuntu3.2
   ubuntu_24_04/libpsl5t64: 0.21.2-1.1build1
-  ubuntu_24_04/libpython3-stdlib: 3.12.3-0ubuntu2
+  ubuntu_24_04/libpython3-stdlib: 3.12.3-0ubuntu2.1
   ubuntu_24_04/libpython3.12-minimal: 3.12.3-1ubuntu0.8
   ubuntu_24_04/libpython3.12-stdlib: 3.12.3-1ubuntu0.8
   ubuntu_24_04/libreadline8t64: 8.2-4build1
@@ -128,14 +128,14 @@ camptocamp/shared_config_manager:latest:
   ubuntu_24_04/perl-base: 5.38.2-3.2ubuntu0.2
   ubuntu_24_04/perl-modules-5.38: 5.38.2-3.2ubuntu0.2
   ubuntu_24_04/procps: 2:4.0.4-4ubuntu3.2
-  ubuntu_24_04/python3: 3.12.3-0ubuntu2
-  ubuntu_24_04/python3-minimal: 3.12.3-0ubuntu2
+  ubuntu_24_04/python3: 3.12.3-0ubuntu2.1
+  ubuntu_24_04/python3-minimal: 3.12.3-0ubuntu2.1
   ubuntu_24_04/python3-pip: 24.0+dfsg-1ubuntu1.3
   ubuntu_24_04/python3-pip-whl: 24.0+dfsg-1ubuntu1.3
   ubuntu_24_04/python3-pkg-resources: 68.1.2-2ubuntu1.2
   ubuntu_24_04/python3-setuptools: 68.1.2-2ubuntu1.2
   ubuntu_24_04/python3-setuptools-whl: 68.1.2-2ubuntu1.2
-  ubuntu_24_04/python3-venv: 3.12.3-0ubuntu2
+  ubuntu_24_04/python3-venv: 3.12.3-0ubuntu2.1
   ubuntu_24_04/python3-wheel: 0.42.0-2
   ubuntu_24_04/python3.12: 3.12.3-1ubuntu0.8
   ubuntu_24_04/python3.12-minimal: 3.12.3-1ubuntu0.8
