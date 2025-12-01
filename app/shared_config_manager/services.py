@@ -28,7 +28,7 @@ _LOG = logging.getLogger(__name__)
 __BRANCH_NAME_SANITIZER = re.compile(r"[^0-9a-zA-z-_]")
 
 
-@_refresh_service.get()  # type: ignore[misc]
+@_refresh_service.get()  # type: ignore[untyped-decorator]
 def _refresh_view(request: pyramid.request.Request) -> dict[str, Any]:
     id_ = request.matchdict["id"]
     source, _ = registry.get_source_check_auth(id_=id_, request=request)
@@ -38,7 +38,7 @@ def _refresh_view(request: pyramid.request.Request) -> dict[str, Any]:
     return _refresh(request)
 
 
-@_refresh_service.post()  # type: ignore[misc]
+@_refresh_service.post()  # type: ignore[untyped-decorator]
 def _refresh_webhook(request: pyramid.request.Request) -> dict[str, Any]:
     id_ = request.matchdict["id"]
     source, _ = registry.get_source_check_auth(id_=id_, request=request)
@@ -77,7 +77,7 @@ def _refresh(request: pyramid.request.Request) -> dict[str, Any]:
     return {"status": 200}
 
 
-@_refresh_all_service.get()  # type: ignore[misc]
+@_refresh_all_service.get()  # type: ignore[untyped-decorator]
 def _refresh_all(request: pyramid.request.Request) -> dict[str, Any]:
     if not registry.MASTER_SOURCE:
         message = "Master source not initialized"
@@ -90,7 +90,7 @@ def _refresh_all(request: pyramid.request.Request) -> dict[str, Any]:
     return {"status": 200, "nb_refresh": nb_refresh}
 
 
-@_refresh_all_service.post()  # type: ignore[misc]
+@_refresh_all_service.post()  # type: ignore[untyped-decorator]
 def _refresh_all_webhook(request: pyramid.request.Request) -> dict[str, Any]:
     if not registry.MASTER_SOURCE:
         message = "Master source not initialized"
@@ -127,7 +127,7 @@ def _refresh_all_webhook(request: pyramid.request.Request) -> dict[str, Any]:
     return {"status": 200, "nb_refresh": nb_refresh}
 
 
-@_status_service.get()  # type: ignore[misc]
+@_status_service.get()  # type: ignore[untyped-decorator]
 def _stats(request: pyramid.request.Request) -> dict[str, Any]:
     if not registry.MASTER_SOURCE:
         return {"slaves": {}}
@@ -138,7 +138,7 @@ def _stats(request: pyramid.request.Request) -> dict[str, Any]:
     return {"slaves": slaves}
 
 
-@_source_stats_service.get()  # type: ignore[misc]
+@_source_stats_service.get()  # type: ignore[untyped-decorator]
 def _source_stats(request: pyramid.request.Request) -> dict[str, Any]:
     id_ = request.matchdict["id"]
     source, _ = registry.get_source_check_auth(id_=id_, request=request)
@@ -165,7 +165,7 @@ def _cleanup_slave_status(status: BroadcastObject) -> BroadcastObject:
     return result
 
 
-@_tarball_service.get()  # type: ignore[misc]
+@_tarball_service.get()  # type: ignore[untyped-decorator]
 def _tarball(request: pyramid.request.Request) -> pyramid.response.Response:
     id_ = request.matchdict["id"]
     source, filtered = registry.get_source_check_auth(id_=id_, request=request)

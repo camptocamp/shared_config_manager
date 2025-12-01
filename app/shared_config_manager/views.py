@@ -46,7 +46,7 @@ def _is_valid(source: BaseSource) -> bool:
     return True
 
 
-@view_config(route_name="ui_index", renderer="./templates/index.html.mako")  # type: ignore[misc]
+@view_config(route_name="ui_index", renderer="./templates/index.html.mako")  # type: ignore[untyped-decorator]
 def _ui_index(request: pyramid.request.Request) -> dict[str, Any]:
     permission = request.has_permission("all", {})
     is_admin = isinstance(permission, Allowed)
@@ -65,7 +65,7 @@ def _ui_index(request: pyramid.request.Request) -> dict[str, Any]:
     return {"sources": sources_list, "is_valid": _is_valid}
 
 
-@view_config(route_name="ui_source", renderer="./templates/source.html.mako")  # type: ignore[misc]
+@view_config(route_name="ui_source", renderer="./templates/source.html.mako")  # type: ignore[untyped-decorator]
 def _ui_source(request: pyramid.request.Request) -> dict[str, Any]:
     def key_format(key: str) -> str:
         return key[0].upper() + key[1:].replace("_", " ")
