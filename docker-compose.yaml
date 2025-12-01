@@ -120,7 +120,7 @@ services:
     hostname: slave-file
 
   redis:
-    image: redis:8.2.2
+    image: redis:8.4.0
     mem_limit: 64m
     command: redis-server --save "" --appendonly no
 
