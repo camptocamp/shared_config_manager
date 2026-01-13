@@ -1,4 +1,4 @@
-import subprocess  # nosec
+import subprocess
 from pathlib import Path
 
 from shared_config_manager.configuration import TemplateEnginesConfig

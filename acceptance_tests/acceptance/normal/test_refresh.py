@@ -7,16 +7,18 @@ from c2cwsgiutils.acceptance.connection import CacheExpected, Connection
 
 
 def test_ok(app_connection: Connection) -> None:
-    answer = app_connection.get_json("1/refresh/test_git", headers={"X-Scm-Secret": "changeme"})
+    answer = app_connection.get_json("1/refresh/test_git", headers={"X-Scm-Secret": "changeme"}, cors=False)
     assert answer == {"status": 200}
 
 
 def test_no_auth(app_connection: Connection) -> None:
+    # http://localhost:8491/scm/1/refresh/test_git
     app_connection.get(
         "1/refresh/test_git",
         expected_status=302,
         allow_redirects=False,
         cache_expected=CacheExpected.DONT_CARE,
+        cors=False,
     )
 
 
@@ -26,6 +28,7 @@ def test_bad_id(app_connection: Connection) -> None:
         headers={"X-Scm-Secret": "changeme"},
         expected_status=404,
         cache_expected=CacheExpected.DONT_CARE,
+        cors=False,
     )
 
 
@@ -43,6 +46,7 @@ def _trigger(app_connection: Connection, url: str, json: dict[str, Any], headers
             ).hexdigest(),
             **headers,
         },
+        cors=False,
     )
 
 
@@ -89,7 +93,7 @@ def test_webhook_not_push(app_connection: Connection) -> None:
 
 
 def test_all(app_connection: Connection) -> None:
-    answer = app_connection.get_json("1/refresh", headers={"X-Scm-Secret": "changeme"})
+    answer = app_connection.get_json("1/refresh", headers={"X-Scm-Secret": "changeme"}, cors=False)
     assert answer == {"status": 200, "nb_refresh": 1}
 
 
@@ -109,4 +113,5 @@ def test_all_no_auth(app_connection: Connection) -> None:
         expected_status=302,
         allow_redirects=False,
         cache_expected=CacheExpected.DONT_CARE,
+        cors=False,
     )

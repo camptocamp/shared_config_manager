@@ -5,7 +5,7 @@ from c2cwsgiutils.acceptance.connection import CacheExpected, Connection
 
 
 def test_ok(app_connection: Connection) -> None:
-    r = app_connection.get_raw("1/tarball/test_git", headers={"X-Scm-Secret": "changeme"})
+    r = app_connection.get_raw("1/tarball/test_git", headers={"X-Scm-Secret": "changeme"}, cors=False)
     assert r.headers["Content-Type"] == "application/x-gtar"
     with tempfile.NamedTemporaryFile() as temp:
         temp.write(r.content)
@@ -20,6 +20,7 @@ def test_bad_key(app_connection: Connection) -> None:
         expected_status=302,
         allow_redirects=False,
         cache_expected=CacheExpected.DONT_CARE,
+        cors=False,
     )
 
 
@@ -29,4 +30,5 @@ def test_bad_id(app_connection: Connection) -> None:
         headers={"X-Scm-Secret": "changeme"},
         expected_status=404,
         cache_expected=CacheExpected.DONT_CARE,
+        cors=False,
     )

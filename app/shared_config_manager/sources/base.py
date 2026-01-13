@@ -1,28 +1,24 @@
+import asyncio
 import copy
 import logging
 import os
 import shutil
-import subprocess  # nosec
-import time
+import subprocess
+import urllib.parse
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, Protocol, cast
 
-import pyramid.request
-import requests
-from c2cwsgiutils import broadcast
+import aiohttp
+from c2casgiutils import broadcast
+from fastapi import HTTPException, Request
 from prometheus_client import Counter, Gauge, Summary
-from pyramid.httpexceptions import HTTPForbidden
-from pyramid.security import Allowed
 
-from shared_config_manager import template_engines
-from shared_config_manager.configuration import SourceConfig, SourceStatus
+from shared_config_manager import broadcast_status, config, template_engines
+from shared_config_manager.configuration import SourceConfig
+from shared_config_manager.security import Allowed, User, permits
 from shared_config_manager.sources import mode
 
 _LOG = logging.getLogger(__name__)
-_TARGET = Path(os.environ.get("TARGET", "/config"))
-_MASTER_TARGET = Path(os.environ.get("MASTER_TARGET", "/master_config"))
-_RETRY_NUMBER = int(os.environ.get("SCM_RETRY_NUMBER", "3"))
-_RETRY_DELAY = int(os.environ.get("SCM_RETRY_DELAY", "1"))
 
 _REFRESH_SUMMARY = Summary("sharedconfigmanager_source_refresh", "Number of source refreshes", ["source"])
 _REFRESH_ERROR_COUNTER = Counter(
@@ -68,20 +64,20 @@ class BaseSource:
             for engine_conf in config.get("template_engines", [])
         ]
 
-    def refresh_or_fetch(self) -> None:
+    async def refresh_or_fetch(self) -> None:
         if mode.is_master():
-            self.refresh()
+            await self.refresh()
         else:
-            self.fetch()
+            await self.fetch()
 
-    def refresh(self) -> None:
+    async def refresh(self) -> None:
         _LOG.info("Doing a refresh of %s", self.get_id())
         try:
             self._is_loaded = False
             with _REFRESH_SUMMARY.labels(self.get_id()).time():
                 self._do_refresh()
-            self._eval_templates()
-            _set_refresh_success(source=self.get_id())
+            await self._eval_templates()
+            await _set_refresh_success(source=self.get_id())
         except Exception:
             _LOG.warning("Error with source %s", self.get_id(), exc_info=True)
             _REFRESH_ERROR_COUNTER.labels(self.get_id()).inc()
@@ -90,7 +86,7 @@ class BaseSource:
         finally:
             self._is_loaded = True
 
-    def _eval_templates(self) -> None:
+    async def _eval_templates(self) -> None:
         if mode.is_master_with_slaves():
             # masters with slaves don't need to evaluate templates
             return
@@ -105,16 +101,16 @@ class BaseSource:
             with _TEMPLATE_SUMMARY.labels(self.get_id(), engine.get_type()).time():
                 engine.evaluate(root_dir, files)
 
-    def fetch(self) -> None:
+    async def fetch(self) -> None:
         try:
             self._is_loaded = False
             with (
                 _FETCH_SUMMARY.labels(self.get_id()).time(),
                 _FETCH_ERROR_COUNTER.labels(self.get_id()).count_exceptions(),
             ):
-                self._do_fetch()
-            self._eval_templates()
-            _set_fetch_success(source=self.get_id())
+                await self._do_fetch()
+            await self._eval_templates()
+            await _set_fetch_success(source=self.get_id())
         except Exception:
             _LOG.warning("Error with source %s", self.get_id(), exc_info=True)
             _FETCH_ERROR_GAUGE.labels(self.get_id()).set(1)
@@ -125,20 +121,26 @@ class BaseSource:
     def _do_refresh(self) -> None:
         pass
 
-    def _do_fetch(self) -> None:
+    async def _do_fetch(self) -> None:
         path = self.get_path()
         url = mode.get_fetch_url(self.get_id())
 
-        for i in list(range(_RETRY_NUMBER))[::-1]:
+        for i in list(range(config.settings.retry_number))[::-1]:
             try:
-                _LOG.info("Doing a fetch of %s", self.get_id())
-                response = requests.get(url, headers={"X-Scm-Secret": os.environ["SCM_SECRET"]}, stream=True)
-                response.raise_for_status()
-                if path.exists():
-                    shutil.rmtree(path)
-                path.mkdir(parents=True, exist_ok=True)
-                with subprocess.Popen(  # nosec
-                    [  # noqa: S607
+                _LOG.info("Doing a fetch of %s, on %s", self.get_id(), url)
+                async with (
+                    aiohttp.ClientSession() as session,
+                    session.get(
+                        url,
+                        headers={"X-Scm-Secret": config.settings.secret or ""},
+                        timeout=config.settings.requests_timeout,
+                    ) as response,
+                ):
+                    response.raise_for_status()
+                    if path.exists():
+                        shutil.rmtree(path)
+                    path.mkdir(parents=True, exist_ok=True)
+                    tar = await asyncio.create_subprocess_exec(
                         "tar",
                         "--extract",
                         "--gzip",
@@ -146,17 +148,19 @@ class BaseSource:
                         "--no-same-permissions",
                         "--touch",
                         "--no-overwrite-dir",
-                    ],
-                    cwd=path,
-                    stdin=subprocess.PIPE,
-                ) as tar:
+                        cwd=path,
+                        stdin=asyncio.subprocess.PIPE,
+                    )
                     if tar.stdin is not None:
-                        shutil.copyfileobj(response.raw, tar.stdin)
+                        async for chunk in response.content.iter_chunked(8192):
+                            tar.stdin.write(chunk)
                         tar.stdin.close()
-                    assert tar.wait() == 0
+                    assert await tar.wait() == 0
             except Exception as exception:  # pylint: disable=broad-exception-caught
+                if not isinstance(exception, aiohttp.ClientConnectorError):
+                    _LOG.exception("Unexpected error while fetching the source from url %s", url)
                 _DO_FETCH_ERROR_COUNTER.labels(self.get_id()).inc()
-                retry_message = f" (will retry in {_RETRY_DELAY}s)" if i else " (failed)"
+                retry_message = f" (will retry in {config.settings.retry_delay}s)" if i else " (failed)"
                 _LOG.warning(
                     "Error fetching the source %s from the master%s: %s",
                     self.get_id(),
@@ -164,7 +168,7 @@ class BaseSource:
                     str(exception),
                 )
                 if i:
-                    time.sleep(_RETRY_DELAY)
+                    await asyncio.sleep(config.settings.retry_delay)
                 else:
                     raise
             else:
@@ -201,24 +205,39 @@ class BaseSource:
             target_dir = self._config["target_dir"]
             if target_dir.startswith("/"):
                 return Path(target_dir)
-            return _MASTER_TARGET if self._is_master else _TARGET / target_dir
-        return _MASTER_TARGET if self._is_master else _TARGET / self.get_id()
+            return config.settings.master_target if self._is_master else config.settings.target / target_dir
+        return config.settings.master_target if self._is_master else config.settings.target / self.get_id()
 
     def get_id(self) -> str:
         return self._id
 
-    def validate_auth(self, request: pyramid.request.Request) -> None:
-        permission = request.has_permission(self._id, self.get_config())
+    async def validate_auth(self, identity: User | None, request: Request) -> None:
+        permission = await permits(identity, self.get_config(), self._id)
         if not isinstance(permission, Allowed):
-            message = "Not allowed to access this source"
-            raise HTTPForbidden(message)
+            if identity is not None:
+                message = "Not allowed to access this source"
+                raise HTTPException(status_code=403, detail=message)
+
+            # To avoid circular import
+            from shared_config_manager import (  # noqa: PLC0415 # pylint: disable=cyclic-import
+                main,
+            )
+
+            raise HTTPException(
+                status_code=302,
+                headers={
+                    "location": main.app.url_path_for("c2c_github_login")
+                    + "?came_from="
+                    + urllib.parse.quote(request.url.path),
+                },
+            )
 
     def is_master(self) -> bool:
         return self._is_master
 
-    def get_stats(self) -> SourceStatus:
+    def get_stats(self) -> broadcast_status.SourceStatus:
         config_copy = copy.deepcopy(self._config)
-        stats_ = cast("SourceStatus", config_copy)
+        stats_ = cast("broadcast_status.SourceStatus", config_copy)
         for template_stats, template_engine in zip(
             stats_.get("template_engines", []),
             self._template_engines,
@@ -277,13 +296,37 @@ class BaseSource:
                 data[key] = "•••"
 
 
-@broadcast.decorator(expect_answers=False)
-def _set_refresh_success(source: str) -> None:
+class _SetRefreshSuccessProto(Protocol):
+    """Protocol for _set_refresh_success function."""
+
+    async def __call__(self, *, source: str) -> list[None] | None: ...
+
+
+_set_refresh_success: _SetRefreshSuccessProto = None  # type: ignore[assignment]
+
+
+async def __set_refresh_success(source: str) -> None:
     """Set refresh in success in all process."""
     _REFRESH_ERROR_GAUGE.labels(source=source).set(0)
 
 
-@broadcast.decorator(expect_answers=False)
-def _set_fetch_success(source: str) -> None:
+class _SetFetchSuccessProto(Protocol):
+    """Protocol for _set_fetch_success function."""
+
+    async def __call__(self, *, source: str) -> list[None] | None: ...
+
+
+_set_fetch_success: _SetFetchSuccessProto = None  # type: ignore[assignment]
+
+
+async def __set_fetch_success(source: str) -> None:
     """Set fetch in success in all process."""
     _FETCH_ERROR_GAUGE.labels(source=source).set(0)
+
+
+async def init() -> None:
+    """Initialize the base source manager."""
+
+    global _set_refresh_success, _set_fetch_success  # noqa: PLW0603
+    _set_refresh_success = await broadcast.decorate(__set_refresh_success, expect_answers=False)
+    _set_fetch_success = await broadcast.decorate(__set_fetch_success, expect_answers=False)

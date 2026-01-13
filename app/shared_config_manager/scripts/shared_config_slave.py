@@ -1,42 +1,57 @@
 #!/usr/bin/env python3
 
 import argparse
+import asyncio
 import logging
-import os
+import logging.config
 import signal
 import sys
-import time
 from types import FrameType
 
-import c2cwsgiutils.setup_process
+import aiofiles
+import c2casgiutils.config
 import prometheus_client
+import yaml
+from c2casgiutils import broadcast
 
-from shared_config_manager.sources import registry
+from shared_config_manager import config, slave_status
+from shared_config_manager.sources import base, registry
+
+_stop_event = asyncio.Event()
 
 
 def main() -> None:
-    """Get the WSGI application."""
+    """Run the shared config slave."""
+    asyncio.run(_async_main())
+
+
+async def _async_main() -> None:
+    """Run the shared config slave."""
     parser = argparse.ArgumentParser(description="Run the shared config slave")
-    c2cwsgiutils.setup_process.fill_arguments(parser)
-    args = parser.parse_args()
+    parser.parse_args()
 
-    os.environ["IS_SLAVE"] = "true"
+    async with aiofiles.open("logging.yaml") as logging_file:
+        logging_config = yaml.safe_load(await logging_file.read())
+        logging.config.dictConfig(logging_config)
 
-    if os.environ.get("C2C_PROMETHEUS_PORT") is not None:
-        prometheus_client.start_http_server(int(os.environ["C2C_PROMETHEUS_PORT"]))
+    config.settings.is_slave = True
+
+    if c2casgiutils.config.settings.prometheus.port is not None:
+        prometheus_client.start_http_server(c2casgiutils.config.settings.prometheus.port)
 
     signal.signal(signal.SIGTERM, _sig_term)
 
-    c2cwsgiutils.setup_process.bootstrap_application_from_options(args)
-
-    registry.init(slave=True)
-    while True:
-        time.sleep(3600)
+    await broadcast.startup()
+    await base.init()
+    await slave_status.init()
+    await registry.init(slave=True)
+    await _stop_event.wait()
 
 
 def _sig_term(signum: int, frame: FrameType | None) -> None:
     del signum, frame
     logging.getLogger("shared_config_slave").info("Got a SIGTERM, stopping the slave")
+    _stop_event.set()
     sys.exit(0)
 
 

@@ -61,9 +61,8 @@ RUN --mount=type=cache,target=/var/lib/apt/lists \
     && apt-get autoremove --assume-yes python3-dev libpq-dev gcc
 
 # Copy the rest of the files (watch for the .dockerignore)
-COPY pyproject.toml poetry.lock production.ini development.ini gunicorn.conf.py ./
-COPY scripts/ /usr/bin/
-COPY shared_config_manager/ ./shared_config_manager/
+COPY pyproject.toml poetry.lock ./
+COPY shared_config_manager/__init__.py ./shared_config_manager/
 
 ARG GIT_HASH
 
@@ -79,21 +78,15 @@ RUN --mount=type=cache,target=/root/.cache \
     && python3 -m compileall -q . \
     && rm -rf /tmp/* /master_config/* /config/*
 
-ENV OTHER_LOG_LEVEL=WARN \
-    GUNICORN_LOG_LEVEL=WARN \
-    C2CWSGIUTILS_LOG_LEVEL=WARN \
-    SQL_LOG_LEVEL=WARN \
-    LOG_LEVEL=INFO \
-    LOG_TYPE=json \
-    C2C_BROADCAST_PREFIX=broadcast_scm_ \
-    GUNICORN_WORKERS=1 \
-    GUNICORN_THREADS=10
+COPY logging.yaml ./
+COPY scripts/ /usr/bin/
+COPY shared_config_manager/ ./shared_config_manager/
 
 RUN mkdir -p /prometheus-metrics \
     && chmod a+rwx /prometheus-metrics
 ENV PROMETHEUS_MULTIPROC_DIR=/prometheus-metrics
 
-CMD ["gunicorn", "--paste=/app/production.ini"]
+CMD ["uvicorn", "shared_config_manager.main:app", "--host=0.0.0.0", "--port=8080", "--log-config=/app/logging.yaml"]
 
 FROM base AS checker
 

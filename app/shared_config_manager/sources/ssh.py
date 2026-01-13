@@ -2,7 +2,8 @@ import fileinput
 import os
 from pathlib import Path
 
-from shared_config_manager.configuration import SourceConfig, SourceStatus
+from shared_config_manager import broadcast_status
+from shared_config_manager.configuration import SourceConfig
 from shared_config_manager.sources.base import BaseSource
 
 
@@ -31,7 +32,7 @@ class SshBaseSource(BaseSource):
     def _ssh_path() -> Path:
         return Path(os.environ["HOME"]) / ".ssh"
 
-    def get_stats(self) -> SourceStatus:
+    def get_stats(self) -> broadcast_status.SourceStatus:
         stats = super().get_stats()
         if "ssh_key" in stats:
             del stats["ssh_key"]
