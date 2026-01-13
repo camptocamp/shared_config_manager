@@ -52,18 +52,18 @@ by setting the `sources` section directly at the root of the `MASTER_CONFIG`.
 
 A few environment variables can be used to tune the containers:
 
-- `C2C_REDIS_URL`: Must point to a running Redis (typical: `redis://redis:6379`) for being able to
+- `C2C__REDIS__URL`: Must point to a running Redis (typical: `redis://redis:6379`) for being able to
   broadcast the refresh notifications
-- `MASTER_CONFIG`: The master configuration (string containing the YAML config)
-- `ROUTE_PREFIX`: The prefix to use for the HTTP API (defaults to `/scm`)
-- `TAG_FILTER`: Load only the sources having the given tag (the master config is always loaded)
-- `TARGET`: default base directory for the `target_dir` configuration (defaults to `/config`)
-- `MASTER_TARGET`: where to store the master config (defaults to `/master_config`)
-- `API_BASE_URL`: how to reach the master for slaves.
-- `API_MASTER`: if defined, this is a master with slaves (no template evaluation)
-- `SCM_SECRET`: the secret used to authenticate the request between the client and the server
+- `SCM__MASTER_CONFIG`: The master configuration (string containing the YAML config)
+- `SCM__ROUTE_PREFIX`: The prefix to use for the HTTP API (defaults to `/scm`)
+- `SCM__TAG_FILTER`: Load only the sources having the given tag (the master config is always loaded)
+- `SCM__TARGET`: default base directory for the `target_dir` configuration (defaults to `/config`)
+- `SCM__MASTER_TARGET`: where to store the master config (defaults to `/master_config`)
+- `SCM__API_BASE_URL`: how to reach the master for slaves.
+- `SCM__API_MASTER`: if defined, this is a master with slaves (no template evaluation)
+- `SCM__SECRET`: the secret used to authenticate the request between the client and the server
 
-See [https://github.com/camptocamp/c2cwsgiutils] for other parameters.
+See [https://github.com/camptocamp/c2casgiutils] for other parameters.
 
 ### Sources
 
@@ -128,8 +128,8 @@ services:
       MASTER_CONFIG: &master_config |
         type: git
         repo: git@github.com:camptocamp/master_config.git
-      SCM_SECRET: changeme
-      TAG_FILTER: master
+      SCM__SECRET: changeme
+      SCM__TAG_FILTER: master
     links:
       - redis
     labels:
@@ -167,40 +167,6 @@ services:
     command: redis-server --save "" --appendonly no
     user: www-data
 ```
-
-rancher-compose.yaml:
-
-```yaml
-version: '2'
-services:
-  scm_api:
-    scale: 1
-    health_check:
-      port: 8080
-      interval: 10000
-      unhealthy_threshold: 3
-      request_line: GET /scm/c2c/health_check HTTP/1.0
-      healthy_threshold: 1
-      response_timeout: 10000
-      strategy: recreate
-
-  scm_slave: {}
-
-  redis:
-    scale: 1
-    health_check:
-      port: 6379
-      interval: 2000
-      initializing_timeout: 60000
-      unhealthy_threshold: 3
-      strategy: recreate
-      healthy_threshold: 1
-      response_timeout: 3000
-```
-
-## Example OpenShift chart
-
-Look there: [https://github.com/camptocamp/private-geo-charts/tree/master/mutualized-print]
 
 # API
 

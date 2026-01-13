@@ -13,7 +13,7 @@ def composition(request):
         path = os.path.join("/config", slave)
         os.makedirs(path, exist_ok=True)
         os.chown(path, 33, 0)
-    utils.wait_url("http://api_file:8080/scm/c2c/health_check?max_level=2")
+    utils.wait_url("http://api_file:8080/scm/c2c/health?tags=ready")
 
 
 @pytest.fixture

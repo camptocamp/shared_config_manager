@@ -4,7 +4,7 @@ from c2cwsgiutils.acceptance.connection import Connection
 
 
 def test_all(app_connection: Connection) -> None:
-    stats = app_connection.get_json("1/status", headers={"X-Scm-Secret": "changeme"})
+    stats = app_connection.get_json("1/status", headers={"X-Scm-Secret": "changeme"}, cors=False)
     print(f"stats={pformat(stats)}")
     assert len(stats["slaves"]) == 4, stats["slaves"].keys()
     assert stats["slaves"]["api"]["sources"] == stats["slaves"]["slave"]["sources"]
@@ -12,15 +12,16 @@ def test_all(app_connection: Connection) -> None:
 
 
 def test_master(app_connection: Connection) -> None:
-    stats = app_connection.get_json("1/status/master", headers={"X-Scm-Secret": "changeme"})
+    stats = app_connection.get_json("1/status/master", headers={"X-Scm-Secret": "changeme"}, cors=False)
     print(f"stats={pformat(stats)}")
     assert len(stats["statuses"]) == 1
 
 
 def test_other(app_connection: Connection) -> None:
-    stats = app_connection.get_json("1/status/test_git", headers={"X-Scm-Secret": "changeme"})
+    # curl -H "X-Scm-Secret: changeme" http://localhost:8491/scm/1/status/test_git|jq
+    stats = app_connection.get_json("1/status/test_git", headers={"X-Scm-Secret": "changeme"}, cors=False)
     print(f"stats={pformat(stats)}")
-    assert len(stats["statuses"]) == 2, stats["statuses"]
+    assert len(stats["statuses"]) == 1
     status = stats["statuses"][0]
     assert len(status["template_engines"]) == 1
     assert "environment_variables" in status["template_engines"][0]

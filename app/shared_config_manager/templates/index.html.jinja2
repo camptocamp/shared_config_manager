@@ -7,14 +7,14 @@
       rel="icon"
       type="image/png"
       sizes="32x32"
-      href="${request.static_url('/app/shared_config_manager/static/favicon-32x32.png')}"
+      href="{{ url_for('static', path='favicon-32x32.png') }}"
       referrerpolicy="no-referrer"
     />
     <link
       rel="icon"
       type="image/png"
       sizes="16x16"
-      href="${request.static_url('/app/shared_config_manager/static/favicon-16x16.png')}"
+      href="{{ url_for('static', path='favicon-16x16.png') }}"
       referrerpolicy="no-referrer"
     />
     <link
@@ -24,10 +24,14 @@
         crossorigin="anonymous"
         referrerpolicy="no-referrer"
     />
+    <style nonce="{{ nonce }}">
+      body { padding-bottom: 1rem; }
+      .login-info { text-align: right; }
+    </style>
     <title>Shared config manager</title>
   </head>
-  <body style="padding-bottom: 1rem;">
-    <script>
+  <body>
+    <script nonce="{{ nonce }}">
       (() => {
         'use strict'
         if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -38,33 +42,34 @@
     <div class="container-fluid">
       <h1>Shared config manager</h1>
 
-      <p style="text-align: right;">
-      %if request.identity is not None:
-      Logged as: <a href="${request.identity.url}">${request.identity.name}</a>,
+      <p class="login-info">
+      {% if identity is not none %}
+      Logged as: <a href="{{ identity.url }}">{{ identity.name }}</a>{% if identity.auth_type == "github_oauth" %},
       <a role="button" class="btn btn-secondary mt-4"
-      href="${request.route_url('c2c_github_logout', _query={'came_from': request.current_route_url()})}" style="vertical-align: baseline;">Logout</a>
-      %else:
+      href="{{ url_for('c2c_github_logout') }}?came_from={{ request.url | urlencode }}" style="vertical-align: baseline;">Logout</a>
+      {% endif %}
+      {% else %}
       <a class="btn btn-primary"
-      href="${request.route_url('c2c_github_login', _query={'came_from': request.current_route_url()})}">Login with GitHub</a>
-      %endif
+      href="{{ url_for('c2c_github_login') }}?came_from={{ request.url | urlencode }}">Login with GitHub</a>
+      {% endif %}
       </p>
 
-      %if sources:
+      {% if valid_sources %}
       <h3>Sources</h3>
       <ul class="list-group">
-        %for source in sources:
+        {% for valid, source in valid_sources %}
         <li class="list-group-item">
-          %if is_valid(source):
+          {% if valid %}
           <span class="badge bg-success">✓</span>
-          %else:
+          {% else %}
           <span class="badge bg-danger">✗</span>
-          %endif
-          <a href="${request.route_url('ui_source', id=source.get_id())}"
-            >${source.get_config().get("name", source.get_id()) | h}</a>
+          {% endif %}
+          <a href="{{ url_for('ui_source', source_id=source.get_id()) }}"
+            >{{ source.get_config().get("name", source.get_id()) }}</a>
         </li>
-        %endfor
+        {% endfor %}
       </ul>
-      %endif
+      {% endif %}
     </div>
   </body>
 </html>

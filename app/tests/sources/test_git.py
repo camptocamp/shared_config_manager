@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from shared_config_manager.sources import registry
+from shared_config_manager.sources import base, registry
 
 TEMP_DIR = tempfile.gettempdir()
 
@@ -38,10 +38,12 @@ def repo():
     subprocess.check_call(["rm", "-rf", repo_path], stderr=subprocess.STDOUT)
 
 
-def test_git(repo: Path) -> None:
+@pytest.mark.asyncio
+async def test_git(repo: Path) -> None:
+    await base.init()
     git = registry._create_source("test_git", {"type": "git", "repo": str(repo)})
     assert not git._do_sparse()
-    git.refresh()
+    await git.refresh()
     subprocess.check_call(["ls", "/config/test_git"])
     assert Path("/config/test_git/toto/test").is_file()
     assert not Path("/config/test_git/.git").is_file()
@@ -58,7 +60,7 @@ def test_git(repo: Path) -> None:
         stderr=subprocess.STDOUT,
     )
 
-    git.refresh()
+    await git.refresh()
     try:
         assert Path("/config/test_git/toto/test").is_file()
         with Path("/config/test_git/toto/test").open() as file:
@@ -67,10 +69,12 @@ def test_git(repo: Path) -> None:
         git.delete()
 
 
-def test_git_sub_dir(repo) -> None:
+@pytest.mark.asyncio
+async def test_git_sub_dir(repo) -> None:
+    base.init()
     git = registry._create_source("test_git", {"type": "git", "repo": repo, "sub_dir": "toto"})
     assert git._do_sparse()
-    git.refresh()
+    await git.refresh()
     subprocess.check_call(["ls", "/config/test_git"])
     assert Path("/config/test_git/test").is_file()
     assert not Path("/config/test_git/.git").is_file()
@@ -87,7 +91,7 @@ def test_git_sub_dir(repo) -> None:
         stderr=subprocess.STDOUT,
     )
 
-    git.refresh()
+    await git.refresh()
     try:
         assert Path("/config/test_git/test").is_file()
         with Path("/config/test_git/test").open() as file:
@@ -96,13 +100,15 @@ def test_git_sub_dir(repo) -> None:
         git.delete()
 
 
-def test_git_sub_dir_no_sparse(repo) -> None:
+@pytest.mark.asyncio
+async def test_git_sub_dir_no_sparse(repo) -> None:
+    await base.init()
     git = registry._create_source(
         "test_git",
         {"type": "git", "repo": str(repo), "sub_dir": "toto", "sparse": False},
     )
     assert not git._do_sparse()
-    git.refresh()
+    await git.refresh()
     subprocess.check_call(["ls", "/config/test_git"])
     assert Path("/config/test_git/test").is_file()
     assert not Path("/config/test_git/.git").is_file()
@@ -119,7 +125,7 @@ def test_git_sub_dir_no_sparse(repo) -> None:
         stderr=subprocess.STDOUT,
     )
 
-    git.refresh()
+    await git.refresh()
     try:
         assert Path("/config/test_git/test").is_file()
         with Path("/config/test_git/test").open() as file:
@@ -129,7 +135,8 @@ def test_git_sub_dir_no_sparse(repo) -> None:
 
 
 @pytest.mark.skipif(os.environ.get("PRIVATE_SSH_KEY") is not None, reason="We needs to have the key")
-def test_git_with_key() -> None:
+@pytest.mark.asyncio
+async def test_git_with_key() -> None:
     ssh_key = os.environ["PRIVATE_SSH_KEY"].split(" ")
     ssh_key = ["-----BEGIN RSA PRIVATE KEY-----"]
     ssh_key += os.environ["PRIVATE_SSH_KEY"].split(" ")[4:-4]
@@ -145,5 +152,5 @@ def test_git_with_key() -> None:
         },
     )
 
-    git.refresh()
+    await git.refresh()
     assert Path("/config/test_key/README.md").is_file()

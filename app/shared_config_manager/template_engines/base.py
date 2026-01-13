@@ -5,13 +5,13 @@ from typing import cast
 
 from prometheus_client import Counter, Gauge
 
+from shared_config_manager import config
 from shared_config_manager.configuration import (
     TemplateEnginesConfig,
     TemplateEnginesStatus,
 )
 
 _LOG = logging.getLogger(__name__)
-_ENV_PREFIXES = os.environ.get("SCM_ENV_PREFIXES", "MUTUALIZED_").split(":")
 _ERROR_COUNTER = Counter(
     "sharedconfigmanager_template_error_counter",
     "Number of template errors",
@@ -62,7 +62,7 @@ class BaseEngine:
                     _ERROR_COUNTER.labels(source=self._source_id, type=self.get_type()).inc()
                     _ERROR_GAUGE.labels(source=self._source_id, type=self.get_type()).set(1)
             elif src_path != dest_path and not src_path.is_dir() and not dest_path.exists():
-                os.link(src_path, dest_path)
+                dest_path.hardlink_to(src_path)
 
     def _get_dest_dir(self, root_dir: Path) -> Path:
         if "dest_sub_dir" in self._config:
@@ -81,4 +81,8 @@ class BaseEngine:
 
 
 def _filter_env(env: dict[str, str]) -> dict[str, str]:
-    return {key: value for key, value in env.items() if any(key.startswith(i) for i in _ENV_PREFIXES)}
+    return {
+        key: value
+        for key, value in env.items()
+        if any(key.startswith(i) for i in config.settings.env_prefixes.split(":"))
+    }

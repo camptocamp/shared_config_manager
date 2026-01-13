@@ -2,4 +2,4 @@
 **/*.pyc
 Dockerfile
 .dockerignore
-pip-cve-ignore
+.ruff_cache

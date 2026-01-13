@@ -70,7 +70,7 @@ def git_source(app_connection: Connection):
     )
     time.sleep(0.1)
 
-    app_connection.get_json("1/refresh/master", headers={"X-Scm-Secret": "changeme"})
+    app_connection.get_json("1/refresh/master", headers={"X-Scm-Secret": "changeme"}, cors=False)
     wait_sync(app_connection, "other", None)
     time.sleep(0.1)
 
@@ -100,7 +100,7 @@ def test_ok(app_connection, git_source) -> None:  # pylint: disable=redefined-ou
     time.sleep(0.1)
 
     hash_ = get_hash(git_source)
-    app_connection.get_json("1/refresh/other", headers={"X-Scm-Secret": "changeme"})
+    app_connection.get_json("1/refresh/other", headers={"X-Scm-Secret": "changeme"}, cors=False)
     wait_sync(app_connection, "other", hash_)
     time.sleep(0.1)
 
