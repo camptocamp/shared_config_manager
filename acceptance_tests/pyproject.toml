@@ -1,6 +1,6 @@
 [tool.ruff.lint]
 select = []
-ignore = ["C90", "D200", "D202", "D207", "D208", "I001", "PLR09", "PLR2004", "Q000", "S101", "S113", "SIM105", "W293"]
+ignore = ["C90", "COM812", "D200", "D202", "D207", "D208", "I001", "PLR09", "PLR2004", "Q000", "S101", "S113", "SIM105", "W293"]
 extend-select = ["UP", "I", "S", "B"]
 
 [tool.ruff.lint.extend-per-file-ignores]
@@ -19,7 +19,7 @@ authors = []
 python = ">=3.10,<3.13"
 pytest-cov = "7.0.0"
 prospector = { version = "1.17.3", extras = ["with_ruff"] }
-prospector-profile-duplicated = "1.10.5"
+prospector-profile-duplicated = "1.11.0"
 prospector-profile-utils = "1.26.5"
 ruff = "0.14.10"
 typing-extensions = "4.15.0"
