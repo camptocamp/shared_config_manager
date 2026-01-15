@@ -1,6 +1,6 @@
 [tool.ruff.lint]
 select = []
-ignore = ["C90", "D200", "D202", "D207", "D208", "I001", "PLR09", "PLR2004", "Q000", "S101", "S113", "SIM105", "W293"]
+ignore = ["C90", "COM812", "D200", "D202", "D207", "D208", "I001", "PLR09", "PLR2004", "Q000", "S101", "S113", "SIM105", "W293"]
 extend-select = ["UP", "I", "S", "B"]
 
 [tool.ruff.lint.extend-per-file-ignores]
