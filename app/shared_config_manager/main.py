@@ -116,14 +116,14 @@ async def _lifespan(main_app: FastAPI) -> AsyncGenerator[None, None]:
 
     # Shutdown: cancel background tasks
     _LOGGER.info("Shutting down the application")
-    if _WATCH_SOURCE_TASK is not None:
+    if _WATCH_SOURCE_TASK is not None and not _WATCH_SOURCE_TASK.done():
         _LOGGER.info("Cancelling source watch task")
         _WATCH_SOURCE_TASK.cancel()
         try:
             await _WATCH_SOURCE_TASK
         except asyncio.CancelledError:
             pass
-        _WATCH_SOURCE_TASK = None
+    _WATCH_SOURCE_TASK = None
 
     await registry.shutdown()
 

@@ -95,14 +95,14 @@ async def init(slave: bool) -> None:
 async def shutdown() -> None:
     """Shutdown the registry and cancel background tasks."""
     global _WATCH_CONFIG_TASK  # noqa: PLW0603
-    if _WATCH_CONFIG_TASK is not None:
+    if _WATCH_CONFIG_TASK is not None and not _WATCH_CONFIG_TASK.done():
         _LOG.info("Cancelling config watch task")
         _WATCH_CONFIG_TASK.cancel()
         try:
             await _WATCH_CONFIG_TASK
         except asyncio.CancelledError:
             pass
-        _WATCH_CONFIG_TASK = None
+    _WATCH_CONFIG_TASK = None
 
 
 async def reload_master_config() -> None:
