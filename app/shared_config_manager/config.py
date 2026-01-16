@@ -1,9 +1,10 @@
 """The configuration environment variables."""
 
 from pathlib import Path
+from typing import Annotated, Any
 
 from pydantic import field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 class Settings(BaseSettings, extra="ignore"):
@@ -25,7 +26,7 @@ class Settings(BaseSettings, extra="ignore"):
     """Interval in seconds to check and refresh source configurations."""
     api_base_url: str | None = None
     """Base URL for the shared config manager API (with trailing slash)."""
-    api_master: str | None = None
+    api_master: dict[str, Any] | None = None
     """Master API endpoint URL for fetching configurations."""
     tag_filter: str | None = None
     """Filter sources by tag on slave nodes. Only sources with this tag will be synced."""
@@ -33,7 +34,7 @@ class Settings(BaseSettings, extra="ignore"):
     """Master configuration YAML content as a string (used instead of loading from file)."""
     master_dispatch: bool = True
     """Whether to dispatch configuration updates from master to slaves."""
-    env_prefixes: list[str] = ["MUTUALIZED_"]
+    env_prefixes: Annotated[list[str], NoDecode] = ["MUTUALIZED_"]
     """Environment variable prefixes to expose in templates (e.g., MUTUALIZED_)."""
     private_ssh_key: str | None = None
     """Private SSH key for accessing git repositories."""
@@ -60,10 +61,7 @@ class Settings(BaseSettings, extra="ignore"):
     def validate_env_prefixes(cls, value: str | list[str] | None) -> list[str]:
         if value is None:
             return ["MUTUALIZED_"]
-        if isinstance(value, str):
-            # Parse colon-separated string
-            return [v.strip() for v in value.split(":") if v.strip()]
-        return value
+        return [v.strip() for v in value.split(":") if v.strip()]
 
 
 settings = Settings()
