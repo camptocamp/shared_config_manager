@@ -12,8 +12,8 @@ from c2casgiutils import broadcast
 from fastapi import HTTPException, Request
 from prometheus_client import Counter, Gauge, Summary
 
-from shared_config_manager import config, template_engines
-from shared_config_manager.configuration import SourceConfig, SourceStatus
+from shared_config_manager import broadcast_status, config, template_engines
+from shared_config_manager.configuration import SourceConfig
 from shared_config_manager.security import Allowed, User, permits
 from shared_config_manager.sources import mode
 
@@ -232,9 +232,9 @@ class BaseSource:
     def is_master(self) -> bool:
         return self._is_master
 
-    def get_stats(self) -> SourceStatus:
+    def get_stats(self) -> broadcast_status.SourceStatus:
         config_copy = copy.deepcopy(self._config)
-        stats_ = cast("SourceStatus", config_copy)
+        stats_ = cast("broadcast_status.SourceStatus", config_copy)
         for template_stats, template_engine in zip(
             stats_.get("template_engines", []),
             self._template_engines,

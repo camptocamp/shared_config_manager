@@ -1,7 +1,8 @@
 import re
 from pathlib import Path
 
-from shared_config_manager.configuration import SourceConfig, SourceStatus
+from shared_config_manager import broadcast_status
+from shared_config_manager.configuration import SourceConfig
 from shared_config_manager.sources.base import BaseSource
 
 
@@ -35,7 +36,7 @@ class RcloneSource(BaseSource):
             file_.write("[remote]\n")
             file_.write(config)
 
-    def get_stats(self) -> SourceStatus:
+    def get_stats(self) -> broadcast_status.SourceStatus:
         stats = super().get_stats()
         stats["config"] = _filter_config(stats["config"])
         return stats

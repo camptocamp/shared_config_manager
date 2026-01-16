@@ -3,6 +3,7 @@ import logging
 import tempfile
 from collections.abc import Mapping
 from pathlib import Path
+from typing import cast
 
 import aiofiles
 import yaml
@@ -10,8 +11,7 @@ from asyncinotify import Inotify, Mask
 from c2casgiutils import broadcast
 from fastapi import HTTPException, Request
 
-from shared_config_manager import config
-from shared_config_manager.configuration import Config, SourceConfig, SourceStatus
+from shared_config_manager import broadcast_status, config, configuration
 from shared_config_manager.security import User
 from shared_config_manager.sources import base, git, mode, rclone, rsync
 
@@ -23,7 +23,9 @@ _SOURCES: dict[str, base.BaseSource] = {}
 FILTERED_SOURCES: Mapping[str, base.BaseSource] = {}
 
 
-def _create_source(source_id: str, config: SourceConfig, is_master: bool = False) -> base.BaseSource:
+def _create_source(
+    source_id: str, config: configuration.SourceConfig, is_master: bool = False
+) -> base.BaseSource:
     type_ = config["type"]
     return _ENGINES[type_](source_id, config, is_master)
 
@@ -48,11 +50,13 @@ async def init(slave: bool) -> None:
     await _prepare_ssh()
     if config.settings.master_config:
         _LOG.info("Load the master config from environment variable")
-        content = yaml.load(config.settings.master_config, Loader=yaml.SafeLoader)
+        content: configuration.Config | configuration.SourceConfig = cast(
+            "configuration.SourceConfig", yaml.load(config.settings.master_config, Loader=yaml.SafeLoader)
+        )
     else:
         _LOG.info("Load the master config from config file")
         async with aiofiles.open("/etc/shared_config_manager/config.yaml", encoding="utf-8") as scm_file:
-            content = yaml.load(await scm_file.read(), Loader=yaml.SafeLoader)
+            content = cast("configuration.Config", yaml.load(await scm_file.read(), Loader=yaml.SafeLoader))
 
         async def watch_config() -> None:
             with Inotify() as inotify:
@@ -70,12 +74,16 @@ async def init(slave: bool) -> None:
 
     if content.get("sources", False) is not False:
         _LOG.info("The master config is inline")
-        content["standalone"] = True
+        cast("configuration.Config", content)["standalone"] = True
         # A fake master source to have auth work
-        MASTER_SOURCE = base.BaseSource(_MASTER_ID, content, is_master=True)
-        await _handle_master_config(content)
+        MASTER_SOURCE = base.BaseSource(
+            _MASTER_ID, cast("configuration.SourceConfig", content), is_master=True
+        )
+        await _handle_master_config(cast("configuration.Config", content))
     else:
-        MASTER_SOURCE = _create_source(_MASTER_ID, content, is_master=True)
+        MASTER_SOURCE = _create_source(
+            _MASTER_ID, cast("configuration.SourceConfig", content), is_master=True
+        )
         _LOG.info("Initial loading of the master config")
         await MASTER_SOURCE.refresh_or_fetch()
         _LOG.info("Loading of the master config finished")
@@ -94,7 +102,7 @@ async def reload_master_config() -> None:
             await _handle_master_config(config)
 
 
-async def _do_handle_master_config(config: Config) -> tuple[int, int]:
+async def _do_handle_master_config(config: configuration.Config) -> tuple[int, int]:
     global FILTERED_SOURCES  # noqa: PLW0603
 
     success = 0
@@ -129,7 +137,7 @@ async def _do_handle_master_config(config: Config) -> tuple[int, int]:
     return success, errors
 
 
-async def _handle_master_config(config: Config) -> None:
+async def _handle_master_config(config: configuration.Config) -> None:
     _LOG.info("Reading the master config")
     if _MASTER_ID in config["sources"]:
         message = f"A source cannot have the {_MASTER_ID} id"
@@ -173,8 +181,8 @@ def _delete_source(source_id: str) -> None:
 
 
 def _filter_sources(
-    source_configs: dict[str, SourceConfig],
-) -> tuple[dict[str, SourceConfig], dict[str, SourceConfig]]:
+    source_configs: dict[str, configuration.SourceConfig],
+) -> tuple[dict[str, configuration.SourceConfig], dict[str, configuration.SourceConfig]]:
     if config.settings.tag_filter is None or mode.is_master():
         return source_configs, {}
     result = {}
@@ -247,7 +255,7 @@ def get_source(source_id: str) -> base.BaseSource | None:
     return _SOURCES.get(source_id)
 
 
-def get_stats() -> dict[str, SourceStatus]:
+def get_stats() -> dict[str, broadcast_status.SourceStatus]:
     """Get the stats of all the sources."""
     return (
         {
