@@ -102,6 +102,7 @@ async def shutdown() -> None:
             await _WATCH_CONFIG_TASK
         except asyncio.CancelledError:
             pass
+    # Clear task reference regardless of state for idempotent shutdown
     _WATCH_CONFIG_TASK = None
 
 

@@ -123,6 +123,7 @@ async def _lifespan(main_app: FastAPI) -> AsyncGenerator[None, None]:
             await _WATCH_SOURCE_TASK
         except asyncio.CancelledError:
             pass
+    # Clear task reference regardless of state for idempotent shutdown
     _WATCH_SOURCE_TASK = None
 
     await registry.shutdown()
