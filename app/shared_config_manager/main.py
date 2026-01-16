@@ -60,30 +60,34 @@ async def _source_needs_refresh(source_id: str) -> bool:
 
 async def _watch_source() -> None:
     """Watch the source."""
-    while True:
-        _LOGGER.debug("Watching the sources")
-        try:
-            has_error = False
-            for key, source in registry.get_sources().items():
-                _LOGGER.debug("Watching the source %s", key)
-                try:
-                    if source.is_master():
-                        continue
+    try:
+        while True:
+            _LOGGER.debug("Watching the sources")
+            try:
+                has_error = False
+                for key, source in registry.get_sources().items():
+                    _LOGGER.debug("Watching the source %s", key)
+                    try:
+                        if source.is_master():
+                            continue
 
-                    if await _source_needs_refresh(key):
-                        await source.refresh()
-                        await broadcast.broadcast("slave_fetch", params={"source_id": key})
+                        if await _source_needs_refresh(key):
+                            await source.refresh()
+                            await broadcast.broadcast("slave_fetch", params={"source_id": key})
 
-                except Exception:  # noqa: BLE001
-                    await registry.update_flag("SOURCE_ERROR")
-                    _LOGGER.warning("Error while watching the source %s", key, exc_info=True)
-                    has_error = True
-            if not has_error:
-                await registry.update_flag("READY")
-        except Exception:
-            await registry.update_flag("ERROR")
-            _LOGGER.exception("Error while watching the sources")
-        await asyncio.sleep(config.settings.watch_source_interval)
+                    except Exception:  # noqa: BLE001
+                        await registry.update_flag("SOURCE_ERROR")
+                        _LOGGER.warning("Error while watching the source %s", key, exc_info=True)
+                        has_error = True
+                if not has_error:
+                    await registry.update_flag("READY")
+            except Exception:
+                await registry.update_flag("ERROR")
+                _LOGGER.exception("Error while watching the sources")
+            await asyncio.sleep(config.settings.watch_source_interval)
+    except asyncio.CancelledError:
+        _LOGGER.info("Source watch task cancelled")
+        raise
 
 
 # Initialize Sentry if the URL is provided
@@ -109,6 +113,18 @@ async def _lifespan(main_app: FastAPI) -> AsyncGenerator[None, None]:
         await registry.init(slave=False)
 
     yield
+
+    # Shutdown: cancel background tasks
+    _LOGGER.info("Shutting down the application")
+    if _WATCH_SOURCE_TASK is not None:
+        _LOGGER.info("Cancelling source watch task")
+        _WATCH_SOURCE_TASK.cancel()
+        try:
+            await _WATCH_SOURCE_TASK
+        except asyncio.CancelledError:
+            pass
+
+    await registry.shutdown()
 
 
 # Core Application Instance

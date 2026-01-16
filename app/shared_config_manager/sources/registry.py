@@ -57,15 +57,19 @@ async def init(slave: bool) -> None:
             content = cast("configuration.Config", yaml.load(await scm_file.read(), Loader=yaml.SafeLoader))
 
         async def watch_config() -> None:
-            with Inotify() as inotify:
-                main_config_path = Path("/etc/shared_config_manager/config.yaml")
-                # Watch for modifications and deletions (move) of the config file
-                inotify.add_watch(main_config_path, Mask.CLOSE_WRITE | Mask.IGNORED)
-                async for _ in inotify:
-                    _LOG.info("Reload the master config from config file")
-                    async with aiofiles.open(main_config_path, encoding="utf-8") as scm_file:
-                        config = yaml.load(await scm_file.read(), Loader=yaml.SafeLoader)
-                    await _handle_master_config(config)
+            try:
+                with Inotify() as inotify:
+                    main_config_path = Path("/etc/shared_config_manager/config.yaml")
+                    # Watch for modifications and deletions (move) of the config file
+                    inotify.add_watch(main_config_path, Mask.CLOSE_WRITE | Mask.IGNORED)
+                    async for _ in inotify:
+                        _LOG.info("Reload the master config from config file")
+                        async with aiofiles.open(main_config_path, encoding="utf-8") as scm_file:
+                            config = yaml.load(await scm_file.read(), Loader=yaml.SafeLoader)
+                        await _handle_master_config(config)
+            except asyncio.CancelledError:
+                _LOG.info("Config watch task cancelled")
+                raise
 
         global _WATCH_CONFIG_TASK  # noqa: PLW0603
         _WATCH_CONFIG_TASK = asyncio.create_task(watch_config())
@@ -86,6 +90,19 @@ async def init(slave: bool) -> None:
         _LOG.info("Loading of the master config finished")
         if not MASTER_SOURCE.get_config().get("standalone", False):
             await reload_master_config()
+
+
+async def shutdown() -> None:
+    """Shutdown the registry and cancel background tasks."""
+    global _WATCH_CONFIG_TASK  # noqa: PLW0603
+    if _WATCH_CONFIG_TASK is not None:
+        _LOG.info("Cancelling config watch task")
+        _WATCH_CONFIG_TASK.cancel()
+        try:
+            await _WATCH_CONFIG_TASK
+        except asyncio.CancelledError:
+            pass
+        _WATCH_CONFIG_TASK = None
 
 
 async def reload_master_config() -> None:
