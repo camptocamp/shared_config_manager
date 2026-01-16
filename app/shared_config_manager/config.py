@@ -61,10 +61,12 @@ class Settings(BaseSettings, extra="ignore"):
 
     @field_validator("env_prefixes", mode="before")
     @classmethod
-    def validate_env_prefixes(cls, value: str | None) -> list[str]:
+    def validate_env_prefixes(cls, value: str | list[str] | None) -> list[str]:
         if value is None:
             return ["MUTUALIZED_"]
-        return [v.strip() for v in value.split(":") if v.strip()]
+        if isinstance(value, str):
+            return [v.strip() for v in value.split(":") if v.strip()]
+        return value
 
     @field_validator("master_config", mode="before")
     @classmethod

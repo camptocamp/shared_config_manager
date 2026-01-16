@@ -161,7 +161,7 @@ async def _prepare_ssh() -> None:
     other_ssh = home.joinpath(".ssh2")
     if other_ssh.is_dir():
         ssh = home.joinpath(".ssh")
-        await asyncio.create_subprocess_exec(
+        proc = await asyncio.create_subprocess_exec(
             "rsync",
             "--recursive",
             "--copy-links",
@@ -169,6 +169,7 @@ async def _prepare_ssh() -> None:
             str(other_ssh) + "/",
             str(ssh) + "/",
         )
+        await proc.wait()
 
 
 def _delete_source(source_id: str) -> None:
@@ -212,7 +213,7 @@ async def _slave_fetch(source_id: str) -> None:
     """Do a refresh on the slave."""
     source, filtered = await get_source_check_auth(source_id, None, check_auth=False)
     if source is None:
-        _LOG.error("Unknown id %d", source_id)
+        _LOG.error("Unknown id %s", source_id)
         return
     if filtered and not mode.is_master():
         _LOG.info("The reloading the %s config is filtered", source_id)
