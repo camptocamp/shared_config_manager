@@ -99,6 +99,7 @@ if c2casgiutils.config.settings.sentry.dsn:
 @asynccontextmanager
 async def _lifespan(main_app: FastAPI) -> AsyncGenerator[None, None]:
     """Handle application lifespan events."""
+    global _WATCH_SOURCE_TASK  # noqa: PLW0603
 
     _LOGGER.info("Starting the application")
     await c2casgiutils.startup(main_app)
@@ -106,7 +107,6 @@ async def _lifespan(main_app: FastAPI) -> AsyncGenerator[None, None]:
     await base.init()
     await api.startup(main_app)
 
-    global _WATCH_SOURCE_TASK  # noqa: PLW0603
     _WATCH_SOURCE_TASK = asyncio.create_task(_watch_source())
 
     if not config.settings.is_slave:
@@ -123,6 +123,7 @@ async def _lifespan(main_app: FastAPI) -> AsyncGenerator[None, None]:
             await _WATCH_SOURCE_TASK
         except asyncio.CancelledError:
             pass
+        _WATCH_SOURCE_TASK = None
 
     await registry.shutdown()
 
