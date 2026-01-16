@@ -49,6 +49,8 @@ class Settings(BaseSettings, extra="ignore"):
     """GitHub webhook secret for validating incoming webhook signatures."""
     route_prefix: str = "/scm"
     """Route prefix for the shared config manager API."""
+    requests_timeout: int = 30
+    """Timeout in seconds for HTTP requests to the master API."""
 
     model_config = SettingsConfigDict(env_prefix="SCM__", env_nested_delimiter="__")
 
