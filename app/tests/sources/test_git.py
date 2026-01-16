@@ -71,7 +71,7 @@ async def test_git(repo: Path) -> None:
 
 @pytest.mark.asyncio
 async def test_git_sub_dir(repo) -> None:
-    base.init()
+    await base.init()
     git = registry._create_source("test_git", {"type": "git", "repo": repo, "sub_dir": "toto"})
     assert git._do_sparse()
     await git.refresh()

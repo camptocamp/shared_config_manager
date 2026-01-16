@@ -33,9 +33,8 @@ class Settings(BaseSettings, extra="ignore"):
     """Master configuration YAML content as a string (used instead of loading from file)."""
     master_dispatch: bool = True
     """Whether to dispatch configuration updates from master to slaves."""
-    # env_prefixes: list[str] = ["MUTUALIZED_"]
-    env_prefixes: str = "MUTUALIZED_"
-    """Environment variable prefixes to expose in templates (e.g., MUTUALIZED_, SCM_)."""
+    env_prefixes: list[str] = ["MUTUALIZED_"]
+    """Environment variable prefixes to expose in templates (e.g., MUTUALIZED_)."""
     private_ssh_key: str | None = None
     """Private SSH key for accessing git repositories."""
     http: bool = False
@@ -56,15 +55,15 @@ class Settings(BaseSettings, extra="ignore"):
             value += "/"
         return value
 
-    # @field_validator("env_prefixes", mode="before")
-    # @classmethod
-    # def validate_env_prefixes(cls, value: str | list[str] | None) -> list[str]:
-    #     if value is None:
-    #         return ["MUTUALIZED_"]
-    #     if isinstance(value, str):
-    #         # Parse colon-separated string
-    #         return [v.strip() for v in value.split(":") if v.strip()]
-    #     return value
+    @field_validator("env_prefixes", mode="before")
+    @classmethod
+    def validate_env_prefixes(cls, value: str | list[str] | None) -> list[str]:
+        if value is None:
+            return ["MUTUALIZED_"]
+        if isinstance(value, str):
+            # Parse colon-separated string
+            return [v.strip() for v in value.split(":") if v.strip()]
+        return value
 
 
 settings = Settings()
