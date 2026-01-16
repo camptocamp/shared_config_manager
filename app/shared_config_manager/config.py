@@ -3,6 +3,7 @@
 from pathlib import Path
 from typing import Annotated, Any
 
+import yaml
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
@@ -30,7 +31,7 @@ class Settings(BaseSettings, extra="ignore"):
     """Master API endpoint URL for fetching configurations."""
     tag_filter: str | None = None
     """Filter sources by tag on slave nodes. Only sources with this tag will be synced."""
-    master_config: str | None = None
+    master_config: Annotated[dict[str, Any], NoDecode] | None = None
     """Master configuration YAML content as a string (used instead of loading from file)."""
     master_dispatch: bool = True
     """Whether to dispatch configuration updates from master to slaves."""
@@ -58,10 +59,17 @@ class Settings(BaseSettings, extra="ignore"):
 
     @field_validator("env_prefixes", mode="before")
     @classmethod
-    def validate_env_prefixes(cls, value: str | list[str] | None) -> list[str]:
+    def validate_env_prefixes(cls, value: str | None) -> list[str]:
         if value is None:
             return ["MUTUALIZED_"]
         return [v.strip() for v in value.split(":") if v.strip()]
+
+    @field_validator("master_config", mode="before")
+    @classmethod
+    def validate_master_config(cls, value: str | None) -> dict[str, Any] | None:
+        if value is not None:
+            return yaml.load(value, Loader=yaml.SafeLoader)
+        return None
 
 
 settings = Settings()

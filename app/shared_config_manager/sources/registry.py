@@ -48,7 +48,7 @@ async def init(slave: bool) -> None:
     await _prepare_ssh()
     if config.settings.master_config:
         _LOG.info("Load the master config from environment variable")
-        content = yaml.load(config.settings.master_config, Loader=yaml.SafeLoader)
+        content = config.settings.master_config
     else:
         _LOG.info("Load the master config from config file")
         async with aiofiles.open("/etc/shared_config_manager/config.yaml", encoding="utf-8") as scm_file:
