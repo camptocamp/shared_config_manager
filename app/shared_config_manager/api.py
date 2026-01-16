@@ -10,7 +10,7 @@ from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-from shared_config_manager import configuration, slave_status
+from shared_config_manager import broadcast_status, configuration, slave_status
 from shared_config_manager.security import User, get_identity
 from shared_config_manager.sources import registry
 
@@ -206,7 +206,7 @@ async def _refresh_all_webhook(
     return RefreshAllResponse(status=200, nb_refresh=nb_refresh)
 
 
-def _source_status_from_dict(data: configuration.SourceStatus) -> SourceStatus:
+def _source_status_from_dict(data: broadcast_status.SourceStatus) -> SourceStatus:
     return SourceStatus(**{k: v for k, v in data.items() if k not in {"hostname"}})  # type: ignore[arg-type]
 
 
@@ -240,7 +240,7 @@ async def _source_stats(
     if source is None:
         message = f"Unknown id {source_id}"
         raise HTTPException(status_code=404, detail=message)
-    slaves: list[configuration.SourceStatus] | None = await slave_status.get_source_status(
+    slaves: list[broadcast_status.SourceStatus] | None = await slave_status.get_source_status(
         source_id=source_id
     )
     assert slaves is not None

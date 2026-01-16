@@ -1,11 +1,13 @@
 """The configuration environment variables."""
 
 from pathlib import Path
-from typing import Annotated, Any
+from typing import Annotated, Any, cast
 
 import yaml
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
+
+from shared_config_manager import configuration
 
 
 class Settings(BaseSettings, extra="ignore"):
@@ -31,7 +33,7 @@ class Settings(BaseSettings, extra="ignore"):
     """Master API endpoint URL for fetching configurations."""
     tag_filter: str | None = None
     """Filter sources by tag on slave nodes. Only sources with this tag will be synced."""
-    master_config: Annotated[dict[str, Any], NoDecode] | None = None
+    master_config: Annotated[configuration.SourceConfig, NoDecode] | None = None
     """Master configuration YAML content as a string (used instead of loading from file)."""
     master_dispatch: bool = True
     """Whether to dispatch configuration updates from master to slaves."""
@@ -66,9 +68,9 @@ class Settings(BaseSettings, extra="ignore"):
 
     @field_validator("master_config", mode="before")
     @classmethod
-    def validate_master_config(cls, value: str | None) -> dict[str, Any] | None:
+    def validate_master_config(cls, value: str | None) -> configuration.SourceConfig | None:
         if value is not None:
-            return yaml.load(value, Loader=yaml.SafeLoader)
+            return cast("configuration.SourceConfig", yaml.load(value, Loader=yaml.SafeLoader))
         return None
 
 

@@ -12,8 +12,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from shared_config_manager import config, nonce, slave_status
-from shared_config_manager.configuration import SourceStatus
+from shared_config_manager import broadcast_status, config, nonce, slave_status
 from shared_config_manager.security import Allowed, User, get_identity, permits
 from shared_config_manager.sources import registry
 from shared_config_manager.sources.base import BaseSource
@@ -145,8 +144,8 @@ def _format_attributes_for_display(
 
 async def _fetch_commit_details(
     source: BaseSource,
-    slave: SourceStatus,
-) -> tuple[SourceStatus, Sequence[str | tuple[str, str]]]:
+    slave: broadcast_status.SourceStatus,
+) -> tuple[broadcast_status.SourceStatus, Sequence[str | tuple[str, str]]]:
     """Fetch commit details from GitHub or local git repository."""
     try:
         match = _REPO_RE.match(source.get_config().get("repo", ""))
@@ -227,7 +226,7 @@ async def ui_source(
 
     slaves = await slave_status.get_source_status(source_id=source_id)
     assert slaves is not None
-    statuses: list[SourceStatus] = []
+    statuses: list[broadcast_status.SourceStatus] = []
     for slave in slaves:
         if slave is None or slave.get("filtered", False):
             continue
@@ -239,7 +238,7 @@ async def ui_source(
 
     _slave_status = await asyncio.gather(*[_fetch_commit_details(source, slave) for slave in statuses])
 
-    def _get_sort_key(elem: tuple[SourceStatus, Sequence[str | tuple[str, str]]]) -> str:
+    def _get_sort_key(elem: tuple[broadcast_status.SourceStatus, Sequence[str | tuple[str, str]]]) -> str:
         return elem[0].get("hostname", "")
 
     return templates.TemplateResponse(
