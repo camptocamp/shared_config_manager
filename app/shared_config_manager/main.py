@@ -72,7 +72,7 @@ async def _watch_source() -> None:
 
                     if await _source_needs_refresh(key):
                         await source.refresh()
-                        await broadcast.broadcast("slave_fetch", params={"id_": key})
+                        await broadcast.broadcast("slave_fetch", params={"source_id": key})
 
                 except Exception:  # noqa: BLE001
                     await registry.update_flag("SOURCE_ERROR")

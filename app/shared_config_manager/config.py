@@ -38,14 +38,16 @@ class Settings(BaseSettings, extra="ignore"):
     """Environment variable prefixes to expose in templates (e.g., MUTUALIZED_, SCM_)."""
     private_ssh_key: str | None = None
     """Private SSH key for accessing git repositories."""
-    http: bool = False
-    """Whether to run in HTTP mode (disables HTTPS redirect). Defaults to False."""
     github_token: str | None = None
     """GitHub API token for accessing GitHub commit information."""
     github_secret: str | None = None
     """GitHub webhook secret for validating incoming webhook signatures."""
     route_prefix: str = "/scm"
     """Route prefix for the shared config manager API."""
+    requests_timeout: int = 30
+    """Timeout in seconds for HTTP requests made by the shared config manager."""
+    http: bool = False
+    """Whether to run in HTTP mode (disables HTTPS redirect). Defaults to False."""
 
     model_config = SettingsConfigDict(env_prefix="SCM__", env_nested_delimiter="__")
 

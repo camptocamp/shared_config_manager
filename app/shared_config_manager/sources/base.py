@@ -129,7 +129,11 @@ class BaseSource:
                 _LOG.info("Doing a fetch of %s, on %s", self.get_id(), url)
                 async with (
                     aiohttp.ClientSession() as session,
-                    session.get(url, headers={"X-Scm-Secret": config.settings.secret or ""}) as response,
+                    session.get(
+                        url,
+                        headers={"X-Scm-Secret": config.settings.secret or ""},
+                        timeout=config.settings.requests_timeout,
+                    ) as response,
                 ):
                     response.raise_for_status()
                     if path.exists():

@@ -152,6 +152,6 @@ async def permits(
         return Allowed("The User is admin.")
     if permission == "all":
         return Denied("Root access is required.")
-    if context is not None and identity.has_access(context):
+    if context is not None and await identity.has_access(context):
         return Allowed(f"The User has access to source {permission}.")
     return Denied(f"The User has no access to source {permission}.")

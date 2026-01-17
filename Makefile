@@ -8,6 +8,8 @@ THIS_DIR := $(shell cd $(dir $(THIS_MAKEFILE_PATH));pwd)
 GIT_HASH := $(shell git rev-parse HEAD)
 
 DOCKER_TTY := $(shell [ -t 0 ] && echo -ti)
+# PYTEST_OPTS: --last-failed --failed-first --exitfirst
+PYTEST_OPTS ?=
 
 .PHONY: help
 help: ## Display this help message
@@ -48,8 +50,7 @@ acceptance: build-acceptance build # Run the acceptance tests
 	C2C_AUTH_GITHUB_CLIENT_ID=$(shell gopass show gs/projects/github/oauth-apps/geoservices-int/client-id) \
 	C2C_AUTH_GITHUB_CLIENT_SECRET=$(shell gopass show gs/projects/github/oauth-apps/geoservices-int/client-secret) \
 	docker compose up --detach
-	docker compose exec -T tests pytest -vv --color=yes --junitxml /reports/acceptance.xml acceptance
-	docker compose down
+	docker compose exec -T tests pytest -vv --color=yes $(PYTEST_OPTS) --junitxml /reports/acceptance.xml acceptance
 
 .PHONY: run
 run: build
@@ -83,7 +84,7 @@ prospector-fast: ## Run Prospector without building the Docker image
 		prospector --output=pylint --die-on-tool-error app
 
 DOCKER_RUN_TESTS = docker run --rm --volume=${PWD}/results/:/results --volume=${PWD}/app:/app
-DOCKER_IMAGE_PYTEST = $(DOCKER_BASE)-checker:$(DOCKER_TAG) pytest -vv --color=yes
+DOCKER_IMAGE_PYTEST = $(DOCKER_BASE)-checker:$(DOCKER_TAG) pytest -vv --color=yes ${PYTEST_OPTS}
 
 .PHONY: tests
 tests: build-checker ## Run the unit tests

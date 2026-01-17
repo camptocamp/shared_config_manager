@@ -26,12 +26,12 @@ def wait_slaves() -> None:
                     if set(status["sources"].keys()) != {"master"}:
                         sources_str = ", ".join(status["sources"].keys())
                         raise Exception(  # pylint: disable=broad-exception-raised
-                            f"Not seeing the 1 source on slave-others (seen:{sources_str}), if you see 'other' you should do `docker compose down`",
+                            f"Not seeing the 1 source on slave-others (seen: {sources_str}), if you see 'other' you should do `docker compose down`",
                         )
                 elif set(status["sources"].keys()) != {"master", "test_git"}:
                     sources_str = ", ".join(status["sources"].keys())
                     raise Exception(  # pylint: disable=broad-exception-raised
-                        f"Not seeing the 2 sources on {name} (seen:{sources_str}), if you see 'other' you should do `docker compose down`",
+                        f"Not seeing the 2 sources on {name} (seen: {sources_str}), if you see 'other' you should do `docker compose down`",
                     )
             return True
         LOG.warning("%i, %s: %s", r.status_code, r.status, r.text)
