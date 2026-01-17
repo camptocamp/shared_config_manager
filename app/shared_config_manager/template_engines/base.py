@@ -84,5 +84,5 @@ def _filter_env(env: dict[str, str]) -> dict[str, str]:
     return {
         key: value
         for key, value in env.items()
-        if any(key.startswith(i) for i in config.settings.env_prefixes.split(":"))
+        if any(key.startswith(i) for i in config.settings.env_prefixes)
     }

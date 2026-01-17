@@ -1,9 +1,13 @@
 """The configuration environment variables."""
 
+import logging
 from pathlib import Path
+from typing import Annotated
 
 from pydantic import field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class Settings(BaseSettings, extra="ignore"):
@@ -33,8 +37,7 @@ class Settings(BaseSettings, extra="ignore"):
     """Master configuration YAML content as a string (used instead of loading from file)."""
     master_dispatch: bool = True
     """Whether to dispatch configuration updates from master to slaves."""
-    # env_prefixes: list[str] = ["MUTUALIZED_"]
-    env_prefixes: str = "MUTUALIZED_"
+    env_prefixes: Annotated[list[str], NoDecode] = ["MUTUALIZED_"]
     """Environment variable prefixes to expose in templates (e.g., MUTUALIZED_, SCM_)."""
     private_ssh_key: str | None = None
     """Private SSH key for accessing git repositories."""
@@ -58,15 +61,15 @@ class Settings(BaseSettings, extra="ignore"):
             value += "/"
         return value
 
-    # @field_validator("env_prefixes", mode="before")
-    # @classmethod
-    # def validate_env_prefixes(cls, value: str | list[str] | None) -> list[str]:
-    #     if value is None:
-    #         return ["MUTUALIZED_"]
-    #     if isinstance(value, str):
-    #         # Parse colon-separated string
-    #         return [v.strip() for v in value.split(":") if v.strip()]
-    #     return value
+    @field_validator("env_prefixes", mode="before")
+    @classmethod
+    def validate_env_prefixes(cls, value: str | list[str] | None) -> list[str]:
+        if value is None:
+            return ["MUTUALIZED_"]
+        if isinstance(value, str):
+            # Parse colon-separated string
+            return [v.strip() for v in value.split(":") if v.strip()]
+        return value
 
 
 settings = Settings()
