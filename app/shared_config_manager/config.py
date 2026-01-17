@@ -38,7 +38,7 @@ class Settings(BaseSettings, extra="ignore"):
     master_dispatch: bool = True
     """Whether to dispatch configuration updates from master to slaves."""
     env_prefixes: Annotated[list[str], NoDecode] = ["MUTUALIZED_"]
-    """Environment variable prefixes to expose in templates (e.g., MUTUALIZED_, SCM_)."""
+    """Environment variable prefixes to expose in templates (e.g., MUTUALIZED_)."""
     private_ssh_key: str | None = None
     """Private SSH key for accessing git repositories."""
     github_token: str | None = None
