@@ -2,30 +2,22 @@ services:
   api:
     image: camptocamp/shared_config_manager:latest
     environment: &scm_env
-      C2C_AUTH_GITHUB_CLIENT_ID: an-id
-      C2C_AUTH_GITHUB_CLIENT_SECRET: a-secret
-      C2C_AUTH_GITHUB_REPOSITORY: camptocamp/shared_config_manager
-      C2C_AUTH_GITHUB_SECRET: a-secret-long-a-secret
-      STATS_VIEW: 1
-      # STATSD_ADDRESS: 172.17.0.1:8125
-      # STATSD_PREFIX: shared_config_manager.dev.app
-      LOG_TYPE: console
-      LOG_LEVEL: DEBUG
-      C2CWSGIUTILS_LOG_LEVEL: INFO
-      OTHER_LOG_LEVEL: DEBUG
-      SCM_SECRET: changeme
-      GITHUB_SECRET: changeme
-      C2C_REDIS_URL: redis://redis:6379/1
-      DEVELOPMENT: 1
-      GUNICORN_PARAMS: '-b :8080 --reload'
-      MASTER_CONFIG: |
+      C2C__AUTH__GITHUB__CLIENT_ID: an-id
+      C2C__AUTH__GITHUB__CLIENT_SECRET: a-secret
+      C2C__AUTH__GITHUB__REPOSITORY: camptocamp/shared_config_manager
+      C2C__AUTH__JWT__SECRET: a-secret-long-a-secret
+      C2C__REDIS__URL: redis://redis:6379/1
+      SCM__SECRET: changeme
+      SCM__GITHUB_SECRET: changeme
+      SCM__MASTER_CONFIG: |
         type: git
         repo: /repos/master
-      API_BASE_URL: http://api:8080/scm
-      TARGET: /config/api
-      SCM_ENV_PREFIXES: TEST_
+      SCM__API_BASE_URL: http://api:8080/scm
+      SCM__TARGET: /config/api
+      SCM__ENV_PREFIXES: TEST_
       TEST_ENV: 42
       TEST_KEY: secret
+      SCM__HTTP: 'true'
     volumes_from:
       - tests:rw
     links:
@@ -36,7 +28,7 @@ services:
     image: camptocamp/shared_config_manager:latest
     environment:
       <<: *scm_env
-      TEST_USER: Test
+      C2C__AUTH__TEST__USERNAME: Test
     volumes_from:
       - tests:rw
     links:
@@ -47,7 +39,7 @@ services:
     image: camptocamp/shared_config_manager:latest
     environment:
       <<: *scm_env
-      MASTER_CONFIG: |
+      SCM__MASTER_CONFIG: |
         sources:
           test_git:
             type: git
@@ -56,9 +48,9 @@ services:
             template_engines:
               - type: shell
                 environment_variables: true
-      API_BASE_URL: http://api_inline:8080/scm
-      TARGET: /config/api-inline
-      C2C_REDIS_URL: redis://redis:6379/2
+      SCM__API_BASE_URL: http://api_inline:8080/scm
+      SCM__TARGET: /config/api-inline
+      C2C__REDIS__URL: redis://redis:6379/2
       C2C_BROADCAST_PREFIX: broadcast_scm_inline_
     volumes_from:
       - tests:rw
@@ -70,10 +62,10 @@ services:
     image: camptocamp/shared_config_manager:latest
     environment: &scm_file_env
       <<: *scm_env
-      MASTER_CONFIG: ''
-      API_BASE_URL: http://api_file:8080/scm
-      TARGET: /config/api-file
-      C2C_REDIS_URL: redis://redis:6379/3
+      SCM__MASTER_CONFIG: ''
+      SCM__API_BASE_URL: http://api_file:8080/scm
+      SCM__TARGET: /config/api-file
+      C2C__REDIS__URL: redis://redis:6379/3
       C2C_BROADCAST_PREFIX: broadcast_scm_file_
     volumes_from:
       - tests:rw
@@ -85,7 +77,7 @@ services:
     image: camptocamp/shared_config_manager:latest
     environment:
       <<: *scm_env
-      TARGET: /config/slave
+      SCM__TARGET: /config/slave
     command: ['shared-config-slave']
     volumes_from:
       - tests:rw
@@ -97,8 +89,8 @@ services:
     image: camptocamp/shared_config_manager:latest
     environment:
       <<: *scm_env
-      TAG_FILTER: others
-      TARGET: /config/slave-other
+      SCM__TAG_FILTER: others
+      SCM__TARGET: /config/slave-other
       TEST_ENV: 42
     command: ['shared-config-slave']
     volumes_from:
@@ -111,7 +103,7 @@ services:
     image: camptocamp/shared_config_manager:latest
     environment:
       <<: *scm_file_env
-      TARGET: /config/slave-file
+      SCM__TARGET: /config/slave-file
     command: ['shared-config-slave']
     volumes_from:
       - tests:rw

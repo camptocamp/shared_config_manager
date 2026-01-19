@@ -12,7 +12,7 @@ services:
       - OAUTHLIB_INSECURE_TRANSPORT=1
     volumes:
       - ./app/shared_config_manager:/app/shared_config_manager:ro
-      # - ../c2cwsgiutils/c2cwsgiutils:/opt/c2cwsgiutils/c2cwsgiutils:ro
+      # - ../c2casgiutils/c2casgiutils:/venv/lib/python3.12/site-packages/c2casgiutils:ro
     ports:
       - '8491:8080'
 
@@ -20,7 +20,7 @@ services:
     environment: *scm_env
     volumes:
       - ./app/shared_config_manager:/app/shared_config_manager:ro
-      # - ../c2cwsgiutils/c2cwsgiutils:/opt/c2cwsgiutils/c2cwsgiutils:ro
+      # - ../c2casgiutils/c2casgiutils:/venv/lib/python3.12/site-packages/c2casgiutils:ro
     ports:
       - '8492:8080'
 
@@ -28,7 +28,7 @@ services:
     environment: *scm_env
     volumes:
       - ./app/shared_config_manager:/app/shared_config_manager:ro
-      # - ../c2cwsgiutils/c2cwsgiutils:/opt/c2cwsgiutils/c2cwsgiutils:ro
+      # - ../c2casgiutils/c2casgiutils:/venv/lib/python3.12/site-packages/c2casgiutils:ro
     ports:
       - '8493:8080'
 
@@ -36,6 +36,7 @@ services:
     environment: *scm_env
     volumes:
       - ./app/shared_config_manager:/app/shared_config_manager:ro
+      # - ../c2casgiutils/c2casgiutils:/venv/lib/python3.12/site-packages/c2casgiutils:ro
     ports:
       - '8494:8080'
 
@@ -43,14 +44,14 @@ services:
     environment: *scm_env
     volumes:
       - ./app/shared_config_manager:/app/shared_config_manager:ro
-      # - ../c2cwsgiutils/c2cwsgiutils:/opt/c2cwsgiutils/c2cwsgiutils:ro
+      # - ../c2casgiutils/c2casgiutils:/venv/lib/python3.12/site-packages/c2casgiutils:ro
 
   slave-others:
     environment: *scm_env
     volumes:
       - ./app/shared_config_manager:/app/shared_config_manager:ro
-      # - ../c2cwsgiutils/c2cwsgiutils:/opt/c2cwsgiutils/c2cwsgiutils:ro
+      # - ../c2casgiutils/c2casgiutils:/venv/lib/python3.12/site-packages/c2casgiutils:ro
 
   # tests:
   #   volumes:
-  #     - ../c2cwsgiutils/c2cwsgiutils:/opt/c2cwsgiutils/c2cwsgiutils:ro
+  #     - ../c2casgiutils/c2casgiutils:/venv/lib/python3.12/site-packages/c2casgiutils:ro

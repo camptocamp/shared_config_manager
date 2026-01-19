@@ -6,7 +6,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from shared_config_manager.configuration import SourceStatus
+from shared_config_manager import broadcast_status
 from shared_config_manager.sources import mode
 from shared_config_manager.sources.ssh import SshBaseSource
 
@@ -70,7 +70,7 @@ class GitSource(SshBaseSource):
             return self._clone_dir()
         return self._clone_dir() / sub_dir
 
-    def get_stats(self) -> SourceStatus:
+    def get_stats(self) -> broadcast_status.SourceStatus:
         stats = super().get_stats()
         stats_path = self.get_path() / ".gitstats"
         if stats_path.is_file():

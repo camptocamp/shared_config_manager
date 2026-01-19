@@ -17,18 +17,21 @@ def wait_slaves() -> None:
         if r.status_code == 200:
             json = r.json()
             if len(json["slaves"]) != 4:
+                slaves_str = ", ".join(json["slaves"].keys())
                 raise Exception(  # pylint: disable=broad-exception-raised
-                    f"Not seeing 4 slaves but {len(json['slaves'])}.",
+                    f"Not seeing 4 slaves but {len(json['slaves'])} ({slaves_str}).",
                 )
             for name, status in json["slaves"].items():
                 if name == "slave-others":
                     if set(status["sources"].keys()) != {"master"}:
+                        sources_str = ", ".join(status["sources"].keys())
                         raise Exception(  # pylint: disable=broad-exception-raised
-                            f"Not seeing the 1 source on {name}",
+                            f"Not seeing the 1 source on slave-others (seen: {sources_str}), if you see 'other' you should do `docker compose down`",
                         )
                 elif set(status["sources"].keys()) != {"master", "test_git"}:
+                    sources_str = ", ".join(status["sources"].keys())
                     raise Exception(  # pylint: disable=broad-exception-raised
-                        f"Not seeing the 2 sources on {name}: {status['sources'].keys()}",
+                        f"Not seeing the 2 sources on {name} (seen: {sources_str}), if you see 'other' you should do `docker compose down`",
                     )
             return True
         LOG.warning("%i, %s: %s", r.status_code, r.status, r.text)
@@ -47,7 +50,7 @@ def composition(request):
         path = os.path.join("/config", slave)
         os.makedirs(path, exist_ok=True)
         os.chown(path, 33, 0)
-    utils.wait_url("http://api:8080/scm/c2c/health_check?max_level=2")
+    utils.wait_url("http://api:8080/scm/c2c/health?tags=ready")
     wait_slaves()
 
 

@@ -1,10 +1,10 @@
-from typing import TypedDict
+from typing import Literal, TypedDict
 
-from c2cwsgiutils.auth import AuthConfig
+from c2casgiutils.auth import AuthConfig
 
 
-class _SourceBase(TypedDict, total=False):
-    type: str
+class SourceBase(TypedDict, total=False):
+    type: Literal["git", "rsync", "rclone"]
     target_dir: str
     excludes: list[str]
     tags: list[str]
@@ -21,38 +21,32 @@ class _SourceBase(TypedDict, total=False):
 
 
 class TemplateEnginesConfig(TypedDict, total=False):
+    """Template engine configuration."""
+
     type: str
     dest_sub_dir: str
     environment_variables: bool
     data: dict[str, str]
 
 
-class SourceConfig(_SourceBase, total=False):
+class SourceConfig(SourceBase, total=False):
+    """Source configuration."""
+
     name: str
     auth: AuthConfig
     template_engines: list[TemplateEnginesConfig]
 
 
 class TemplateEnginesStatus(TypedDict, total=False):
+    """Template engine status."""
+
     type: str
     environment_variables: dict[str, str]
     data: dict[str, str]
 
 
-class BroadcastObject(TypedDict, total=False):
-    hostname: str
-    pid: int
-
-
-class SourceStatus(_SourceBase, BroadcastObject, total=False):
-    filtered: bool
-    template_engines: list[TemplateEnginesStatus]
-    hash: str
-
-
-class SlaveStatus(BroadcastObject, total=False):
-    sources: dict[str, SourceStatus]
-
-
 class Config(TypedDict, total=False):
+    """Overall configuration."""
+
     sources: dict[str, SourceConfig]
+    standalone: bool

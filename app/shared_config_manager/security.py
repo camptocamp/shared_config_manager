@@ -1,12 +1,13 @@
 import hashlib
 import hmac
 import logging
-import os
+from typing import Annotated
 
-import c2cwsgiutils.auth
-import pyramid.request
-from pyramid.security import Allowed, Denied
+import c2casgiutils.auth
+import c2casgiutils.config
+from fastapi import Depends, Header, Request
 
+from shared_config_manager import config
 from shared_config_manager.configuration import SourceConfig
 
 _LOG = logging.getLogger(__name__)
@@ -21,8 +22,6 @@ class User:
     url: str | None
     is_auth: bool
     token: str | None
-    is_admin: bool
-    request: pyramid.request.Request
 
     def __init__(
         self,
@@ -32,123 +31,127 @@ class User:
         url: str | None = None,
         is_auth: bool = False,
         token: str | None = None,
-        request: pyramid.request.Request | None = None,
+        auth_info: c2casgiutils.auth.AuthInfo | None = None,
     ) -> None:
-        assert request is not None
         self.auth_type = auth_type
         self.login = login
         self.name = name
         self.url = url
         self.is_auth = is_auth
         self.token = token
-        self.request = request
-        self.is_admin = c2cwsgiutils.auth.check_access(self.request) if token is not None else False
+        self.auth_info = auth_info
 
-    def has_access(self, source_config: SourceConfig) -> bool:
-        if self.is_admin:
+    async def is_admin(self) -> bool:
+        return (
+            await c2casgiutils.auth.check_access(self.auth_info, {})
+            if self.token is not None and self.auth_info is not None
+            else False
+        )
+
+    async def has_access(self, source_config: SourceConfig) -> bool:
+        if await self.is_admin():
             return True
 
         auth_config = source_config.get("auth", {})
-        if "github_repository" in auth_config:
-            return c2cwsgiutils.auth.check_access_config(self.request, auth_config) or self.is_admin
+        if "github_repository" in auth_config and self.auth_info is not None:
+            return await c2casgiutils.auth.check_access(self.auth_info, auth_config)
 
         return False
 
 
-class SecurityPolicy:
-    """Security policy for the application."""
-
-    def identity(self, request: pyramid.request.Request) -> User:
-        """Return app-specific user object."""
-        if not hasattr(request, "user"):
-            user = None
-
-            if "TEST_USER" in os.environ:
-                user = User(
-                    auth_type="test_user",
-                    login=os.environ["TEST_USER"],
-                    name=os.environ["TEST_USER"],
-                    url="https://example.com/user",
-                    is_auth=True,
-                    token=None,
-                    request=request,
-                )
-            elif "X-Hub-Signature-256" in request.headers and "GITHUB_SECRET" in os.environ:
-                our_signature = hmac.new(
-                    key=os.environ["GITHUB_SECRET"].encode("utf-8"),
-                    msg=request.body,
-                    digestmod=hashlib.sha256,
-                ).hexdigest()
-                if hmac.compare_digest(
-                    our_signature,
-                    request.headers["X-Hub-Signature-256"].split("=", 1)[1],
-                ):
-                    user = User("github_webhook", is_auth=True, request=request)
-                else:
-                    _LOG.warning("Invalid GitHub signature")
-                    _LOG.debug(
-                        """Incorrect GitHub signature
+async def get_identity(
+    request: Request,
+    auth_info: Annotated[c2casgiutils.auth.AuthInfo, Depends(c2casgiutils.auth.get_auth)],
+    x_hub_signature_256: str | None = Header(default=None),
+    x_scm_secret: str | None = Header(default=None),
+) -> User | None:
+    """
+    FastAPI dependency to get the identity.
+    """
+    if c2casgiutils.config.settings.auth.test.username is not None:
+        return User(
+            auth_type="test_user",
+            login=auth_info.user.login,
+            name=auth_info.user.display_name,
+            url=auth_info.user.url,
+            is_auth=auth_info.is_logged_in,
+            token=auth_info.user.token,
+            auth_info=auth_info,
+        )
+    if x_hub_signature_256 is not None and config.settings.github_secret is not None:
+        body = await request.body()
+        our_signature = hmac.new(
+            key=config.settings.github_secret.encode("utf-8"),
+            msg=body,
+            digestmod=hashlib.sha256,
+        ).hexdigest()
+        if hmac.compare_digest(
+            our_signature,
+            x_hub_signature_256.split("=", 1)[1],
+        ):
+            return User("github_webhook", is_auth=True, auth_info=auth_info)
+        _LOG.warning("Invalid GitHub signature")
+        _LOG.debug(
+            """Incorrect GitHub signature
 GitHub signature: %s
 Our signature: %s
 Content length: %i
 body:
 %s
 ---""",
-                        request.headers["X-Hub-Signature-256"],
-                        our_signature,
-                        len(request.body),
-                        request.body,
-                    )
+            x_hub_signature_256,
+            our_signature,
+            len(body),
+            body,
+        )
 
-            elif "X-Scm-Secret" in request.headers and "SCM_SECRET" in os.environ:
-                if request.headers["X-Scm-Secret"] == os.environ["SCM_SECRET"]:
-                    user = User("scm_internal", is_auth=True, request=request)
-                else:
-                    _LOG.warning("Invalid SCM secret")
+    elif x_scm_secret is not None and config.settings.secret is not None:
+        if x_scm_secret == config.settings.secret:
+            return User("scm_internal", is_auth=True, auth_info=auth_info)
+        _LOG.warning("Invalid SCM secret")
 
-            else:
-                is_auth, c2cuser = c2cwsgiutils.auth.is_auth_user(request)
-                if is_auth:
-                    user = User(
-                        "github_oauth",
-                        c2cuser.get("login"),
-                        c2cuser.get("name"),
-                        c2cuser.get("url"),
-                        is_auth,
-                        c2cuser.get("token"),
-                        request,
-                    )
+    elif auth_info.is_logged_in:
+        return User(
+            "github_oauth",
+            auth_info.user.login,
+            auth_info.user.display_name,
+            auth_info.user.url,
+            auth_info.is_logged_in,
+            auth_info.user.token,
+            auth_info=auth_info,
+        )
 
-            request.user = user
+    return None
 
-        return request.user  # type: ignore[no-any-return]
 
-    def authenticated_userid(self, request: pyramid.request.Request) -> str | None:
-        """Return a string ID for the user."""
-        identity = self.identity(request)
+class Allowed:
+    """Allowed access."""
 
-        if identity is None:
-            return None
+    def __init__(self, reason: str) -> None:
+        self.reason = reason
 
-        return identity.login
 
-    def permits(
-        self,
-        request: pyramid.request.Request,
-        context: SourceConfig,
-        permission: str,
-    ) -> Allowed | Denied:
-        """Allow access to everything if signed in."""
-        identity = self.identity(request)
+class Denied:
+    """Denied access."""
 
-        if identity is None:
-            return Denied("User is not signed in.")
-        if identity.auth_type in ("github_webhook", "scm_internal", "test_user"):
-            return Allowed(f"All access auth type: {identity.auth_type}")
-        if identity.is_admin:
-            return Allowed("The User is admin.")
-        if permission == "all":
-            return Denied("Root access is required.")
-        if identity.has_access(context):
-            return Allowed(f"The User has access to source {permission}.")
-        return Denied(f"The User has no access to source {permission}.")
+    def __init__(self, reason: str) -> None:
+        self.reason = reason
+
+
+async def permits(
+    identity: User | None,
+    context: SourceConfig | None,
+    permission: str,
+) -> Allowed | Denied:
+    """Allow access to everything if signed in."""
+    if identity is None:
+        return Denied("User is not signed in.")
+    if identity.auth_type in ("github_webhook", "scm_internal", "test_user"):
+        return Allowed(f"All access auth type: {identity.auth_type}")
+    if await identity.is_admin():
+        return Allowed("The User is admin.")
+    if permission == "all":
+        return Denied("Root access is required.")
+    if context is not None and await identity.has_access(context):
+        return Allowed(f"The User has access to source {permission}.")
+    return Denied(f"The User has no access to source {permission}.")

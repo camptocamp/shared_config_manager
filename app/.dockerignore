@@ -1,5 +1,9 @@
+*
+!poetry.lock
+!pyproject.toml
+!requirements.txt
+!logging.yaml
+!scripts/
+!shared_config_manager/
 **/__pycache__
 **/*.pyc
-Dockerfile
-.dockerignore
-pip-cve-ignore
