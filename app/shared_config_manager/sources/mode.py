@@ -16,7 +16,7 @@ def is_master() -> bool:
 
 def is_master_with_slaves() -> bool:
     """Is the master with slaves."""
-    return is_master() and config.settings.api_master is not None
+    return is_master() and config.settings.api_master
 
 
 def get_fetch_url(id_: str) -> str:
