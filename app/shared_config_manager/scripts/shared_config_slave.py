@@ -13,6 +13,7 @@ import c2casgiutils.config
 import prometheus_client
 import yaml
 from c2casgiutils import broadcast
+from c2casgiutils.tools import logging_ as logging_tools
 
 from shared_config_manager import config, slave_status
 from shared_config_manager.sources import base, registry
@@ -42,6 +43,7 @@ async def _async_main() -> None:
     signal.signal(signal.SIGTERM, _sig_term)
 
     await broadcast.startup()
+    await logging_tools.startup(None)  # type: ignore[arg-type]
     await base.init()
     await slave_status.init()
     await registry.init(slave=True)
