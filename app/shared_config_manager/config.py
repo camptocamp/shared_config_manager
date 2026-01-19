@@ -29,8 +29,12 @@ class Settings(BaseSettings, extra="ignore"):
     """Interval in seconds to check and refresh source configurations."""
     api_base_url: str | None = None
     """Base URL for the shared config manager API (with trailing slash)."""
-    api_master: str | None = None
-    """Master API endpoint URL for fetching configurations."""
+    api_master: bool = False
+    """
+    Whether this instance exposes the shared config manager API as the master node.
+    When this is True and slave nodes are present, templates will not be rendered
+    on the master node (they are rendered only on slave nodes).
+    """
     tag_filter: str | None = None
     """Filter sources by tag on slave nodes. Only sources with this tag will be synced."""
     master_config: str | None = None
