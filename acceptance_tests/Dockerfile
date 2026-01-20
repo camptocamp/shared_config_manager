@@ -35,11 +35,10 @@ RUN --mount=type=cache,target=/var/lib/apt/lists \
 
 RUN --mount=type=cache,target=/var/lib/apt/lists \
     --mount=type=cache,target=/var/cache,sharing=locked \
-    . /etc/os-release \
-    && echo "deb https://deb.nodesource.com/node_18.x ${VERSION_CODENAME} main" > /etc/apt/sources.list.d/nodesource.list \
+    echo "deb https://deb.nodesource.com/node_22.x nodistro main" > /etc/apt/sources.list.d/nodesource.list \
     && curl --silent https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - \
     && apt-get update \
-    && apt-get install --assume-yes --no-install-recommends 'nodejs=18.*'
+    && apt-get install --assume-yes --no-install-recommends 'nodejs=22.*'
 
 COPY package.json package-lock.json ./
 RUN npm install
