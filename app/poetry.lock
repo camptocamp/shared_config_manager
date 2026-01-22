@@ -1373,6 +1373,9 @@ files = [
     {file = "pylint-flask-0.6.tar.gz", hash = "sha256:f4d97de2216bf7bfce07c9c08b166e978fe9f2725de2a50a9845a97de7e31517"},
 ]
 
+[package.dependencies]
+pylint-plugin-utils = ">=0.2.1"
+
 [[package]]
 name = "pylint-plugin-utils"
 version = "0.7"
