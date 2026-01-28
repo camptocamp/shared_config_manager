@@ -5,7 +5,6 @@ import asyncio
 import logging
 import logging.config
 import signal
-import sys
 from types import FrameType
 
 import aiofiles
@@ -19,6 +18,7 @@ from shared_config_manager import config, slave_status
 from shared_config_manager.sources import base, registry
 
 _stop_event = asyncio.Event()
+_LOGGER = logging.getLogger("shared_config_slave")
 
 
 def main() -> None:
@@ -48,13 +48,13 @@ async def _async_main() -> None:
     await slave_status.init()
     await registry.init(slave=True)
     await _stop_event.wait()
+    _LOGGER.info("Shutting down the shared config slave")
 
 
 def _sig_term(signum: int, frame: FrameType | None) -> None:
     del signum, frame
-    logging.getLogger("shared_config_slave").info("Got a SIGTERM, stopping the slave")
+    _LOGGER.info("Got a SIGTERM, stopping the slave")
     _stop_event.set()
-    sys.exit(0)
 
 
 if __name__ == "__main__":
