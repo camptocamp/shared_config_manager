@@ -12,7 +12,7 @@ extend-select = ["UP", "I", "S", "B"]
 [tool.poetry.dependencies]
 python = ">=3.10,<3.13"
 pytest-cov = "7.0.0"
-prospector = { version = "1.17.3", extras = ["with_ruff"] }
+prospector = { version = "1.18.0", extras = ["with_ruff"] }
 prospector-profile-duplicated = "1.11.0"
 prospector-profile-utils = "1.26.5"
 ruff = "0.14.14"
