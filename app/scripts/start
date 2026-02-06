@@ -1,0 +1,7 @@
+#!/bin/bash -eux
+
+while true
+do
+    "$@"
+    echo "Command exited with code $?. Restarting..."
+done
