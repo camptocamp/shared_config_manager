@@ -24,17 +24,14 @@ do
     CHILD_PID=$!
 
     # Wait for the child process to complete
-    set +e
-    wait "${CHILD_PID}"
-    EXIT_CODE=$?
-    set -e
+    wait "${CHILD_PID}" || EXIT_CODE=$?
 
     # Clear the child PID
     unset CHILD_PID
 
     # Only restart if we haven't received a termination signal
     if [ "${KEEP_RUNNING}" = true ]; then
-        echo "Command exited with code ${EXIT_CODE}. Restarting..."
+        echo "Command exited with code ${EXIT_CODE:-0}. Restarting..."
     fi
 done
 
