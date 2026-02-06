@@ -1,7 +1,38 @@
 #!/bin/bash -eux
 
-while true
+# Variable to track if we should continue restarting
+KEEP_RUNNING=true
+
+# Function to handle termination signals
+terminate() {
+    echo "Received termination signal, stopping..."
+    KEEP_RUNNING=false
+    # Forward the signal to the child process if it exists
+    if [ -n "${CHILD_PID:-}" ]; then
+        kill -TERM "${CHILD_PID}" 2>/dev/null || true
+        wait "${CHILD_PID}" 2>/dev/null || true
+    fi
+}
+
+# Set up signal handlers
+trap terminate SIGTERM SIGINT
+
+while [ "${KEEP_RUNNING}" = true ]
 do
-    "$@"
-    echo "Command exited with code $?. Restarting..."
+    # Run the command in the background to allow signal handling
+    "$@" &
+    CHILD_PID=$!
+
+    # Wait for the child process to complete
+    wait "${CHILD_PID}" || EXIT_CODE=$?
+
+    # Clear the child PID
+    unset CHILD_PID
+
+    # Only restart if we haven't received a termination signal
+    if [ "${KEEP_RUNNING}" = true ]; then
+        echo "Command exited with code ${EXIT_CODE:-0}. Restarting..."
+    fi
 done
+
+echo "Start script terminated gracefully."
