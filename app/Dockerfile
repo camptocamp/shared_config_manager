@@ -86,7 +86,7 @@ RUN mkdir -p /prometheus-metrics \
     && chmod a+rwx /prometheus-metrics
 ENV PROMETHEUS_MULTIPROC_DIR=/prometheus-metrics
 
-CMD ["uvicorn", "shared_config_manager.main:app", "--host=0.0.0.0", "--port=8080", "--log-config=/app/logging.yaml"]
+CMD ["start", "uvicorn", "shared_config_manager.main:app", "--host=0.0.0.0", "--port=8080", "--log-config=/app/logging.yaml"]
 
 FROM base AS checker
 
