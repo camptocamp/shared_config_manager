@@ -207,7 +207,7 @@ async def _refresh_all_webhook(
 
 
 def _source_status_from_dict(data: broadcast_status.SourceStatus) -> SourceStatus:
-    return SourceStatus(**{k: v for k, v in data.items() if k not in {"hostname"}})  # type: ignore[arg-type]
+    return SourceStatus(**{k: v for k, v in data.items() if k != "hostname"})  # type: ignore[arg-type]
 
 
 @app.get("/status", response_model_exclude_none=True)
