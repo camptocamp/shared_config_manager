@@ -8,7 +8,7 @@ terminate() {
     echo "Received termination signal, stopping..."
     KEEP_RUNNING=false
     # Forward the signal to the child process if it exists
-    if [ -n "${CHILD_PID:-}" ] && kill -0 "${CHILD_PID}" 2>/dev/null; then
+    if [ -n "${CHILD_PID:-}" ]; then
         kill -TERM "${CHILD_PID}" 2>/dev/null || true
         wait "${CHILD_PID}" 2>/dev/null || true
     fi
@@ -24,8 +24,10 @@ do
     CHILD_PID=$!
 
     # Wait for the child process to complete
-    EXIT_CODE=0
-    wait "${CHILD_PID}" || EXIT_CODE=$?
+    set +e
+    wait "${CHILD_PID}"
+    EXIT_CODE=$?
+    set -e
 
     # Clear the child PID
     unset CHILD_PID
