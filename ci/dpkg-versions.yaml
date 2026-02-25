@@ -8,7 +8,7 @@ camptocamp/shared_config_manager:latest:
   ubuntu_24_04/ca-certificates: '20240203'
   ubuntu_24_04/coreutils: 9.4-3ubuntu6
   ubuntu_24_04/cpp: 4:13.2.0-7ubuntu1
-  ubuntu_24_04/curl: 8.5.0-2ubuntu10.6
+  ubuntu_24_04/curl: 8.5.0-2ubuntu10.7
   ubuntu_24_04/dash: 0.5.12-6ubuntu5
   ubuntu_24_04/debconf: 1.5.86ubuntu1
   ubuntu_24_04/debianutils: 5.17build1
@@ -43,8 +43,8 @@ camptocamp/shared_config_manager:latest:
   ubuntu_24_04/libcom-err2: 1.47.0-2.4~exp1ubuntu4.1
   ubuntu_24_04/libcrypt-dev: 1:4.4.36-4build1
   ubuntu_24_04/libcrypt1: 1:4.4.36-4build1
-  ubuntu_24_04/libcurl3t64-gnutls: 8.5.0-2ubuntu10.6
-  ubuntu_24_04/libcurl4t64: 8.5.0-2ubuntu10.6
+  ubuntu_24_04/libcurl3t64-gnutls: 8.5.0-2ubuntu10.7
+  ubuntu_24_04/libcurl4t64: 8.5.0-2ubuntu10.7
   ubuntu_24_04/libdb5.3t64: 5.3.28+dfsg2-7
   ubuntu_24_04/libdebconfclient0: 0.271ubuntu3
   ubuntu_24_04/libedit2: 3.1-20230828-1build1
