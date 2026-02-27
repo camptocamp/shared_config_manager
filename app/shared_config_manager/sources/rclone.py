@@ -3,15 +3,11 @@ import re
 from anyio import Path
 
 from shared_config_manager import broadcast_status
-from shared_config_manager.configuration import SourceConfig
 from shared_config_manager.sources.base import BaseSource
 
 
 class RcloneSource(BaseSource):
     """Source that get files with rclone."""
-
-    def __init__(self, id_: str, config: SourceConfig, is_master: bool) -> None:
-        super().__init__(id_, config, is_master)
 
     async def refresh(self) -> None:
         await self._setup_config(self._config["config"])
