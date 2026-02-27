@@ -25,7 +25,7 @@ class SshBaseSource(BaseSource):
         key_path = ssh_path / f"{self.get_id()}.key"
         was_here = await key_path.is_file()
         await key_path.write_text(ssh_key, encoding="utf-8")
-        await key_path.chmod(0o700)
+        await key_path.chmod(0o600)
 
         if not was_here:
             async with await (ssh_path / "config").open("a", encoding="utf-8") as config:

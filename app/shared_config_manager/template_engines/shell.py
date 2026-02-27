@@ -18,10 +18,11 @@ class ShellEngine(BaseEngine):
             "envsubst",
             stdin=asyncio.subprocess.PIPE,
             stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
             env=self._data,
         )
-        stdout, _ = await proc.communicate(input=content.encode("utf-8"))
+        stdout, stderr = await proc.communicate(input=content.encode("utf-8"))
         if proc.returncode != 0:
-            msg = f"envsubst failed with return code {proc.returncode}"
+            msg = f"envsubst failed with return code {proc.returncode}: {stderr.decode('utf-8')}"
             raise RuntimeError(msg)
         await dst_path.write_text(stdout.decode("utf-8"), encoding="utf-8")

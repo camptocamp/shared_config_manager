@@ -32,7 +32,7 @@ class RcloneSource(BaseSource):
             await target.rename(self.get_path())
 
     async def _config_path(self) -> Path:
-        return await Path.home() / ".config" / "rclone" / f"{self.get_id()}.conf"
+        return (await Path.home()) / ".config" / "rclone" / f"{self.get_id()}.conf"
 
     async def _setup_config(self, config: str) -> None:
         path = await self._config_path()
