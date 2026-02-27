@@ -1,9 +1,13 @@
 import os
 
+import pytest
+from anyio import Path as AnyioPath
+
 from shared_config_manager import template_engines
 
 
-def test_ok(temp_dir) -> None:
+@pytest.mark.asyncio
+async def test_ok(temp_dir) -> None:
     os.environ["MUTUALIZED_TEST_ENV"] = "yall"
     engine = template_engines.create_engine(
         "test",
@@ -16,13 +20,14 @@ def test_ok(temp_dir) -> None:
         out.write("Hello ${param} ${MUTUALIZED_TEST_ENV}\n")
 
     files = [p.relative_to(temp_dir) for p in temp_dir.glob("**/*")]
-    engine.evaluate(temp_dir, files)
+    await engine.evaluate(AnyioPath(temp_dir), [AnyioPath(str(f)) for f in files])
 
     with file_path.open() as input_:
         assert input_.read() == "Hello world yall\n"
 
 
-def test_dest_sub_dir(temp_dir) -> None:
+@pytest.mark.asyncio
+async def test_dest_sub_dir(temp_dir) -> None:
     os.environ["MUTUALIZED_TEST_ENV"] = "yall"
     engine = template_engines.create_engine(
         "test",
@@ -36,7 +41,7 @@ def test_dest_sub_dir(temp_dir) -> None:
         out.write("Hello\n")
 
     files = [p.relative_to(temp_dir) for p in temp_dir.glob("**/*")]
-    engine.evaluate(temp_dir, files)
+    await engine.evaluate(AnyioPath(temp_dir), [AnyioPath(str(f)) for f in files])
 
     with (temp_dir / "copy" / "file1").open() as input_:
         assert input_.read() == "Hello world yall\n"
