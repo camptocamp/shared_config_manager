@@ -52,8 +52,6 @@ class SshBaseSource(BaseSource):
                 config_path = ssh_path / "config"
                 content = await config_path.read_text(encoding="utf-8")
                 lines = [
-                    line
-                    for line in content.splitlines(keepends=True)
-                    if line != f"IdentityFile {key_path}\n"
+                    line for line in content.splitlines(keepends=True) if line != f"IdentityFile {key_path}\n"
                 ]
                 await config_path.write_text("".join(lines), encoding="utf-8")
