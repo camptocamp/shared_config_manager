@@ -58,25 +58,30 @@ async def _source_needs_refresh(source_id: str) -> bool:
     return False
 
 
+async def _refresh_source_if_needed(key: str, source: base.BaseSource) -> None:
+    """Refresh a single source if it needs refreshing."""
+    if source.is_master():
+        return
+    if await _source_needs_refresh(key):
+        await source.refresh()
+        await broadcast.broadcast("slave_fetch", params={"source_id": key})
+
+
 async def _watch_source() -> None:
     """Watch the source."""
     while True:
         _LOGGER.debug("Watching the sources")
         try:
+            sources = list(registry.get_sources().items())
+            results = await asyncio.gather(
+                *[_refresh_source_if_needed(key, source) for key, source in sources],
+                return_exceptions=True,
+            )
             has_error = False
-            for key, source in registry.get_sources().items():
-                _LOGGER.debug("Watching the source %s", key)
-                try:
-                    if source.is_master():
-                        continue
-
-                    if await _source_needs_refresh(key):
-                        await source.refresh()
-                        await broadcast.broadcast("slave_fetch", params={"source_id": key})
-
-                except Exception:  # noqa: BLE001
+            for (key, _), result in zip(sources, results, strict=True):
+                if isinstance(result, BaseException):
                     await registry.update_flag("SOURCE_ERROR")
-                    _LOGGER.warning("Error while watching the source %s", key, exc_info=True)
+                    _LOGGER.warning("Error while watching the source %s", key, exc_info=result)
                     has_error = True
             if not has_error:
                 await registry.update_flag("READY")

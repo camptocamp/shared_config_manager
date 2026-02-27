@@ -1,13 +1,23 @@
 """The configuration environment variables."""
 
 import logging
-from pathlib import Path
 from typing import Annotated
 
+from anyio import Path
 from pydantic import field_validator
+from pydantic.functional_validators import BeforeValidator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def _to_path(v: object) -> Path:
+    if isinstance(v, Path):
+        return v
+    return Path(str(v))
+
+
+_AnyioPath = Annotated[Path, BeforeValidator(_to_path)]
 
 
 class Settings(BaseSettings, extra="ignore"):
@@ -17,9 +27,9 @@ class Settings(BaseSettings, extra="ignore"):
     """Whether this instance is a slave (non-master) node. Defaults to False."""
     secret: str | None = None
     """Shared secret for internal authentication between master and slave nodes."""
-    target: Path = Path("/config")
+    target: _AnyioPath = Path("/config")
     """Target directory where configuration is deployed on slave nodes."""
-    master_target: Path = Path("/master_config")
+    master_target: _AnyioPath = Path("/master_config")
     """Target directory where configuration is deployed on the master node."""
     retry_number: int = 3
     """Number of retry attempts when fetching configuration from the master."""

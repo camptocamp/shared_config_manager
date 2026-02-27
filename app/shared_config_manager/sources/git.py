@@ -4,7 +4,8 @@ import logging
 import os
 import subprocess
 import tempfile
-from pathlib import Path
+
+from anyio import Path
 
 from shared_config_manager import broadcast_status
 from shared_config_manager.sources import mode
@@ -17,19 +18,19 @@ LOG = logging.getLogger(__name__)
 class GitSource(SshBaseSource):
     """Source that get files with git."""
 
-    def _do_refresh(self) -> None:
-        self._checkout()
-        self._copy(self._copy_dir(), excludes=[".git"])
+    async def _do_refresh(self) -> None:
+        await self._checkout()
+        await self._copy(self._copy_dir(), excludes=[".git"])
         stats = {"hash": self._get_hash(), "tags": self._get_tags()}
-        with (self.get_path() / ".gitstats").open("w", encoding="utf-8") as gitstats:
-            json.dump(stats, gitstats)
+        async with await (self.get_path() / ".gitstats").open("w", encoding="utf-8") as gitstats:
+            await gitstats.write(json.dumps(stats))
 
-    def _checkout(self) -> None:
+    async def _checkout(self) -> None:
         cwd = self._clone_dir()
         repo = self._get_repo()
         branch = self.get_branch()
         git_dir = cwd / ".git"
-        if git_dir.is_dir():
+        if await git_dir.is_dir():
             LOG.info("Fetching a new version of %s", repo)
             try:
                 self._exec("git", "fetch", "--depth=1", "origin", branch, cwd=cwd)
@@ -38,15 +39,15 @@ class GitSource(SshBaseSource):
             except subprocess.CalledProcessError:
                 LOG.warning("Failed to fetch a new version of %s, retry checkout", repo)
                 self._exec("rm", "-rf", git_dir)
-                self._checkout()
+                await self._checkout()
         elif self._do_sparse():
             LOG.info("Cloning %s (sparse)", repo)
             self._exec("git-sparse-clone", repo, branch, cwd, self._config["sub_dir"], cwd=TEMP_DIR)
         else:
             LOG.info("Cloning %s", repo)
-            if cwd.exists():
+            if await cwd.exists():
                 os.removedirs(cwd)
-            cwd.parent.mkdir(parents=True, exist_ok=True)
+            await cwd.parent.mkdir(parents=True, exist_ok=True)
             command = ["git", "clone", f"--branch={branch}", "--depth=1", repo, cwd.name]
             self._exec(*command, cwd=TEMP_DIR)
 
@@ -70,12 +71,11 @@ class GitSource(SshBaseSource):
             return self._clone_dir()
         return self._clone_dir() / sub_dir
 
-    def get_stats(self) -> broadcast_status.SourceStatus:
-        stats = super().get_stats()
+    async def get_stats(self) -> broadcast_status.SourceStatus:
+        stats = await super().get_stats()
         stats_path = self.get_path() / ".gitstats"
-        if stats_path.is_file():
-            with stats_path.open(encoding="utf-8") as gitstats:
-                stats.update(json.load(gitstats))
+        if await stats_path.is_file():
+            stats.update(json.loads(await stats_path.read_text(encoding="utf-8")))
         return stats
 
     def _get_hash(self) -> str:
@@ -88,7 +88,7 @@ class GitSource(SshBaseSource):
     def get_branch(self) -> str:
         return str(self._config.get("branch", "master"))
 
-    def delete(self) -> None:
-        super().delete()
+    async def delete(self) -> None:
+        await super().delete()
         if mode.is_master():
             self._exec("rm", "-rf", self._clone_dir())

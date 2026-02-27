@@ -2,11 +2,10 @@ import asyncio
 import logging
 import tempfile
 from collections.abc import Mapping
-from pathlib import Path
 from typing import cast
 
-import aiofiles
 import yaml
+from anyio import Path
 from asyncinotify import Inotify, Mask
 from c2casgiutils import broadcast
 from fastapi import HTTPException, Request
@@ -55,19 +54,22 @@ async def init(slave: bool) -> None:
         )
     else:
         _LOG.info("Load the master config from config file")
-        async with aiofiles.open("/etc/shared_config_manager/config.yaml", encoding="utf-8") as scm_file:
-            content = cast("configuration.Config", yaml.load(await scm_file.read(), Loader=yaml.SafeLoader))
+        main_config_path = Path("/etc/shared_config_manager/config.yaml")
+        content = cast(
+            "configuration.Config",
+            yaml.load(await main_config_path.read_text(encoding="utf-8"), Loader=yaml.SafeLoader),
+        )
 
         async def watch_config() -> None:
             with Inotify() as inotify:
-                main_config_path = Path("/etc/shared_config_manager/config.yaml")
                 # Watch for modifications and deletions (move) of the config file
                 inotify.add_watch(main_config_path, Mask.CLOSE_WRITE | Mask.IGNORED)
                 async for _ in inotify:
                     _LOG.info("Reload the master config from config file")
-                    async with aiofiles.open(main_config_path, encoding="utf-8") as scm_file:
-                        config = yaml.load(await scm_file.read(), Loader=yaml.SafeLoader)
-                    await _handle_master_config(config)
+                    cfg = yaml.load(
+                        await main_config_path.read_text(encoding="utf-8"), Loader=yaml.SafeLoader
+                    )
+                    await _handle_master_config(cfg)
 
         global _WATCH_CONFIG_TASK  # noqa: PLW0603
         _WATCH_CONFIG_TASK = asyncio.create_task(watch_config())
@@ -94,12 +96,9 @@ async def init(slave: bool) -> None:
 async def reload_master_config() -> None:
     """Reload the master config."""
     if MASTER_SOURCE:
-        async with aiofiles.open(
-            MASTER_SOURCE.get_path() / "shared_config_manager.yaml",
-            encoding="utf-8",
-        ) as config_file:
-            config = yaml.load(await config_file.read(), Loader=yaml.SafeLoader)
-            await _handle_master_config(config)
+        config_path = MASTER_SOURCE.get_path() / "shared_config_manager.yaml"
+        cfg = yaml.load(await config_path.read_text(encoding="utf-8"), Loader=yaml.SafeLoader)
+        await _handle_master_config(cfg)
 
 
 async def _do_handle_master_config(config: configuration.Config) -> tuple[int, int]:
@@ -115,7 +114,7 @@ async def _do_handle_master_config(config: configuration.Config) -> tuple[int, i
 
     to_deletes = set(_SOURCES.keys()) - set(new_sources.keys())
     for to_delete in to_deletes:
-        _delete_source(to_delete)
+        await _delete_source(to_delete)
     for source_id, source_config in new_sources.items():
         prev_source = _SOURCES.get(source_id)
         if prev_source is None:
@@ -125,7 +124,7 @@ async def _do_handle_master_config(config: configuration.Config) -> tuple[int, i
             continue
         else:
             _LOG.info("Change detected in source %s, reloading it", source_id)
-            _delete_source(source_id)  # to be sure the old stuff is cleaned
+            await _delete_source(source_id)  # to be sure the old stuff is cleaned
 
         try:
             _SOURCES[source_id] = _create_source(source_id, source_config)
@@ -155,15 +154,14 @@ async def _handle_master_config(config: configuration.Config) -> None:
 
 async def update_flag(value: str) -> None:
     """Update the status flag."""
-    async with aiofiles.open(Path(tempfile.gettempdir()) / "status", "w", encoding="utf-8") as flag:
-        await flag.write(value)
+    await (Path(tempfile.gettempdir()) / "status").write_text(value, encoding="utf-8")
 
 
 async def _prepare_ssh() -> None:
-    home = Path.home()
-    other_ssh = home.joinpath(".ssh2")
-    if other_ssh.is_dir():
-        ssh = home.joinpath(".ssh")
+    home = await Path.home()
+    other_ssh = home / ".ssh2"
+    if await other_ssh.is_dir():
+        ssh = home / ".ssh"
         proc = await asyncio.create_subprocess_exec(
             "rsync",
             "--recursive",
@@ -175,8 +173,8 @@ async def _prepare_ssh() -> None:
         await proc.wait()
 
 
-def _delete_source(source_id: str) -> None:
-    _SOURCES[source_id].delete()
+async def _delete_source(source_id: str) -> None:
+    await _SOURCES[source_id].delete()
     del _SOURCES[source_id]
 
 
@@ -255,13 +253,10 @@ def get_source(source_id: str) -> base.BaseSource | None:
     return _SOURCES.get(source_id)
 
 
-def get_stats() -> dict[str, broadcast_status.SourceStatus]:
+async def get_stats() -> dict[str, broadcast_status.SourceStatus]:
     """Get the stats of all the sources."""
-    return (
-        {
-            source_id: source.get_stats()
-            for source_id, source in {**_SOURCES, MASTER_SOURCE.get_id(): MASTER_SOURCE}.items()
-        }
-        if MASTER_SOURCE
-        else {}
-    )
+    if not MASTER_SOURCE:
+        return {}
+    all_sources = {**_SOURCES, MASTER_SOURCE.get_id(): MASTER_SOURCE}
+    results = await asyncio.gather(*[source.get_stats() for source in all_sources.values()])
+    return dict(zip(all_sources.keys(), results, strict=True))

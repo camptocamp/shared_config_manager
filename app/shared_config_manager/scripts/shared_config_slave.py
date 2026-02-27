@@ -7,10 +7,10 @@ import logging.config
 import signal
 from types import FrameType
 
-import aiofiles
 import c2casgiutils.config
 import prometheus_client
 import yaml
+from anyio import Path
 from c2casgiutils import broadcast
 from c2casgiutils.tools import logging_ as logging_tools
 
@@ -31,9 +31,8 @@ async def _async_main() -> None:
     parser = argparse.ArgumentParser(description="Run the shared config slave")
     parser.parse_args()
 
-    async with aiofiles.open("logging.yaml") as logging_file:
-        logging_config = yaml.safe_load(await logging_file.read())
-        logging.config.dictConfig(logging_config)
+    logging_config = yaml.safe_load(await Path("logging.yaml").read_text(encoding="utf-8"))
+    logging.config.dictConfig(logging_config)
 
     config.settings.is_slave = True
 

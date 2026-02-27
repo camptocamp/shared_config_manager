@@ -157,11 +157,11 @@ async def _refresh_all(
         message = "Master source not initialized"
         raise HTTPException(status_code=500, detail=message)
     await registry.MASTER_SOURCE.validate_auth(identity=identity, request=request)
-    nb_refresh = 0
-    for source_id in registry.get_sources():
-        await registry.refresh(source_id=source_id, identity=identity, request=request)
-        nb_refresh += 1
-    return RefreshAllResponse(status=200, nb_refresh=nb_refresh)
+    source_ids = list(registry.get_sources())
+    await asyncio.gather(
+        *[registry.refresh(source_id=sid, identity=identity, request=request) for sid in source_ids]
+    )
+    return RefreshAllResponse(status=200, nb_refresh=len(source_ids))
 
 
 @app.post("/refresh", response_model_exclude_none=True)
@@ -185,7 +185,7 @@ async def _refresh_all_webhook(
         message = "Webhook is missing the ref"
         raise HTTPException(status_code=500, detail=message)
 
-    nb_refresh = 0
+    matching_source_ids = []
     for source_id, source in registry.get_sources().items():
         if not source or source.get_type() != "git":
             continue
@@ -200,10 +200,12 @@ async def _refresh_all_webhook(
                 source_id,
             )
             continue
-        await registry.refresh(source_id=source_id, identity=identity, request=request)
-        nb_refresh += 1
+        matching_source_ids.append(source_id)
 
-    return RefreshAllResponse(status=200, nb_refresh=nb_refresh)
+    await asyncio.gather(
+        *[registry.refresh(source_id=sid, identity=identity, request=request) for sid in matching_source_ids]
+    )
+    return RefreshAllResponse(status=200, nb_refresh=len(matching_source_ids))
 
 
 def _source_status_from_dict(data: broadcast_status.SourceStatus) -> SourceStatus:
@@ -277,12 +279,12 @@ async def _tarball(
         raise HTTPException(status_code=403, detail=message)
     path = source.get_path()
 
-    if not path.is_dir():
+    if not await path.is_dir():
         _LOG.error("The path %s does not exists or is not a path, for the source %s.", path, source.get_id())
         message = "Not loaded yet: path didn't exists"
         raise HTTPException(status_code=404, detail=message)
 
-    files = [file.name for file in path.iterdir()]
+    files = [file.name async for file in path.iterdir()]
     gitstats_filename = ".gitstats"
     if gitstats_filename in files:
         # put .gitstats at the end, that way, it is updated last at the destination
