@@ -158,9 +158,21 @@ async def _refresh_all(
         raise HTTPException(status_code=500, detail=message)
     await registry.MASTER_SOURCE.validate_auth(identity=identity, request=request)
     source_ids = list(registry.get_sources())
-    await asyncio.gather(
-        *[registry.refresh(source_id=sid, identity=identity, request=request) for sid in source_ids]
+    results = await asyncio.gather(
+        *[registry.refresh(source_id=sid, identity=identity, request=request) for sid in source_ids],
+        return_exceptions=True,
     )
+    errors: list[Exception] = []
+    for sid, result in zip(source_ids, results, strict=True):
+        if isinstance(result, Exception):
+            _LOG.error("Error refreshing source %s", sid, exc_info=result)
+            errors.append(result)
+    if errors:
+        # Prefer propagating an HTTPException if any, otherwise the first generic exception.
+        for err in errors:
+            if isinstance(err, HTTPException):
+                raise err
+        raise errors[0]
     return RefreshAllResponse(status=200, nb_refresh=len(source_ids))
 
 
@@ -202,9 +214,20 @@ async def _refresh_all_webhook(
             continue
         matching_source_ids.append(source_id)
 
-    await asyncio.gather(
-        *[registry.refresh(source_id=sid, identity=identity, request=request) for sid in matching_source_ids]
+    results = await asyncio.gather(
+        *[registry.refresh(source_id=sid, identity=identity, request=request) for sid in matching_source_ids],
+        return_exceptions=True,
     )
+    errors: list[Exception] = []
+    for sid, result in zip(matching_source_ids, results, strict=True):
+        if isinstance(result, Exception):
+            _LOG.error("Error refreshing source %s", sid, exc_info=result)
+            errors.append(result)
+    if errors:
+        for err in errors:
+            if isinstance(err, HTTPException):
+                raise err
+        raise errors[0]
     return RefreshAllResponse(status=200, nb_refresh=len(matching_source_ids))
 
 
