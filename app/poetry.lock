@@ -272,14 +272,14 @@ files = [
 
 [[package]]
 name = "asyncinotify"
-version = "4.3.2"
+version = "4.4.0"
 description = "'A simple optionally-async python inotify library, focused on simplicity of use and operation, and leveraging modern Python features"
 optional = false
 python-versions = "<4,>=3.6"
 groups = ["main"]
 files = [
-    {file = "asyncinotify-4.3.2-py3-none-any.whl", hash = "sha256:5d2b3e3575b11996960224536d063ec92abd5189ede7e752e61e065bc4686983"},
-    {file = "asyncinotify-4.3.2.tar.gz", hash = "sha256:3321deedc443c8402229a423623d3ae2fc17c433b9b9bfe170828ee0c7ea3871"},
+    {file = "asyncinotify-4.4.0-py3-none-any.whl", hash = "sha256:76e1199e5d66241a70fb612fe966f4422c1e769ca5b47497d4c96b053aee7c9c"},
+    {file = "asyncinotify-4.4.0.tar.gz", hash = "sha256:438bdc0715f4f959e6e0af70e76cea198b4e28e5933c7cbf1e9987b50394afb3"},
 ]
 
 [[package]]
@@ -2171,14 +2171,14 @@ with-vulture = ["vulture"]
 
 [[package]]
 name = "prospector-profile-duplicated"
-version = "1.11.0"
+version = "1.12.0"
 description = "Profile that can be used to disable the duplicated or conflict rules between Prospector and other tools"
 optional = false
 python-versions = "*"
 groups = ["dev"]
 files = [
-    {file = "prospector_profile_duplicated-1.11.0-py2.py3-none-any.whl", hash = "sha256:8552d57b17442d5dfa143e9e05dd4139c86e1a12ea7b35fef968dbf0820856ce"},
-    {file = "prospector_profile_duplicated-1.11.0.tar.gz", hash = "sha256:b2fc64541e0cef51e6929f090f204774c219a0fe01ffb9760cc6165ea97d7227"},
+    {file = "prospector_profile_duplicated-1.12.0-py2.py3-none-any.whl", hash = "sha256:e833592234172f7b557c54c0c6ad047ac1df0019e361d3d2549f59978062cd98"},
+    {file = "prospector_profile_duplicated-1.12.0.tar.gz", hash = "sha256:5543e27d7ac77a5426123c988274b50834b07902567abdb5a1f61496cc625d96"},
 ]
 
 [package.dependencies]
@@ -2186,18 +2186,18 @@ prospector = "*"
 
 [[package]]
 name = "prospector-profile-utils"
-version = "1.26.5"
+version = "1.27.0"
 description = "Some utility Prospector profiles."
 optional = false
 python-versions = "*"
 groups = ["dev"]
 files = [
-    {file = "prospector_profile_utils-1.26.5-py2.py3-none-any.whl", hash = "sha256:370637f4a1ec9bc48c02a2cf7d66aec29dc47690f7936f66f6571333af56c0ba"},
-    {file = "prospector_profile_utils-1.26.5.tar.gz", hash = "sha256:393614037822c26eb3ec25ba2e281de1edc07e36e0c6ea716a7b94c2a047308d"},
+    {file = "prospector_profile_utils-1.27.0-py2.py3-none-any.whl", hash = "sha256:15902c24d5005c895d79b232678c878b1d2bdaaedfec7d29774d2b3ba5e0d4d7"},
+    {file = "prospector_profile_utils-1.27.0.tar.gz", hash = "sha256:1f74b5c07b895ce280e5988a3b82f475424b59efc70914881fcddd0cdec7a716"},
 ]
 
 [package.dependencies]
-prospector = {version = ">=1.14.0", extras = ["with-mypy", "with-ruff"]}
+prospector = {version = ">=1.13.0", extras = ["with-mypy", "with-ruff"]}
 
 [[package]]
 name = "pycodestyle"
@@ -2752,14 +2752,14 @@ files = [
 
 [[package]]
 name = "redis"
-version = "7.1.0"
+version = "7.2.1"
 description = "Python client for Redis database and key-value store"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "redis-7.1.0-py3-none-any.whl", hash = "sha256:23c52b208f92b56103e17c5d06bdc1a6c2c0b3106583985a76a18f83b265de2b"},
-    {file = "redis-7.1.0.tar.gz", hash = "sha256:b1cc3cfa5a2cb9c2ab3ba700864fb0ad75617b41f01352ce5779dabf6d5f9c3c"},
+    {file = "redis-7.2.1-py3-none-any.whl", hash = "sha256:49e231fbc8df2001436ae5252b3f0f3dc930430239bfeb6da4c7ee92b16e5d33"},
+    {file = "redis-7.2.1.tar.gz", hash = "sha256:6163c1a47ee2d9d01221d8456bc1c75ab953cbda18cfbc15e7140e9ba16ca3a5"},
 ]
 
 [package.dependencies]
@@ -2770,6 +2770,8 @@ circuit-breaker = ["pybreaker (>=1.4.0)"]
 hiredis = ["hiredis (>=3.2.0)"]
 jwt = ["pyjwt (>=2.9.0)"]
 ocsp = ["cryptography (>=36.0.1)", "pyopenssl (>=20.0.1)", "requests (>=2.31.0)"]
+otel = ["opentelemetry-api (>=1.39.1)", "opentelemetry-exporter-otlp-proto-http (>=1.39.1)", "opentelemetry-sdk (>=1.39.1)"]
+xxhash = ["xxhash (>=3.6.0,<3.7.0)"]
 
 [[package]]
 name = "requests"
@@ -4033,4 +4035,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.15"
-content-hash = "8b618d1bb31cd33f4172a2f0624ad772909007322ac87f5171e19bffb7ba0a29"
+content-hash = "d9ec6a1d5836dba5bbfc8f218b701b3546c87eea945e6db56e7dcba5fc221831"
