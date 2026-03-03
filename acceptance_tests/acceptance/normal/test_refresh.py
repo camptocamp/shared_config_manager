@@ -38,6 +38,7 @@ def _trigger(app_connection: Connection, url: str, json: dict[str, Any], headers
         url,
         data=json,
         headers={
+            "Content-Type": "application/json",
             "X-Hub-Signature-256": "sha256="
             + hmac.new(
                 key=b"changeme",
