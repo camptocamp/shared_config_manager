@@ -20,7 +20,7 @@ get_slaves_status: GetSlavesStatusProto = None  # type: ignore[assignment]
 
 async def _get_slaves_status() -> broadcast_status.SlaveStatus:
     """Get the status of all the slaves."""
-    return broadcast_status.SlaveStatus(sources=registry.get_stats())
+    return broadcast_status.SlaveStatus(sources=await registry.get_stats())
 
 
 class GetSourceStatusProto(Protocol):
@@ -37,7 +37,7 @@ async def _get_source_status(*, source_id: str) -> broadcast_status.SourceStatus
     source = registry.get_source(source_id)
     if source is None:
         return broadcast_status.SourceStatus(filtered=source_id in registry.FILTERED_SOURCES)
-    return source.get_stats()
+    return await source.get_stats()
 
 
 async def init() -> None:

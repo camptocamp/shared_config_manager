@@ -66,7 +66,7 @@ async def test_git(repo: Path) -> None:
         with Path("/config/test_git/toto/test").open() as file:
             assert file.read() == "Good bye"
     finally:
-        git.delete()
+        await git.delete()
 
 
 @pytest.mark.asyncio
@@ -97,7 +97,7 @@ async def test_git_sub_dir(repo) -> None:
         with Path("/config/test_git/test").open() as file:
             assert file.read() == "Good bye"
     finally:
-        git.delete()
+        await git.delete()
 
 
 @pytest.mark.asyncio
@@ -131,7 +131,7 @@ async def test_git_sub_dir_no_sparse(repo) -> None:
         with Path("/config/test_git/test").open() as file:
             assert file.read() == "Good bye"
     finally:
-        git.delete()
+        await git.delete()
 
 
 @pytest.mark.skipif(os.environ.get("PRIVATE_SSH_KEY") is not None, reason="We needs to have the key")

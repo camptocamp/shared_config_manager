@@ -5,10 +5,10 @@ import os
 import shutil
 import subprocess
 import urllib.parse
-from pathlib import Path
 from typing import Any, Protocol, cast
 
 import aiohttp
+from anyio import Path
 from c2casgiutils import broadcast
 from fastapi import HTTPException, Request
 from prometheus_client import Counter, Gauge, Summary
@@ -75,7 +75,7 @@ class BaseSource:
         try:
             self._is_loaded = False
             with _REFRESH_SUMMARY.labels(self.get_id()).time():
-                self._do_refresh()
+                await self._do_refresh()
             await self._eval_templates()
             await _set_refresh_success(source=self.get_id())
         except Exception:
@@ -95,11 +95,11 @@ class BaseSource:
         # all the files that are created by template engines (see the --delete rsync flag in
         # BaseSource._copy).
         root_dir = self.get_path()
-        files = [p.relative_to(root_dir) for p in root_dir.glob("**/*")]
+        files = [p.relative_to(root_dir) async for p in root_dir.glob("**/*")]
 
         for engine in self._template_engines:
             with _TEMPLATE_SUMMARY.labels(self.get_id(), engine.get_type()).time():
-                engine.evaluate(root_dir, files)
+                await engine.evaluate(root_dir, files)
 
     async def fetch(self) -> None:
         try:
@@ -118,7 +118,7 @@ class BaseSource:
         finally:
             self._is_loaded = True
 
-    def _do_refresh(self) -> None:
+    async def _do_refresh(self) -> None:
         pass
 
     async def _do_fetch(self) -> None:
@@ -137,9 +137,9 @@ class BaseSource:
                     ) as response,
                 ):
                     response.raise_for_status()
-                    if path.exists():
+                    if await path.exists():
                         shutil.rmtree(path)
-                    path.mkdir(parents=True, exist_ok=True)
+                    await path.mkdir(parents=True, exist_ok=True)
                     tar = await asyncio.create_subprocess_exec(
                         "tar",
                         "--extract",
@@ -174,8 +174,8 @@ class BaseSource:
             else:
                 return
 
-    def _copy(self, source: Path, excludes: list[str] | None = None) -> None:
-        self.get_path().mkdir(parents=True, exist_ok=True)
+    async def _copy(self, source: Path, excludes: list[str] | None = None) -> None:
+        await self.get_path().mkdir(parents=True, exist_ok=True)
         cmd = [
             "rsync",
             "--recursive",
@@ -194,10 +194,10 @@ class BaseSource:
         with _COPY_SUMMARY.labels(self.get_id()).time():
             self._exec(*cmd)
 
-    def delete_target_dir(self) -> None:
+    async def delete_target_dir(self) -> None:
         dest = self.get_path()
         _LOG.info("Deleting target dir %s", dest)
-        if dest.is_dir():
+        if await dest.is_dir():
             shutil.rmtree(dest)
 
     def get_path(self) -> Path:
@@ -235,7 +235,7 @@ class BaseSource:
     def is_master(self) -> bool:
         return self._is_master
 
-    def get_stats(self) -> broadcast_status.SourceStatus:
+    async def get_stats(self) -> broadcast_status.SourceStatus:
         config_copy = copy.deepcopy(self._config)
         stats_ = cast("broadcast_status.SourceStatus", config_copy)
         for template_stats, template_engine in zip(
@@ -255,8 +255,8 @@ class BaseSource:
     def get_type(self) -> str:
         return self._config["type"]
 
-    def delete(self) -> None:
-        self.delete_target_dir()
+    async def delete(self) -> None:
+        await self.delete_target_dir()
 
     @staticmethod
     def _exec(*args: Any, **kwargs: Any) -> str:

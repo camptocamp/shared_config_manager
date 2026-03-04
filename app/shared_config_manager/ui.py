@@ -3,10 +3,10 @@ import logging
 import math
 import re
 from collections.abc import Callable, Sequence
-from pathlib import Path
 from typing import Annotated, cast
 
 import aiohttp
+from anyio import Path
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles

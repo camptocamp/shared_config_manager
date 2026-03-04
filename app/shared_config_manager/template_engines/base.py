@@ -1,8 +1,8 @@
 import logging
 import os
-from pathlib import Path
 from typing import cast
 
+from anyio import Path
 from prometheus_client import Counter, Gauge
 
 from shared_config_manager import config
@@ -33,7 +33,7 @@ class BaseEngine:
         else:
             self._data = config.get("data", {})
 
-    def evaluate(self, root_dir: Path, files: list[Path]) -> None:
+    async def evaluate(self, root_dir: Path, files: list[Path]) -> None:
         dest_dir = self._get_dest_dir(root_dir)
         _LOG.info(
             "Evaluating templates %s -> %s with data keys: %s",
@@ -45,12 +45,12 @@ class BaseEngine:
         for sub_path in files:
             src_path = root_dir / sub_path
             dest_path = dest_dir / sub_path
-            dest_path.parent.mkdir(parents=True, exist_ok=True)
+            await dest_path.parent.mkdir(parents=True, exist_ok=True)
             if src_path.suffix == "." + self._extension:
                 dest_path = dest_path.parent / dest_path.stem
                 _LOG.debug("Evaluating template: %s -> %s", src_path, dest_path)
                 try:
-                    self._evaluate_file(src_path, dest_path)
+                    await self._evaluate_file(src_path, dest_path)
                     _ERROR_GAUGE.labels(source=self._source_id, type=self.get_type()).set(0)
                 except Exception:  # noqa: BLE001
                     _LOG.warning(
@@ -61,15 +61,15 @@ class BaseEngine:
                     )
                     _ERROR_COUNTER.labels(source=self._source_id, type=self.get_type()).inc()
                     _ERROR_GAUGE.labels(source=self._source_id, type=self.get_type()).set(1)
-            elif src_path != dest_path and not src_path.is_dir() and not dest_path.exists():
-                dest_path.hardlink_to(src_path)
+            elif src_path != dest_path and not await src_path.is_dir() and not await dest_path.exists():
+                await dest_path.hardlink_to(src_path)
 
     def _get_dest_dir(self, root_dir: Path) -> Path:
         if "dest_sub_dir" in self._config:
             return root_dir / self._config["dest_sub_dir"]
         return root_dir
 
-    def _evaluate_file(self, src_path: Path, dst_path: Path) -> None:
+    async def _evaluate_file(self, src_path: Path, dst_path: Path) -> None:
         pass
 
     def get_type(self) -> str:

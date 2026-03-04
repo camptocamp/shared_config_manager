@@ -1,43 +1,44 @@
 import re
-from pathlib import Path
+
+from anyio import Path
 
 from shared_config_manager import broadcast_status
-from shared_config_manager.configuration import SourceConfig
 from shared_config_manager.sources.base import BaseSource
 
 
 class RcloneSource(BaseSource):
     """Source that get files with rclone."""
 
-    def __init__(self, id_: str, config: SourceConfig, is_master: bool) -> None:
-        super().__init__(id_, config, is_master)
-        self._setup_config(config["config"])
+    async def refresh(self) -> None:
+        await self._setup_config(self._config["config"])
+        await super().refresh()
 
-    def _do_refresh(self) -> None:
-        was_here = self.get_path().is_dir()
+    async def _do_refresh(self) -> None:
+        config_path = await self._config_path()
+        was_here = await self.get_path().is_dir()
         target = self.get_path() if was_here else self.get_path().with_suffix(".tmp")
-        target.mkdir(parents=True, exist_ok=True)
-        cmd = ["rclone", "sync", "--verbose", "--config", str(self._config_path())]
+        await target.mkdir(parents=True, exist_ok=True)
+        cmd = ["rclone", "sync", "--verbose", "--config", str(config_path)]
         if "excludes" in self._config:
             cmd += ["--exclude=" + exclude for exclude in self._config["excludes"]]
 
         cmd += ["remote:" + self.get_config().get("sub_dir", ""), str(target)]
         self._exec(*cmd)
         if not was_here:
-            target.rename(self.get_path())
+            await target.rename(self.get_path())
 
-    def _config_path(self) -> Path:
-        return Path.home() / ".config" / "rclone" / f"{self.get_id()}.conf"
+    async def _config_path(self) -> Path:
+        return (await Path.home()) / ".config" / "rclone" / f"{self.get_id()}.conf"
 
-    def _setup_config(self, config: str) -> None:
-        path = self._config_path()
-        path.parent.mkdir(parents=True, exist_ok=True)
-        with path.open("w", encoding="utf-8") as file_:
-            file_.write("[remote]\n")
-            file_.write(config)
+    async def _setup_config(self, config: str) -> None:
+        path = await self._config_path()
+        await path.parent.mkdir(parents=True, exist_ok=True)
+        async with await path.open("w", encoding="utf-8") as file_:
+            await file_.write("[remote]\n")
+            await file_.write(config)
 
-    def get_stats(self) -> broadcast_status.SourceStatus:
-        stats = super().get_stats()
+    async def get_stats(self) -> broadcast_status.SourceStatus:
+        stats = await super().get_stats()
         stats["config"] = _filter_config(stats["config"])
         return stats
 
