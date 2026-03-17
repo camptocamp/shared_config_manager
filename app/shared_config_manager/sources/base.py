@@ -5,7 +5,7 @@ import os
 import shutil
 import subprocess
 import urllib.parse
-from typing import Any, Protocol, cast
+from typing import Any, Protocol
 
 import aiohttp
 from anyio import Path
@@ -14,7 +14,7 @@ from fastapi import HTTPException, Request
 from prometheus_client import Counter, Gauge, Summary
 
 from shared_config_manager import broadcast_status, config, template_engines
-from shared_config_manager.configuration import SourceConfig
+from shared_config_manager.configuration import SourceConfig, TemplateEnginesStatus
 from shared_config_manager.security import Allowed, User, permits
 from shared_config_manager.sources import mode
 
@@ -237,17 +237,20 @@ class BaseSource:
 
     async def get_stats(self) -> broadcast_status.SourceStatus:
         config_copy = copy.deepcopy(self._config)
-        stats_ = cast("broadcast_status.SourceStatus", config_copy)
-        for template_stats, template_engine in zip(
-            stats_.get("template_engines", []),
+        for template_stats_config, template_engine in zip(
+            config_copy.get("template_engines", []),
             self._template_engines,
             strict=False,
         ):
+            template_stats = TemplateEnginesStatus(
+                **{k: v for k, v in template_stats_config.items() if k != "environment_variables"}  # type: ignore[arg-type]
+            )
             template_engine.get_stats(template_stats)
 
-            BaseSource._hide_sensitive(template_stats.get("data"))
-            BaseSource._hide_sensitive(template_stats.get("environment_variables"))
-        return stats_
+            BaseSource._hide_sensitive(template_stats.data)
+            BaseSource._hide_sensitive(template_stats.environment_variables)
+            template_stats_config.update(template_stats.model_dump(exclude_none=True, exclude_unset=True))  # type: ignore[typeddict-item]
+        return broadcast_status.SourceStatus.model_validate(config_copy)
 
     def get_config(self) -> SourceConfig:
         return self._config
@@ -299,13 +302,13 @@ class BaseSource:
 class _SetRefreshSuccessProto(Protocol):
     """Protocol for _set_refresh_success function."""
 
-    async def __call__(self, *, source: str) -> list[None] | None: ...
+    async def __call__(self, *, source: str) -> None: ...
 
 
 _set_refresh_success: _SetRefreshSuccessProto = None  # type: ignore[assignment]
 
 
-async def __set_refresh_success(source: str) -> None:
+def __set_refresh_success(source: str) -> None:
     """Set refresh in success in all process."""
     _REFRESH_ERROR_GAUGE.labels(source=source).set(0)
 
@@ -313,13 +316,13 @@ async def __set_refresh_success(source: str) -> None:
 class _SetFetchSuccessProto(Protocol):
     """Protocol for _set_fetch_success function."""
 
-    async def __call__(self, *, source: str) -> list[None] | None: ...
+    async def __call__(self, *, source: str) -> None: ...
 
 
 _set_fetch_success: _SetFetchSuccessProto = None  # type: ignore[assignment]
 
 
-async def __set_fetch_success(source: str) -> None:
+def __set_fetch_success(source: str) -> None:
     """Set fetch in success in all process."""
     _FETCH_ERROR_GAUGE.labels(source=source).set(0)
 

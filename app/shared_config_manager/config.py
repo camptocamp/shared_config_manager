@@ -63,8 +63,6 @@ class Settings(BaseSettings, extra="ignore"):
     """Route prefix for the shared config manager API."""
     requests_timeout: float = 30
     """Timeout in seconds for HTTP requests made by the shared config manager."""
-    http: bool = False
-    """Whether to run in HTTP mode (disables HTTPS redirect). Defaults to False."""
 
     model_config = SettingsConfigDict(env_prefix="SCM__", env_nested_delimiter="__")
 

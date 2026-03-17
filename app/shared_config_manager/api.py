@@ -4,17 +4,20 @@ import re
 import shlex
 import subprocess
 from collections.abc import AsyncGenerator
-from typing import TYPE_CHECKING, Annotated, Literal, cast
+from typing import TYPE_CHECKING, Annotated, cast
 
+from c2casgiutils import broadcast
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-from shared_config_manager import broadcast_status, configuration, slave_status
+from shared_config_manager import broadcast_status, slave_status
 from shared_config_manager.security import User, get_identity
 from shared_config_manager.sources import registry
 
 if TYPE_CHECKING:
+    from c2casgiutils.broadcast import types as broadcast_types
+
     from shared_config_manager.sources import git
 
 app = FastAPI()
@@ -46,43 +49,16 @@ class RefreshAllResponse(BaseModel):
     reason: str | None = None
 
 
-class Auth(BaseModel):
-    """Authentication model."""
-
-    github_access_type: str | None = None
-    github_repository: str | None = None
-
-
-class SourceStatus(BaseModel):
-    """Source status model."""
-
-    filtered: bool | None = None
-    template_engines: list[configuration.TemplateEnginesStatus] = []
-    hash: str | None = None
-    auth: Auth | None = None
-    branch: str | None = None
-    repo: str | None = None
-    sub_dir: str | None = None
-    tags: list[str] = []
-    type: Literal["git", "rsync", "rclone"] | None = None
-
-
-class SlaveStatus(BaseModel):
-    """Slave status model."""
-
-    sources: dict[str, SourceStatus]
-
-
 class StatusResponse(BaseModel):
     """Response model for status endpoint."""
 
-    slaves: dict[str, SlaveStatus]
+    slaves: dict[str, broadcast_status.SlaveStatus]
 
 
 class SourceStatusResponse(BaseModel):
     """Response model for source status endpoint."""
 
-    statuses: list[SourceStatus]
+    statuses: list[broadcast_status.SourceStatus]
 
 
 async def startup(app: FastAPI) -> None:
@@ -231,10 +207,6 @@ async def _refresh_all_webhook(
     return RefreshAllResponse(status=200, nb_refresh=len(matching_source_ids))
 
 
-def _source_status_from_dict(data: broadcast_status.SourceStatus) -> SourceStatus:
-    return SourceStatus(**{k: v for k, v in data.items() if k != "hostname"})  # type: ignore[arg-type]
-
-
 @app.get("/status", response_model_exclude_none=True)
 async def _stats(request: Request, identity: Annotated[User | None, Depends(get_identity)]) -> StatusResponse:
     if not registry.MASTER_SOURCE:
@@ -244,13 +216,11 @@ async def _stats(request: Request, identity: Annotated[User | None, Depends(get_
     assert slaves_status is not None
     return StatusResponse(
         slaves={
-            slave["hostname"]: SlaveStatus(
-                sources={
-                    key: _source_status_from_dict(source) for key, source in slave.get("sources", {}).items()
-                },
+            slave.hostname: broadcast_status.SlaveStatus(
+                sources=slave.payload.sources,
             )
             for slave in slaves_status
-            if slave is not None
+            if not isinstance(slave, broadcast.MissingAnswer)
         },
     )
 
@@ -265,15 +235,14 @@ async def _source_stats(
     if source is None:
         message = f"Unknown id {source_id}"
         raise HTTPException(status_code=404, detail=message)
-    slaves: list[broadcast_status.SourceStatus] | None = await slave_status.get_source_status(
-        source_id=source_id
-    )
-    assert slaves is not None
-    statuses: list[SourceStatus] = []
+    slaves: list[
+        broadcast_types.BroadcastResponse[broadcast_status.SourceStatus] | broadcast.MissingAnswer
+    ] = await slave_status.get_source_status(source_id=source_id)
+    statuses: list[broadcast_status.SourceStatus] = []
     for slave in slaves:
-        if slave is None or slave.get("filtered", False):
+        if isinstance(slave, broadcast.MissingAnswer) or slave.payload.filtered:
             continue
-        new_status = _source_status_from_dict(slave)
+        new_status = slave.payload
         if new_status not in statuses:
             statuses.append(new_status)
 

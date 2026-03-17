@@ -77,7 +77,7 @@ class BaseEngine:
 
     def get_stats(self, stats: TemplateEnginesStatus) -> None:
         if self._config.get("environment_variables", False):
-            stats["environment_variables"] = _filter_env(cast("dict[str, str]", os.environ))
+            stats.environment_variables = _filter_env(cast("dict[str, str]", os.environ))
 
 
 def _filter_env(env: dict[str, str]) -> dict[str, str]:

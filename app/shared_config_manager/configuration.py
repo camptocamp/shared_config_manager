@@ -1,6 +1,7 @@
 from typing import Literal, TypedDict
 
 from c2casgiutils.auth import AuthConfig
+from pydantic import BaseModel
 
 
 class SourceBase(TypedDict, total=False):
@@ -37,12 +38,12 @@ class SourceConfig(SourceBase, total=False):
     template_engines: list[TemplateEnginesConfig]
 
 
-class TemplateEnginesStatus(TypedDict, total=False):
+class TemplateEnginesStatus(BaseModel):
     """Template engine status."""
 
     type: str
-    environment_variables: dict[str, str]
-    data: dict[str, str]
+    environment_variables: dict[str, str] = {}
+    data: dict[str, str] = {}
 
 
 class Config(TypedDict, total=False):

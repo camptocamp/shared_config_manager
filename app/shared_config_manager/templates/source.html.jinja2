@@ -81,9 +81,9 @@
         <li class="list-group-item">
         <div class="row align-items-start">
           <div class="col">
-            <h4>{{ status.get('hostname') }}</h4>
+            <h4>{{ status.hostname }}</h4>
             <p>
-            Tags: {{ ', '.join(status.get('tags', [])) if status.get('tags', []) else '-' }}<br>
+            Tags: {{ ', '.join(status.payload.tags) if status.payload.tags else '-' }}<br>
             {% if commit %}
               {% for s in commit %}
               <br />
@@ -94,22 +94,24 @@
               {% endif %}
               {% endfor %}
             {% else %}
-            {{ status.get('hash') }}
+            {{ status.payload.hash }}
             {% endif %}
           </div>
           <div class="col">
             <h5>Template engines</h5>
             <ul class="list-group">
-            {% for template_engine in status.get('template_engines', []) %}
+            {% for template_engine in status.payload.template_engines %}
             <li class="list-group-item">
-            {% for key, value in template_engine.items() %}
+            {% for key, value in template_engine.model_dump(exclude_none=True, exclude_unset=True).items() %}
             {% if value is sequence and value is not string and value is not mapping %}
             <b>{{ key_format(key) }}</b>: {{ ', '.join(value) }}<br />
             {% elif value is mapping %}
+            {% if value|length != 0 %}
             <b>{{ key_format(key) }}</b>:<br />
             {% for k in value.keys()|sort %}
             &nbsp;&nbsp;&nbsp;&nbsp;{{ k }} = {{ value[k] }}<br />
             {% endfor %}
+            {% endif %}
             {% else %}
             <b>{{ key_format(key) }}</b>: {{ value }}<br />
             {% endif %}
