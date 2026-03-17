@@ -242,14 +242,14 @@ class BaseSource:
             self._template_engines,
             strict=False,
         ):
-            template_stats = TemplateEnginesStatus(
-                **{k: v for k, v in template_stats_config.items() if k != "environment_variables"}  # type: ignore[arg-type]
+            template_stats = TemplateEnginesStatus.model_validate(
+                {k: v for k, v in template_stats_config.items() if k != "environment_variables"}
             )
             template_engine.get_stats(template_stats)
 
             BaseSource._hide_sensitive(template_stats.data)
             BaseSource._hide_sensitive(template_stats.environment_variables)
-            template_stats_config["environment_variables"] = template_stats.environment_variables  # type: ignore[typeddict-item]
+            template_stats_config.update(template_stats.model_dump(exclude_none=True))  # type: ignore[typeddict-item]
         return broadcast_status.SourceStatus.model_validate(config_copy)
 
     def get_config(self) -> SourceConfig:
