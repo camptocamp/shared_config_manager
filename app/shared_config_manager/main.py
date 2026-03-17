@@ -4,7 +4,6 @@ from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 import c2casgiutils.config
-import sentry_sdk
 from c2casgiutils import broadcast, headers, health_checks
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,7 +13,7 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from prometheus_client import start_http_server
 from prometheus_fastapi_instrumentator import Instrumentator
 
-from shared_config_manager import api, config, nonce, slave_status, ui
+from shared_config_manager import api, config, nonce, sentry, slave_status, ui
 from shared_config_manager.sources import base, registry
 
 _LOGGER = logging.getLogger(__name__)
@@ -91,10 +90,7 @@ async def _watch_source() -> None:
         await asyncio.sleep(config.settings.watch_source_interval)
 
 
-# Initialize Sentry if the URL is provided
-if c2casgiutils.config.settings.sentry.dsn:
-    _LOGGER.info("Sentry is enabled with URL: %s", c2casgiutils.config.settings.sentry.dsn)
-    sentry_sdk.init(**c2casgiutils.config.settings.sentry.model_dump())
+sentry.init_sentry()
 
 
 @asynccontextmanager
@@ -125,7 +121,7 @@ app.add_middleware(
     allowed_hosts=["*"],  # Configure with specific hosts in production
 )
 
-http = config.settings.http
+http = c2casgiutils.config.settings.http
 # Add HTTPSRedirectMiddleware
 if not http:
     _LOGGER.info("HTTPS redirect middleware is enabled")

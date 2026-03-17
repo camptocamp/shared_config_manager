@@ -42,18 +42,21 @@ class User:
         self.auth_info = auth_info
 
     async def is_admin(self) -> bool:
-        return (
-            await c2casgiutils.auth.check_access(self.auth_info, {})
-            if self.token is not None and self.auth_info is not None
-            else False
+        if self.token is None or self.auth_info is None:
+            return False
+        return await c2casgiutils.auth.check_access(
+            self.auth_info,
+            c2casgiutils.auth.AuthConfig(),
         )
 
     async def has_access(self, source_config: SourceConfig) -> bool:
         if await self.is_admin():
             return True
 
-        auth_config = source_config.get("auth", {})
-        if "github_repository" in auth_config and self.auth_info is not None:
+        auth_config: c2casgiutils.auth.AuthConfig = (
+            source_config.get("auth") or c2casgiutils.auth.AuthConfig()
+        )
+        if auth_config.github_repository and self.auth_info is not None:
             return await c2casgiutils.auth.check_access(self.auth_info, auth_config)
 
         return False
