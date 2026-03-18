@@ -12,7 +12,9 @@ _LOG = logging.getLogger(__name__)
 class GetSlavesStatusProto(Protocol):
     """Protocol for get_slaves_status function."""
 
-    async def __call__(self) -> list[broadcast_status.SlaveStatus] | None: ...
+    async def __call__(
+        self,
+    ) -> list[broadcast.types.BroadcastResponse[broadcast_status.SlaveStatus] | broadcast.MissingAnswer]: ...
 
 
 get_slaves_status: GetSlavesStatusProto = None  # type: ignore[assignment]
@@ -26,7 +28,9 @@ async def _get_slaves_status() -> broadcast_status.SlaveStatus:
 class GetSourceStatusProto(Protocol):
     """Protocol for get_source_status function."""
 
-    async def __call__(self, *, source_id: str) -> list[broadcast_status.SourceStatus] | None: ...
+    async def __call__(
+        self, *, source_id: str
+    ) -> list[broadcast.types.BroadcastResponse[broadcast_status.SourceStatus] | broadcast.MissingAnswer]: ...
 
 
 get_source_status: GetSourceStatusProto = None  # type: ignore[assignment]

@@ -25,11 +25,11 @@ async def _source_needs_refresh(source_id: str) -> bool:
     slaves = await slave_status.get_source_status(source_id=source_id) or []
     hash_ = ""
     for slave in slaves:
-        if slave is None or slave.get("filtered", False):
+        if isinstance(slave, broadcast.MissingAnswer) or slave.payload.filtered is True:
             continue
 
-        slave_hash = slave.get("hash")
-        hostname = slave.get("hostname")
+        slave_hash = slave.payload.hash
+        hostname = slave.hostname
         _LOGGER.debug("Watching slave %s for source %s, with hash %s", hostname, source_id, slave_hash)
 
         if slave_hash is None:

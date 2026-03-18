@@ -6,6 +6,8 @@ import subprocess
 from collections.abc import AsyncGenerator
 from typing import TYPE_CHECKING, Annotated, Literal, cast
 
+from c2casgiutils import broadcast
+from c2casgiutils.broadcast import types as broadcast_types
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
@@ -231,10 +233,6 @@ async def _refresh_all_webhook(
     return RefreshAllResponse(status=200, nb_refresh=len(matching_source_ids))
 
 
-def _source_status_from_dict(data: broadcast_status.SourceStatus) -> SourceStatus:
-    return SourceStatus(**{k: v for k, v in data.items() if k != "hostname"})  # type: ignore[arg-type]
-
-
 @app.get("/status", response_model_exclude_none=True)
 async def _stats(request: Request, identity: Annotated[User | None, Depends(get_identity)]) -> StatusResponse:
     if not registry.MASTER_SOURCE:
@@ -244,13 +242,11 @@ async def _stats(request: Request, identity: Annotated[User | None, Depends(get_
     assert slaves_status is not None
     return StatusResponse(
         slaves={
-            slave["hostname"]: SlaveStatus(
-                sources={
-                    key: _source_status_from_dict(source) for key, source in slave.get("sources", {}).items()
-                },
+            slave.hostname: SlaveStatus(
+                sources=slave.payload.sources,
             )
             for slave in slaves_status
-            if slave is not None
+            if not isinstance(slave, broadcast.MissingAnswer)
         },
     )
 
@@ -265,15 +261,14 @@ async def _source_stats(
     if source is None:
         message = f"Unknown id {source_id}"
         raise HTTPException(status_code=404, detail=message)
-    slaves: list[broadcast_status.SourceStatus] | None = await slave_status.get_source_status(
-        source_id=source_id
-    )
-    assert slaves is not None
+    slaves: list[
+        broadcast_types.BroadcastResponse[broadcast_status.SourceStatus] | broadcast.MissingAnswer
+    ] = await slave_status.get_source_status(source_id=source_id)
     statuses: list[SourceStatus] = []
     for slave in slaves:
-        if slave is None or slave.get("filtered", False):
+        if isinstance(slave, broadcast.MissingAnswer) or slave.payload.filtered:
             continue
-        new_status = _source_status_from_dict(slave)
+        new_status = slave.payload
         if new_status not in statuses:
             statuses.append(new_status)
 

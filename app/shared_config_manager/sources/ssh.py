@@ -37,8 +37,7 @@ class SshBaseSource(BaseSource):
 
     async def get_stats(self) -> broadcast_status.SourceStatus:
         stats = await super().get_stats()
-        if "ssh_key" in stats:
-            del stats["ssh_key"]
+        stats.ssh_key = None
         return stats
 
     async def delete(self) -> None:

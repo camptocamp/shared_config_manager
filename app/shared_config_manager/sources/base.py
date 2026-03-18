@@ -239,7 +239,7 @@ class BaseSource:
         config_copy = copy.deepcopy(self._config)
         stats_ = cast("broadcast_status.SourceStatus", config_copy)
         for template_stats, template_engine in zip(
-            stats_.get("template_engines", []),
+            stats_.template_engines or [],
             self._template_engines,
             strict=False,
         ):
@@ -299,13 +299,13 @@ class BaseSource:
 class _SetRefreshSuccessProto(Protocol):
     """Protocol for _set_refresh_success function."""
 
-    async def __call__(self, *, source: str) -> list[None] | None: ...
+    async def __call__(self, *, source: str) -> None: ...
 
 
 _set_refresh_success: _SetRefreshSuccessProto = None  # type: ignore[assignment]
 
 
-async def __set_refresh_success(source: str) -> None:
+def __set_refresh_success(source: str) -> None:
     """Set refresh in success in all process."""
     _REFRESH_ERROR_GAUGE.labels(source=source).set(0)
 
@@ -313,13 +313,13 @@ async def __set_refresh_success(source: str) -> None:
 class _SetFetchSuccessProto(Protocol):
     """Protocol for _set_fetch_success function."""
 
-    async def __call__(self, *, source: str) -> list[None] | None: ...
+    async def __call__(self, *, source: str) -> None: ...
 
 
 _set_fetch_success: _SetFetchSuccessProto = None  # type: ignore[assignment]
 
 
-async def __set_fetch_success(source: str) -> None:
+def __set_fetch_success(source: str) -> None:
     """Set fetch in success in all process."""
     _FETCH_ERROR_GAUGE.labels(source=source).set(0)
 

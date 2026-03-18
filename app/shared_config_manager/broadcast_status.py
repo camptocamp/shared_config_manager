@@ -1,27 +1,37 @@
-from typing import TypedDict
+from typing import Literal
 
 from c2casgiutils.auth import AuthConfig
+from pydantic import BaseModel
 
 from shared_config_manager import configuration
 
 
-class BroadcastObject(TypedDict, total=False):
-    """Base class for broadcasted objects."""
-
-    hostname: str
-    pid: int
-
-
-class SourceStatus(configuration.SourceBase, BroadcastObject, total=False):
+class SourceStatus(BaseModel):
     """Source status."""
 
-    filtered: bool
-    template_engines: list[configuration.TemplateEnginesStatus]
-    hash: str
-    auth: AuthConfig
+    filtered: bool = False
+    template_engines: list[configuration.TemplateEnginesStatus] = []
+    hash: str | None = None
+    auth: AuthConfig | None = None
+
+    # from configuration.SourceBase
+    type: Literal["git", "rsync", "rclone"] | None = None
+    target_dir: str | None = None
+    excludes: list[str] = []
+    tags: list[str] = []
+    # git
+    branch: str | None = None
+    repo: str | None = None
+    sub_dir: str | None = None
+    sparse: bool | None = None
+    ssh_key: str | None = None
+    # rsync
+    source: str | None = None
+    # rclone
+    config: str | None = None
 
 
-class SlaveStatus(BroadcastObject, total=False):
+class SlaveStatus(BaseModel):
     """Slave status."""
 
     sources: dict[str, SourceStatus]

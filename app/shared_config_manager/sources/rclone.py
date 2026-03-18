@@ -39,7 +39,8 @@ class RcloneSource(BaseSource):
 
     async def get_stats(self) -> broadcast_status.SourceStatus:
         stats = await super().get_stats()
-        stats["config"] = _filter_config(stats["config"])
+        assert stats.config is not None
+        stats.config = _filter_config(stats.config)
         return stats
 
 
