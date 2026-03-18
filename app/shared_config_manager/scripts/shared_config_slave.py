@@ -42,7 +42,7 @@ async def _async_main() -> None:
     signal.signal(signal.SIGTERM, _sig_term)
 
     await broadcast.startup()
-    await logging_tools.startup(None)  # type: ignore[arg-type]
+    await logging_tools.startup(None)
     await base.init()
     await slave_status.init()
     await registry.init(slave=True)

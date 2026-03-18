@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
@@ -26,11 +27,11 @@ async def _source_needs_refresh(source_id: str) -> bool:
     slaves = await slave_status.get_source_status(source_id=source_id) or []
     hash_ = ""
     for slave in slaves:
-        if slave is None or slave.get("filtered", False):
+        if isinstance(slave, broadcast.MissingAnswer) or slave.payload.filtered is True:
             continue
 
-        slave_hash = slave.get("hash")
-        hostname = slave.get("hostname")
+        slave_hash = slave.payload.hash
+        hostname = slave.hostname
         _LOGGER.debug("Watching slave %s for source %s, with hash %s", hostname, source_id, slave_hash)
 
         if slave_hash is None:
@@ -92,9 +93,14 @@ async def _watch_source() -> None:
 
 
 # Initialize Sentry if the URL is provided
-if c2casgiutils.config.settings.sentry.dsn:
-    _LOGGER.info("Sentry is enabled with URL: %s", c2casgiutils.config.settings.sentry.dsn)
-    sentry_sdk.init(**c2casgiutils.config.settings.sentry.model_dump())
+if c2casgiutils.config.settings.sentry.dsn or "SENTRY_DSN" in os.environ:
+    _LOGGER.info("Sentry is enabled with URL: %s", config.settings.sentry.dsn or os.environ.get("SENTRY_DSN"))
+    sentry_sdk.init(
+        **{k: v for k, v in config.settings.sentry.model_dump().items() if v is not None and k != "tags"}
+    )
+
+    for tag, value in c2casgiutils.config.settings.sentry.tags.items():
+        sentry_sdk.set_tag(tag, value)
 
 
 @asynccontextmanager
@@ -125,7 +131,7 @@ app.add_middleware(
     allowed_hosts=["*"],  # Configure with specific hosts in production
 )
 
-http = config.settings.http
+http = c2casgiutils.config.settings.http
 # Add HTTPSRedirectMiddleware
 if not http:
     _LOGGER.info("HTTPS redirect middleware is enabled")
