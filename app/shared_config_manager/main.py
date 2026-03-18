@@ -1,9 +1,11 @@
 import asyncio
 import logging
+import os
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 import c2casgiutils.config
+import sentry_sdk
 from c2casgiutils import broadcast, headers, health_checks
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -13,7 +15,7 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from prometheus_client import start_http_server
 from prometheus_fastapi_instrumentator import Instrumentator
 
-from shared_config_manager import api, config, nonce, sentry, slave_status, ui
+from shared_config_manager import api, config, nonce, slave_status, ui
 from shared_config_manager.sources import base, registry
 
 _LOGGER = logging.getLogger(__name__)
@@ -90,7 +92,15 @@ async def _watch_source() -> None:
         await asyncio.sleep(config.settings.watch_source_interval)
 
 
-sentry.init_sentry()
+# Initialize Sentry if the URL is provided
+if c2casgiutils.config.settings.sentry.dsn or "SENTRY_DSN" in os.environ:
+    _LOGGER.info("Sentry is enabled with URL: %s", config.settings.sentry.dsn or os.environ.get("SENTRY_DSN"))
+    sentry_sdk.init(
+        **{k: v for k, v in config.settings.sentry.model_dump().items() if v is not None and k != "tags"}
+    )
+
+    for tag, value in c2casgiutils.config.settings.sentry.tags.items():
+        sentry_sdk.set_tag(tag, value)
 
 
 @asynccontextmanager
