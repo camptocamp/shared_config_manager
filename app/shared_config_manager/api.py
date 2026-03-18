@@ -4,19 +4,20 @@ import re
 import shlex
 import subprocess
 from collections.abc import AsyncGenerator
-from typing import TYPE_CHECKING, Annotated, Literal, cast
+from typing import TYPE_CHECKING, Annotated, cast
 
 from c2casgiutils import broadcast
-from c2casgiutils.broadcast import types as broadcast_types
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-from shared_config_manager import broadcast_status, configuration, slave_status
+from shared_config_manager import broadcast_status, slave_status
 from shared_config_manager.security import User, get_identity
 from shared_config_manager.sources import registry
 
 if TYPE_CHECKING:
+    from c2casgiutils.broadcast import types as broadcast_types
+
     from shared_config_manager.sources import git
 
 app = FastAPI()
@@ -48,43 +49,16 @@ class RefreshAllResponse(BaseModel):
     reason: str | None = None
 
 
-class Auth(BaseModel):
-    """Authentication model."""
-
-    github_access_type: str | None = None
-    github_repository: str | None = None
-
-
-class SourceStatus(BaseModel):
-    """Source status model."""
-
-    filtered: bool | None = None
-    template_engines: list[configuration.TemplateEnginesStatus] = []
-    hash: str | None = None
-    auth: Auth | None = None
-    branch: str | None = None
-    repo: str | None = None
-    sub_dir: str | None = None
-    tags: list[str] = []
-    type: Literal["git", "rsync", "rclone"] | None = None
-
-
-class SlaveStatus(BaseModel):
-    """Slave status model."""
-
-    sources: dict[str, SourceStatus]
-
-
 class StatusResponse(BaseModel):
     """Response model for status endpoint."""
 
-    slaves: dict[str, SlaveStatus]
+    slaves: dict[str, broadcast_status.SlaveStatus]
 
 
 class SourceStatusResponse(BaseModel):
     """Response model for source status endpoint."""
 
-    statuses: list[SourceStatus]
+    statuses: list[broadcast_status.SourceStatus]
 
 
 async def startup(app: FastAPI) -> None:
@@ -242,7 +216,7 @@ async def _stats(request: Request, identity: Annotated[User | None, Depends(get_
     assert slaves_status is not None
     return StatusResponse(
         slaves={
-            slave.hostname: SlaveStatus(
+            slave.hostname: broadcast_status.SlaveStatus(
                 sources=slave.payload.sources,
             )
             for slave in slaves_status
@@ -264,7 +238,7 @@ async def _source_stats(
     slaves: list[
         broadcast_types.BroadcastResponse[broadcast_status.SourceStatus] | broadcast.MissingAnswer
     ] = await slave_status.get_source_status(source_id=source_id)
-    statuses: list[SourceStatus] = []
+    statuses: list[broadcast_status.SourceStatus] = []
     for slave in slaves:
         if isinstance(slave, broadcast.MissingAnswer) or slave.payload.filtered:
             continue

@@ -2,7 +2,6 @@ import os
 
 from anyio import Path
 
-from shared_config_manager import broadcast_status
 from shared_config_manager.configuration import SourceConfig
 from shared_config_manager.sources.base import BaseSource
 
@@ -34,11 +33,6 @@ class SshBaseSource(BaseSource):
     @staticmethod
     def _ssh_path() -> Path:
         return Path(os.environ["HOME"]) / ".ssh"
-
-    async def get_stats(self) -> broadcast_status.SourceStatus:
-        stats = await super().get_stats()
-        stats.ssh_key = None
-        return stats
 
     async def delete(self) -> None:
         await super().delete()
