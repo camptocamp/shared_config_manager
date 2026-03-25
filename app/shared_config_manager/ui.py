@@ -7,6 +7,8 @@ from typing import Annotated, cast
 
 import aiohttp
 from anyio import Path
+from c2casgiutils import broadcast
+from c2casgiutils.broadcast import types as broadcast_type
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -42,9 +44,9 @@ async def _is_valid(source: BaseSource) -> bool:
         return True
     hash_ = ""
     for slave in slaves:
-        if slave is None or slave.get("filtered", False):
+        if isinstance(slave, broadcast.MissingAnswer) or slave.payload.filtered is True:
             continue
-        slave_hash = slave.get("hash")
+        slave_hash = slave.payload.hash
         if slave_hash is None:
             return False
         if hash_:
@@ -144,8 +146,8 @@ def _format_attributes_for_display(
 
 async def _fetch_commit_details(
     source: BaseSource,
-    slave: broadcast_status.SourceStatus,
-) -> tuple[broadcast_status.SourceStatus, Sequence[str | tuple[str, str]]]:
+    slave: broadcast_type.BroadcastResponse[broadcast_status.SourceStatus],
+) -> tuple[broadcast_type.BroadcastResponse[broadcast_status.SourceStatus], Sequence[str | tuple[str, str]]]:
     """Fetch commit details from GitHub or local git repository."""
     try:
         match = _REPO_RE.match(source.get_config().get("repo", ""))
@@ -155,13 +157,13 @@ async def _fetch_commit_details(
             if config.settings.github_token:
                 headers["Authorization"] = f"token {config.settings.github_token}"
 
-            if "hash" not in slave:
+            if not slave.payload.hash:
                 return (slave, ["No provided hash"])
 
             async with (
                 aiohttp.ClientSession() as session,
                 session.get(
-                    f"https://api.github.com/repos/{match.group(1)}/commits/{slave['hash']}",
+                    f"https://api.github.com/repos/{match.group(1)}/commits/{slave.payload.hash}",
                     headers=headers,
                 ) as commit_response,
             ):
@@ -180,20 +182,22 @@ async def _fetch_commit_details(
                 ]
                 return (slave, commit_details)
 
-        else:
+        elif slave.payload.hash is not None:
             process = await asyncio.create_subprocess_exec(
                 "git",
                 "show",
                 "--quiet",
-                slave["hash"],
+                slave.payload.hash,
                 cwd=str(Path("/repos") / source.get_id()),
                 stdout=asyncio.subprocess.PIPE,
             )
             stdout, _ = await process.communicate()
             commit_details = stdout.decode("utf-8").split("\n")
             return (slave, commit_details)
+        else:
+            return (slave, ["Missing hash"])
     except Exception:  # noqa: BLE001
-        _LOG.warning("Unable to get the commit status for %s", slave.get("hash"), exc_info=True)
+        _LOG.warning("Unable to get the commit status for %s", slave.payload.hash, exc_info=True)
         return (slave, [])
 
 
@@ -226,9 +230,9 @@ async def ui_source(
 
     slaves = await slave_status.get_source_status(source_id=source_id)
     assert slaves is not None
-    statuses: list[broadcast_status.SourceStatus] = []
+    statuses: list[broadcast_type.BroadcastResponse[broadcast_status.SourceStatus]] = []
     for slave in slaves:
-        if slave is None or slave.get("filtered", False):
+        if isinstance(slave, broadcast.MissingAnswer) or slave.payload.filtered is True:
             continue
         if slave not in statuses:
             statuses.append(slave)
@@ -238,8 +242,13 @@ async def ui_source(
 
     _slave_status = await asyncio.gather(*[_fetch_commit_details(source, slave) for slave in statuses])
 
-    def _get_sort_key(elem: tuple[broadcast_status.SourceStatus, Sequence[str | tuple[str, str]]]) -> str:
-        return elem[0].get("hostname", "")
+    def _get_sort_key(
+        elem: tuple[
+            broadcast_type.BroadcastResponse[broadcast_status.SourceStatus], Sequence[str | tuple[str, str]]
+        ],
+    ) -> str:
+        response, _ = elem
+        return response.hostname
 
     return templates.TemplateResponse(
         "source.html.jinja2",

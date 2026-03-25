@@ -198,6 +198,8 @@ Same as the GET API, but to be used with a GutHub/GitLab webhook for push events
 
 Returns the glable status, looking like that:
 
+When a source has no template engines configured, the `template_engines` field is an empty list.
+
 ```json
 {
   "slaves": {

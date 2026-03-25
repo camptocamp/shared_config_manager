@@ -75,7 +75,8 @@ class GitSource(SshBaseSource):
         stats = await super().get_stats()
         stats_path = self.get_path() / ".gitstats"
         if await stats_path.is_file():
-            stats.update(json.loads(await stats_path.read_text(encoding="utf-8")))
+            for key, value in json.loads(await stats_path.read_text(encoding="utf-8")).items():
+                setattr(stats, key, value)
         return stats
 
     def _get_hash(self) -> str:

@@ -17,7 +17,7 @@ services:
       SCM__ENV_PREFIXES: TEST_
       TEST_ENV: 42
       TEST_KEY: secret
-      SCM__HTTP: 'true'
+      C2C__HTTP: 'true'
     volumes_from:
       - tests:rw
     links:
@@ -51,7 +51,7 @@ services:
       SCM__API_BASE_URL: http://api_inline:8080/scm
       SCM__TARGET: /config/api-inline
       C2C__REDIS__URL: redis://redis:6379/2
-      C2C_BROADCAST_PREFIX: broadcast_scm_inline_
+      C2C__REDIS__BROADCAST_PREFIX: broadcast_scm_inline_
     volumes_from:
       - tests:rw
     links:
@@ -66,7 +66,7 @@ services:
       SCM__API_BASE_URL: http://api_file:8080/scm
       SCM__TARGET: /config/api-file
       C2C__REDIS__URL: redis://redis:6379/3
-      C2C_BROADCAST_PREFIX: broadcast_scm_file_
+      C2C__REDIS__BROADCAST_PREFIX: broadcast_scm_file_
     volumes_from:
       - tests:rw
     links:
