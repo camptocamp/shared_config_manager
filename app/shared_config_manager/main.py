@@ -10,7 +10,6 @@ from c2casgiutils import broadcast, headers, health_checks
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from prometheus_client import start_http_server
 from prometheus_fastapi_instrumentator import Instrumentator
@@ -139,10 +138,6 @@ app.add_middleware(
 )
 
 http = c2casgiutils.config.settings.http
-# Add HTTPSRedirectMiddleware
-if not http:
-    _LOGGER.info("HTTPS redirect middleware is enabled")
-    app.add_middleware(HTTPSRedirectMiddleware)
 
 # Add GZipMiddleware
 app.add_middleware(GZipMiddleware, minimum_size=1000)
