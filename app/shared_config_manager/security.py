@@ -53,8 +53,8 @@ class User:
         if await self.is_admin():
             return True
 
-        auth_config: c2casgiutils.auth.AuthConfig = (
-            source_config.get("auth") or c2casgiutils.auth.AuthConfig()
+        auth_config = c2casgiutils.auth.AuthConfig.model_validate(
+            source_config["auth"] if "auth" in source_config else c2casgiutils.auth.AuthConfig()
         )
         if auth_config.github_repository and self.auth_info is not None:
             return await c2casgiutils.auth.check_access(self.auth_info, auth_config)
