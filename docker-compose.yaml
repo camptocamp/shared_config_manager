@@ -6,6 +6,7 @@ services:
       C2C__AUTH__GITHUB__CLIENT_SECRET: a-secret
       C2C__AUTH__GITHUB__REPOSITORY: camptocamp/shared_config_manager
       C2C__AUTH__JWT__SECRET: a-secret-long-a-secret
+      C2C__AUTH__JWT__COOKIE__PATH: /scm
       C2C__REDIS__URL: redis://redis:6379/1
       SCM__SECRET: changeme
       SCM__GITHUB_SECRET: changeme
