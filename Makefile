@@ -47,17 +47,17 @@ build-acceptance:
 
 .PHONY: acceptance
 acceptance: build-acceptance build # Run the acceptance tests
-	C2C_AUTH_GITHUB_CLIENT_ID=$(shell gopass show gs/projects/github/oauth-apps/geoservices-int/client-id) \
-	C2C_AUTH_GITHUB_CLIENT_SECRET=$(shell gopass show gs/projects/github/oauth-apps/geoservices-int/client-secret) \
+	C2C__AUTH__GITHUB__CLIENT_ID=$(shell gopass show gs/projects/github/oauth-apps/geoservices-int/client-id) \
+	C2C__AUTH__GITHUB__CLIENT_SECRET=$(shell gopass show gs/projects/github/oauth-apps/geoservices-int/client-secret) \
 	docker compose up --detach
 	docker compose exec -T tests pytest -vv --color=yes $(PYTEST_OPTS) --junitxml /reports/acceptance.xml acceptance
 
 .PHONY: run
 run: build
-	docker compose stop
+	docker compose stop api api_inline api_file api_test_user slave slave-others
 	docker compose rm --force
-	C2C_AUTH_GITHUB_CLIENT_ID=$(shell gopass show gs/projects/github/oauth-apps/geoservices-int/client-id) \
-	C2C_AUTH_GITHUB_CLIENT_SECRET=$(shell gopass show gs/projects/github/oauth-apps/geoservices-int/client-secret) \
+	C2C__AUTH__GITHUB__CLIENT_ID=$(shell gopass show gs/projects/github/oauth-apps/geoservices-int/client-id) \
+	C2C__AUTH__GITHUB__CLIENT_SECRET=$(shell gopass show gs/projects/github/oauth-apps/geoservices-int/client-secret) \
 	docker compose up --detach
 
 .PHONY: clean
