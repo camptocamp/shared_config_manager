@@ -357,14 +357,14 @@ virtualenv = ["virtualenv (>=20.11) ; python_version < \"3.10\"", "virtualenv (>
 
 [[package]]
 name = "c2casgiutils"
-version = "0.7.0"
+version = "0.8.0"
 description = "Common utilities for Camptocamp ASGI applications"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "c2casgiutils-0.7.0-py3-none-any.whl", hash = "sha256:867be711e96cd1487476e532770007765c511848e84369a42cf15b3153c8645d"},
-    {file = "c2casgiutils-0.7.0.tar.gz", hash = "sha256:fa8cb9788ab0cd78b35eda945b0d8120cc8b83fd2a5611960b22270897d0a8ac"},
+    {file = "c2casgiutils-0.8.0-py3-none-any.whl", hash = "sha256:67a2458469f2fb74fadb7ca8df6b14758dbf2bb8b01b8337526d5062b7e88009"},
+    {file = "c2casgiutils-0.8.0.tar.gz", hash = "sha256:9b2c9eba9bcbba7eb6ff1ec4830d29c19b788b0a688e9310ee5d41ec9cf63ab9"},
 ]
 
 [package.dependencies]
@@ -376,7 +376,6 @@ prometheus-client = "*"
 prometheus-fastapi-instrumentator = "*"
 pydantic-settings = "*"
 pyjwt = "*"
-python-multipart = "0.0.22"
 redis = "*"
 sentry-sdk = {version = "*", extras = ["fastapi"]}
 sqlalchemy = {version = "*", optional = true, markers = "extra == \"sqlalchemy\""}
@@ -4056,4 +4055,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.15"
-content-hash = "00070bbcbf9ad7c3060ccb7f92e6ade28075fd938715da9ae03e135ac50decbe"
+content-hash = "dd7bc5de1c8391a0d8566d16831f32c0756086603492a24ef25306f08401206e"
