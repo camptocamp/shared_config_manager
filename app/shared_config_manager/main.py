@@ -7,10 +7,11 @@ from contextlib import asynccontextmanager
 import c2casgiutils.config
 import sentry_sdk
 from c2casgiutils import broadcast, headers, health_checks
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.responses import RedirectResponse
 from prometheus_client import start_http_server
 from prometheus_fastapi_instrumentator import Instrumentator
 
@@ -194,6 +195,17 @@ app.add_middleware(
 # Add Health Checks
 health_checks.FACTORY.add(health_checks.Redis(tags=["liveness", "redis", "all"]))
 health_checks.FACTORY.add(health_checks.Wrong(tags=["wrong", "all"]))
+
+
+@app.get(f"{config.settings.route_prefix}/c2c")
+async def redirect_c2c(request: Request) -> RedirectResponse:
+    """Redirect to the mounted c2c app canonical path."""
+    url = request.url
+    redirect_url = f"{url.path}/"
+    if url.query:
+        redirect_url += f"?{url.query}"
+    return RedirectResponse(url=redirect_url, status_code=307)
+
 
 # Add Routers
 app.mount(f"{config.settings.route_prefix}/1", api.app)
