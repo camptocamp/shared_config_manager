@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+import re
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
@@ -15,7 +16,7 @@ from fastapi.responses import RedirectResponse
 from prometheus_client import start_http_server
 from prometheus_fastapi_instrumentator import Instrumentator
 
-from shared_config_manager import api, config, nonce, slave_status, ui
+from shared_config_manager import api, config, slave_status, ui
 from shared_config_manager.sources import base, registry
 
 _LOGGER = logging.getLogger(__name__)
@@ -155,35 +156,30 @@ app.add_middleware(
 _ui_headers: dict[str, str | list[str] | dict[str, str] | dict[str, list[str]] | None] = {
     "Content-Security-Policy": {
         "default-src": ["'self'"],
-        "script-src-elem": ["'self'", f"'nonce-{nonce}'"],
-        "style-src-elem": ["'self'", f"'nonce-{nonce}'", "https://cdnjs.cloudflare.com/"],
-        "style-src-attr": ["'self'"],
+        "script-src-elem": ["'self'", headers.CSP_NONCE],
+        "style-src-elem": ["'self'", headers.CSP_NONCE, "https://cdnjs.cloudflare.com/"],
+        "style-src-attr": ["'none'"],
     },
     "Cache-Control": "max-age=10",
 }
-route_prefix = config.settings.route_prefix
-if route_prefix and route_prefix.startswith("/"):
-    route_prefix = route_prefix[1:]
-if route_prefix and route_prefix.endswith("/"):
-    route_prefix = route_prefix[:-1]
+_route_prefix_regex_base = re.escape(c2casgiutils.config.settings.route_prefix.removeprefix("/"))
 
-_LOGGER.info("Using route prefix: '%s'", route_prefix)
 app.add_middleware(
     headers.ArmorHeaderMiddleware,
     headers_config={
         "http": {"headers": {"Strict-Transport-Security": None} if http else {}},
         "ui_index": {
-            "path_match": rf"{route_prefix}/$",
+            "path_match": rf"^{_route_prefix_regex_base}$",
             "headers": _ui_headers,
             "status_code": 200,
         },
         "ui_sources": {
-            "path_match": rf"{route_prefix}/source/.*",
+            "path_match": rf"^{_route_prefix_regex_base}source/.*",
             "headers": _ui_headers,
             "status_code": 200,
         },
         "api": {
-            "path_match": rf"{route_prefix}/1/.*",
+            "path_match": rf"^{_route_prefix_regex_base}1/.*",
             "headers": {
                 "Cache-Control": "max-age=0, no-cache, no-store, must-revalidate",
             },
@@ -197,7 +193,7 @@ health_checks.FACTORY.add(health_checks.Redis(tags=["liveness", "redis", "all"])
 health_checks.FACTORY.add(health_checks.Wrong(tags=["wrong", "all"]))
 
 
-@app.get(f"{config.settings.route_prefix}/c2c")
+@app.get(f"{c2casgiutils.config.settings.route_prefix}c2c")
 async def redirect_c2c(request: Request) -> RedirectResponse:
     """Redirect to the mounted c2c app canonical path."""
     url = request.url
@@ -208,9 +204,9 @@ async def redirect_c2c(request: Request) -> RedirectResponse:
 
 
 # Add Routers
-app.mount(f"{config.settings.route_prefix}/1", api.app)
-app.mount(f"{config.settings.route_prefix}/c2c", c2casgiutils.app)
-app.mount(f"{config.settings.route_prefix}/", ui.app)
+app.mount(f"{c2casgiutils.config.settings.route_prefix}1", api.app)
+app.mount(f"{c2casgiutils.config.settings.route_prefix}c2c", c2casgiutils.app)
+app.mount(c2casgiutils.config.settings.route_prefix, ui.app)
 
 # Get Prometheus HTTP server port from environment variable 9000 by default
 start_http_server(c2casgiutils.config.settings.prometheus.port)

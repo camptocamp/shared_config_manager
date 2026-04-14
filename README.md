@@ -55,13 +55,16 @@ A few environment variables can be used to tune the containers:
 - `C2C__REDIS__URL`: Must point to a running Redis (typical: `redis://redis:6379`) for being able to
   broadcast the refresh notifications
 - `SCM__MASTER_CONFIG`: The master configuration (string containing the YAML config)
-- `SCM__ROUTE_PREFIX`: The prefix to use for the HTTP API (defaults to `/scm`)
+- `C2C__ROUTE_PREFIX`: The route prefix used by the ASGI app and HTTP API (defaults to `/` and should start/end with `/`)
 - `SCM__TAG_FILTER`: Load only the sources having the given tag (the master config is always loaded)
 - `SCM__TARGET`: default base directory for the `target_dir` configuration (defaults to `/config`)
 - `SCM__MASTER_TARGET`: where to store the master config (defaults to `/master_config`)
 - `SCM__API_BASE_URL`: how to reach the master for slaves.
 - `SCM__API_MASTER`: if defined, this is a master with slaves (no template evaluation)
 - `SCM__SECRET`: the secret used to authenticate the request between the client and the server
+
+`SCM__API_BASE_URL` should include the effective route prefix configured through `C2C__ROUTE_PREFIX`
+(for example `http://api:8080/scm` when `C2C__ROUTE_PREFIX=/scm/`).
 
 See [https://github.com/camptocamp/c2casgiutils] for other parameters.
 
