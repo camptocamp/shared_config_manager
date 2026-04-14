@@ -14,7 +14,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from shared_config_manager import broadcast_status, config, nonce, slave_status
+from shared_config_manager import broadcast_status, config, slave_status
 from shared_config_manager.security import Allowed, User, get_identity, permits
 from shared_config_manager.sources import registry
 from shared_config_manager.sources.base import BaseSource
@@ -89,6 +89,11 @@ async def ui_index(
     valid_sources = list(
         zip(await asyncio.gather(*[_is_valid(source) for source in sources_list]), sources_list, strict=True),
     )
+
+    try:
+        nonce = request.state.nonce
+    except AttributeError as exc:
+        raise HTTPException(status_code=500, detail="CSP nonce not initialized") from exc
 
     return templates.TemplateResponse(
         "index.html.jinja2",
@@ -249,6 +254,11 @@ async def ui_source(
     ) -> str:
         response, _ = elem
         return response.hostname
+
+    try:
+        nonce = request.state.nonce
+    except AttributeError as exc:
+        raise HTTPException(status_code=500, detail="CSP nonce not initialized") from exc
 
     return templates.TemplateResponse(
         "source.html.jinja2",

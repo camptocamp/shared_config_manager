@@ -59,8 +59,6 @@ class Settings(BaseSettings, extra="ignore"):
     """GitHub API token for accessing GitHub commit information."""
     github_secret: str | None = None
     """GitHub webhook secret for validating incoming webhook signatures."""
-    route_prefix: str = "/scm"
-    """Route prefix for the shared config manager API."""
     requests_timeout: float = 30
     """Timeout in seconds for HTTP requests made by the shared config manager."""
 
