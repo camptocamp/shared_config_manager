@@ -52,10 +52,7 @@ by setting the `sources` section directly at the root of the `MASTER_CONFIG`.
 
 A few environment variables can be used to tune the containers:
 
-- `C2C__REDIS__URL`: Must point to a running Redis (typical: `redis://redis:6379`) for being able to
-  broadcast the refresh notifications
 - `SCM__MASTER_CONFIG`: The master configuration (string containing the YAML config)
-- `C2C__ROUTE_PREFIX`: The route prefix used by the ASGI app and HTTP API (defaults to `/` and should start/end with `/`)
 - `SCM__TAG_FILTER`: Load only the sources having the given tag (the master config is always loaded)
 - `SCM__TARGET`: default base directory for the `target_dir` configuration (defaults to `/config`)
 - `SCM__MASTER_TARGET`: where to store the master config (defaults to `/master_config`)
