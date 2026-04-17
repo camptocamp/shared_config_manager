@@ -139,7 +139,14 @@ app.add_middleware(
     allowed_hosts=["*"],  # Configure with specific hosts in production
 )
 
-http = c2casgiutils.config.settings.http
+# Enable trusted proxy header rewriting when configured.
+proxy_headers = c2casgiutils.config.settings.proxy_headers
+if proxy_headers.type != "none":
+    app.add_middleware(
+        headers.ForwardedHeadersMiddleware,
+        trusted_hosts=proxy_headers.trusted_hosts,
+        headers_type=proxy_headers.type,
+    )
 
 # Add GZipMiddleware
 app.add_middleware(GZipMiddleware, minimum_size=1000)
@@ -167,7 +174,7 @@ _route_prefix_regex_base = re.escape(c2casgiutils.config.settings.route_prefix.r
 app.add_middleware(
     headers.ArmorHeaderMiddleware,
     headers_config={
-        "http": {"headers": {"Strict-Transport-Security": None} if http else {}},
+        "http": {"headers": {"Strict-Transport-Security": None} if c2casgiutils.config.settings.http else {}},
         "ui_index": {
             "path_match": rf"^{_route_prefix_regex_base}$",
             "headers": _ui_headers,
