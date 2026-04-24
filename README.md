@@ -48,7 +48,7 @@ environment variable. For that, set the `standalone` key to `true` in the `MASTE
 There is also a mode where you can put directly the sources in the `MASTER_CONFIG`
 by setting the `sources` section directly at the root of the `MASTER_CONFIG`.
 
-### Tunnings
+### Tunings
 
 A few environment variables can be used to tune the containers:
 
@@ -269,7 +269,7 @@ Returns the status for the given source ID, looking like that:
 }
 ```
 
-## tarball
+## Tarball
 
 - `GET {ROUTE_PREFIX}/1/tarball/{ID}`
 
