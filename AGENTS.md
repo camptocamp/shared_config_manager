@@ -20,3 +20,7 @@ The user documentation in the `README.md` file should be updated to reflect the 
 The new functionalities should be reasonably tested in the `app/tests/` folder.
 
 Test files in `app/tests/` may not follow the rules concerning `async` requirements, as there are no performance requirements.
+
+## Pull Requests
+
+- Do not include a `Testing` section in pull request descriptions unless explicitly requested.
