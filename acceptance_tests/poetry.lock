@@ -450,14 +450,14 @@ smmap = ">=3.0.1,<6"
 
 [[package]]
 name = "gitpython"
-version = "3.1.47"
+version = "3.1.48"
 description = "GitPython is a Python library used to interact with Git repositories"
 optional = false
 python-versions = ">=3.7"
 groups = ["main"]
 files = [
-    {file = "gitpython-3.1.47-py3-none-any.whl", hash = "sha256:489f590edfd6d20571b2c0e72c6a6ac6915ee8b8cd04572330e3842207a78905"},
-    {file = "gitpython-3.1.47.tar.gz", hash = "sha256:dba27f922bd2b42cb54c87a8ab3cb6beb6bf07f3d564e21ac848913a05a8a3cd"},
+    {file = "gitpython-3.1.48-py3-none-any.whl", hash = "sha256:737698b05889cca0f9aba7054d796620df2092c68926ee1470e5c7f5ac886680"},
+    {file = "gitpython-3.1.48.tar.gz", hash = "sha256:b7c49ff4a49946fce38ac84116efa311b15e7dad06dc3787fc9e206bf9ef75e1"},
 ]
 
 [package.dependencies]
@@ -1762,14 +1762,14 @@ ocsp = ["cryptography (>=36.0.1)", "pyopenssl (==23.2.1)", "requests (>=2.31.0)"
 
 [[package]]
 name = "requests"
-version = "2.33.0"
+version = "2.33.1"
 description = "Python HTTP for Humans."
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "requests-2.33.0-py3-none-any.whl", hash = "sha256:3324635456fa185245e24865e810cecec7b4caf933d7eb133dcde67d48cee69b"},
-    {file = "requests-2.33.0.tar.gz", hash = "sha256:c7ebc5e8b0f21837386ad0e1c8fe8b829fa5f544d8df3b2253bff14ef29d7652"},
+    {file = "requests-2.33.1-py3-none-any.whl", hash = "sha256:4e6d1ef462f3626a1f0a0a9c42dd93c63bad33f9f1c1937509b8c5c8718ab56a"},
+    {file = "requests-2.33.1.tar.gz", hash = "sha256:18817f8c57c6263968bc123d237e3b8b08ac046f5456bd1e307ee8f4250d3517"},
 ]
 
 [package.dependencies]
@@ -1780,7 +1780,6 @@ urllib3 = ">=1.26,<3"
 
 [package.extras]
 socks = ["PySocks (>=1.5.6,!=1.5.7)"]
-test = ["PySocks (>=1.5.6,!=1.5.7)", "pytest (>=3)", "pytest-cov", "pytest-httpbin (==2.1.0)", "pytest-mock", "pytest-xdist"]
 use-chardet-on-py3 = ["chardet (>=3.0.2,<8)"]
 
 [[package]]
@@ -2573,4 +2572,4 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.13"
-content-hash = "1c7b22e5891fcfa3b94d75c265d8da8f13a6485534aa1a0a15930c2df2ddc3da"
+content-hash = "25769fe9f54cbcf0b6be65876b4c8e517f438b2c999e0af81887cd80961cfac9"
