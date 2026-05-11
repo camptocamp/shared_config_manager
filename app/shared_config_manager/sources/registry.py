@@ -101,38 +101,55 @@ async def reload_master_config() -> None:
         await _handle_master_config(cfg)
 
 
-async def _do_handle_master_config(config: configuration.Config) -> tuple[int, int]:
+async def _do_handle_master_config(master_config: configuration.Config) -> tuple[int, int]:
     global FILTERED_SOURCES  # noqa: PLW0603
 
-    success = 0
-    errors = 0
-
-    new_sources, filtered = _filter_sources(config["sources"])
+    new_sources, filtered = _filter_sources(master_config["sources"])
     FILTERED_SOURCES = {
-        source_id: _create_source(source_id, config) for source_id, config in filtered.items()
+        source_id: _create_source(source_id, source_config) for source_id, source_config in filtered.items()
     }
 
     to_deletes = set(_SOURCES.keys()) - set(new_sources.keys())
-    for to_delete in to_deletes:
-        await _delete_source(to_delete)
+    await asyncio.gather(*[_delete_source(to_delete) for to_delete in to_deletes])
+
+    to_reload: dict[str, configuration.SourceConfig] = {}
+    changed_sources: list[str] = []
     for source_id, source_config in new_sources.items():
         prev_source = _SOURCES.get(source_id)
         if prev_source is None:
             _LOG.info("New source detected: %s", source_id)
+            to_reload[source_id] = source_config
         elif prev_source.get_config() == source_config:
             _LOG.debug("Source %s didn't change, not reloading it", source_id)
             continue
         else:
             _LOG.info("Change detected in source %s, reloading it", source_id)
-            await _delete_source(source_id)  # to be sure the old stuff is cleaned
+            changed_sources.append(source_id)
+            to_reload[source_id] = source_config
 
-        try:
-            _SOURCES[source_id] = _create_source(source_id, source_config)
-            await _SOURCES[source_id].refresh_or_fetch()
-            success += 1
-        except Exception:  # noqa: BLE001
-            _LOG.error("Cannot load the %s config", source_id, exc_info=True)
-            errors += 1
+    await asyncio.gather(*[_delete_source(source_id) for source_id in changed_sources])
+
+    if not to_reload:
+        return 0, 0
+
+    semaphore = asyncio.Semaphore(config.settings.slave.init_sources_concurrency)
+
+    async def load_source(source_id: str, source_config: configuration.SourceConfig) -> bool:
+        async with semaphore:
+            try:
+                source = _create_source(source_id, source_config)
+                await source.refresh_or_fetch()
+                _SOURCES[source_id] = source
+            except Exception:  # noqa: BLE001
+                _LOG.error("Cannot load the %s config", source_id, exc_info=True)
+                return False
+            return True
+
+    results = await asyncio.gather(
+        *[load_source(source_id, source_config) for source_id, source_config in to_reload.items()]
+    )
+    success = sum(results)
+    errors = len(results) - success
     return success, errors
 
 
@@ -181,12 +198,12 @@ async def _delete_source(source_id: str) -> None:
 def _filter_sources(
     source_configs: dict[str, configuration.SourceConfig],
 ) -> tuple[dict[str, configuration.SourceConfig], dict[str, configuration.SourceConfig]]:
-    if config.settings.tag_filter is None or mode.is_master():
+    if config.settings.slave.tag_filter is None or mode.is_master():
         return source_configs, {}
     result = {}
     filtered = {}
     for source_id, source_config in source_configs.items():
-        if config.settings.tag_filter in source_config.get("tags", []):
+        if config.settings.slave.tag_filter in source_config.get("tags", []):
             result[source_id] = source_config
         else:
             filtered[source_id] = source_config
