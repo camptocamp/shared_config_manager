@@ -124,7 +124,7 @@ async def _lifespan(main_app: FastAPI) -> AsyncGenerator[None, None]:
     global _WATCH_SOURCE_TASK  # noqa: PLW0603
     _WATCH_SOURCE_TASK = asyncio.create_task(_watch_source())
 
-    if not config.settings.is_slave:
+    if not config.settings.slave.enabled:
         await registry.init(slave=False)
 
     yield

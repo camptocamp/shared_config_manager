@@ -125,7 +125,7 @@ class BaseSource:
         path = self.get_path()
         url = mode.get_fetch_url(self.get_id())
 
-        for i in list(range(config.settings.retry_number))[::-1]:
+        for i in list(range(config.settings.slave.retry_number))[::-1]:
             try:
                 _LOG.info("Doing a fetch of %s, on %s", self.get_id(), url)
                 async with (
@@ -133,7 +133,7 @@ class BaseSource:
                     session.get(
                         url,
                         headers={"X-Scm-Secret": config.settings.secret or ""},
-                        timeout=config.settings.requests_timeout,
+                        timeout=config.settings.slave.requests_timeout,
                     ) as response,
                 ):
                     response.raise_for_status()
@@ -160,7 +160,7 @@ class BaseSource:
                 if not isinstance(exception, aiohttp.ClientConnectorError):
                     _LOG.exception("Unexpected error while fetching the source from url %s", url)
                 _DO_FETCH_ERROR_COUNTER.labels(self.get_id()).inc()
-                retry_message = f" (will retry in {config.settings.retry_delay}s)" if i else " (failed)"
+                retry_message = f" (will retry in {config.settings.slave.retry_delay}s)" if i else " (failed)"
                 _LOG.warning(
                     "Error fetching the source %s from the master%s: %s",
                     self.get_id(),
@@ -168,7 +168,7 @@ class BaseSource:
                     str(exception),
                 )
                 if i:
-                    await asyncio.sleep(config.settings.retry_delay)
+                    await asyncio.sleep(config.settings.slave.retry_delay)
                 else:
                     raise
             else:
@@ -205,8 +205,14 @@ class BaseSource:
             target_dir = self._config["target_dir"]
             if target_dir.startswith("/"):
                 return Path(target_dir)
-            return config.settings.master_target if self._is_master else config.settings.target / target_dir
-        return config.settings.master_target if self._is_master else config.settings.target / self.get_id()
+            return (
+                config.settings.master_target
+                if self._is_master
+                else config.settings.slave.target / target_dir
+            )
+        return (
+            config.settings.master_target if self._is_master else config.settings.slave.target / self.get_id()
+        )
 
     def get_id(self) -> str:
         return self._id

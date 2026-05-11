@@ -24,3 +24,4 @@ Test files in `app/tests/` may not follow the rules concerning `async` requireme
 ## Pull Requests
 
 - Do not include a `Testing` section in pull request descriptions unless explicitly requested.
+- Never create git branch names containing `/`; use hyphens instead.

@@ -11,7 +11,7 @@ def init(slave: bool) -> None:
 
 def is_master() -> bool:
     """Is the master."""
-    return not _SLAVE or config.settings.api_base_url is None
+    return not _SLAVE or config.settings.slave.api_base_url is None
 
 
 def is_master_with_slaves() -> bool:
@@ -21,4 +21,4 @@ def is_master_with_slaves() -> bool:
 
 def get_fetch_url(id_: str) -> str:
     """Get the URL to fetch the tarball."""
-    return f"{config.settings.api_base_url}1/tarball/{id_}"
+    return f"{config.settings.slave.api_base_url}1/tarball/{id_}"

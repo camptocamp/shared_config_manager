@@ -53,14 +53,22 @@ by setting the `sources` section directly at the root of the `MASTER_CONFIG`.
 A few environment variables can be used to tune the containers:
 
 - `SCM__MASTER_CONFIG`: The master configuration (string containing the YAML config)
-- `SCM__TAG_FILTER`: Load only the sources having the given tag (the master config is always loaded)
-- `SCM__TARGET`: default base directory for the `target_dir` configuration (defaults to `/config`)
 - `SCM__MASTER_TARGET`: where to store the master config (defaults to `/master_config`)
-- `SCM__API_BASE_URL`: how to reach the master for slaves.
 - `SCM__API_MASTER`: if defined, this is a master with slaves (no template evaluation)
 - `SCM__SECRET`: the secret used to authenticate the request between the client and the server
 
-`SCM__API_BASE_URL` should include the effective route prefix configured through `C2C__ROUTE_PREFIX`
+Slave-related variables:
+
+- `SCM__SLAVE__ENABLED`: run in slave mode (set to `true` for the slave process)
+- `SCM__SLAVE__API_BASE_URL`: how to reach the master for slaves
+- `SCM__SLAVE__TAG_FILTER`: load only the sources having the given tag (the master config is always loaded)
+- `SCM__SLAVE__TARGET`: default base directory for the `target_dir` configuration (defaults to `/config`)
+- `SCM__SLAVE__RETRY_NUMBER`: retry attempts when fetching from master (defaults to `3`)
+- `SCM__SLAVE__RETRY_DELAY`: delay between retries in seconds (defaults to `1`)
+- `SCM__SLAVE__REQUESTS_TIMEOUT`: timeout in seconds for slave fetch requests (defaults to `30`)
+- `SCM__SLAVE__INIT_SOURCES_CONCURRENCY`: number of sources loaded in parallel while reading master config (defaults to `4`)
+
+`SCM__SLAVE__API_BASE_URL` should include the effective route prefix configured through `C2C__ROUTE_PREFIX`
 (for example `http://api:8080/scm` when `C2C__ROUTE_PREFIX=/scm/`).
 
 See [https://github.com/camptocamp/c2casgiutils] for other parameters.
@@ -73,7 +81,7 @@ See [https://github.com/camptocamp/c2casgiutils] for other parameters.
 - `target_dir`: the location where the source will be copied (default is the value of `id` in `/config`)
 - `excludes`: the list of files/directories to exclude
 - `template_engines`: a list of template engine configurations
-- `tags`: an optional list of tags. Slaves having `TAG_FILTER` defined will load only sources having the matching tag.
+- `tags`: an optional list of tags. Slaves having `SCM__SLAVE__TAG_FILTER` defined will load only sources having the matching tag.
 
 #### GIT source configuration parameters
 
@@ -129,7 +137,7 @@ services:
         type: git
         repo: git@github.com:camptocamp/master_config.git
       SCM__SECRET: changeme
-      SCM__TAG_FILTER: master
+      SCM__SLAVE__TAG_FILTER: master
     links:
       - redis
     labels:

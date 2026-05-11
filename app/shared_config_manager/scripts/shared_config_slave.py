@@ -34,7 +34,7 @@ async def _async_main() -> None:
     logging_config = yaml.safe_load(await Path("logging.yaml").read_text(encoding="utf-8"))
     logging.config.dictConfig(logging_config)
 
-    config.settings.is_slave = True
+    config.settings.slave.enabled = True
 
     if c2casgiutils.config.settings.prometheus.port is not None:
         prometheus_client.start_http_server(c2casgiutils.config.settings.prometheus.port)
