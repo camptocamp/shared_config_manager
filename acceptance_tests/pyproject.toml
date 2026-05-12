@@ -1,3 +1,10 @@
+
+[project]
+name = "shared-config-manager-acceptance"
+version = "0.0.0"
+description = "Not used"
+authors = []
+
 [tool.ruff.lint]
 select = []
 ignore = ["C90", "COM812", "D200", "D202", "D207", "D208", "I001", "PLR09", "PLR2004", "Q000", "S101", "S113", "SIM105", "W293"]
@@ -23,9 +30,4 @@ boltons = "25.0.0"
 netifaces = "0.11.0"
 lxml = "6.1.0"
 mako = "1.3.12"
-
-[project]
-name = "shared-config-manager-acceptance"
-version = "0.0.0"
-description = "Not used"
-authors = []
+urllib3 = "2.7.0"

@@ -1,3 +1,17 @@
+
+[build-system]
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
+build-backend = "poetry.core.masonry.api"
+
+[project]
+classifiers = []
+dynamic = ["dependencies", "version"]
+name = "shared-config-manager"
+description = "Not used"
+
+[project.scripts]
+shared-config-slave = "shared_config_manager.scripts.shared_config_slave:main"
+
 [tool.ruff]
 target-version = "py310"
 line-length = 110
@@ -31,6 +45,7 @@ aiohttp = "3.13.5"
 anyio = "4.13.0"
 python-multipart = "0.0.27"
 click = "8.3.3"
+urllib3 = "2.7.0"
 
 [tool.poetry.group.dev.dependencies]
 prospector = { version = "1.18.0", extras = ["with_mypy", "with_bandit", "with_pyroma", "with_ruff"] }
@@ -59,16 +74,3 @@ format-jinja = """
 
 [tool.poetry-plugin-tweak-dependencies-version]
 default = "present"
-
-[project]
-classifiers = []
-dynamic = ["dependencies", "version"]
-name = "shared-config-manager"
-description = "Not used"
-
-[project.scripts]
-shared-config-slave = "shared_config_manager.scripts.shared_config_slave:main"
-
-[build-system]
-requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
-build-backend = "poetry.core.masonry.api"
