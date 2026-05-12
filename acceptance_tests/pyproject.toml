@@ -23,6 +23,7 @@ boltons = "25.0.0"
 netifaces = "0.11.0"
 lxml = "6.1.0"
 mako = "1.3.12"
+urllib3 = "2.7.0"
 
 [project]
 name = "shared-config-manager-acceptance"
