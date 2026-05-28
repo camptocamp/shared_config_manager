@@ -96,9 +96,9 @@ async def ui_index(
         raise HTTPException(status_code=500, detail="CSP nonce not initialized") from exc
 
     return templates.TemplateResponse(
+        request,
         "index.html.jinja2",
         {
-            "request": request,
             "identity": identity,
             "nonce": nonce,
             "valid_sources": valid_sources,
@@ -261,9 +261,9 @@ async def ui_source(
         raise HTTPException(status_code=500, detail="CSP nonce not initialized") from exc
 
     return templates.TemplateResponse(
+        request,
         "source.html.jinja2",
         {
-            "request": request,
             "identity": identity,
             "nonce": nonce,
             "key_format": key_format,
