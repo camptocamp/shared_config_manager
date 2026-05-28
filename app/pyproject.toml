@@ -1,3 +1,17 @@
+
+[build-system]
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
+build-backend = "poetry.core.masonry.api"
+
+[project]
+classifiers = []
+dynamic = ["dependencies", "version"]
+name = "shared-config-manager"
+description = "Not used"
+
+[project.scripts]
+shared-config-slave = "shared_config_manager.scripts.shared_config_slave:main"
+
 [tool.ruff]
 target-version = "py310"
 line-length = 110
@@ -63,16 +77,3 @@ format-jinja = """
 
 [tool.poetry-plugin-tweak-dependencies-version]
 default = "present"
-
-[project]
-classifiers = []
-dynamic = ["dependencies", "version"]
-name = "shared-config-manager"
-description = "Not used"
-
-[project.scripts]
-shared-config-slave = "shared_config_manager.scripts.shared_config_slave:main"
-
-[build-system]
-requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
-build-backend = "poetry.core.masonry.api"
