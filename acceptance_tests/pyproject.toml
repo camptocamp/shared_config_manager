@@ -1,3 +1,10 @@
+
+[project]
+name = "shared-config-manager-acceptance"
+version = "0.0.0"
+description = "Not used"
+authors = []
+
 [tool.ruff.lint]
 select = []
 ignore = ["C90", "COM812", "D200", "D202", "D207", "D208", "I001", "PLR09", "PLR2004", "Q000", "S101", "S113", "SIM105", "W293"]
@@ -15,16 +22,10 @@ pytest-cov = "7.1.0"
 prospector = { version = "1.18.0", extras = ["with_ruff"] }
 prospector-profile-duplicated = "1.12.0"
 prospector-profile-utils = "1.27.0"
-ruff = "0.15.12"
+ruff = "0.15.14"
 typing-extensions = "4.15.0"
 c2cwsgiutils = { version = "6.1.9", extras = ["standard", "test_images"] }
 requests = "2.33.1"
 boltons = "25.0.0"
 netifaces = "0.11.0"
 lxml = "6.1.0"
-
-[project]
-name = "shared-config-manager-acceptance"
-version = "0.0.0"
-description = "Not used"
-authors = []
