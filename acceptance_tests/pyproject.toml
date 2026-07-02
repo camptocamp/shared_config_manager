@@ -19,10 +19,10 @@ extend-select = ["UP", "I", "S", "B"]
 [tool.poetry.dependencies]
 python = ">=3.10,<3.13"
 pytest-cov = "7.1.0"
-prospector = { version = "1.18.0", extras = ["with_ruff"] }
+prospector = { version = "1.19.0", extras = ["with_ruff"] }
 prospector-profile-duplicated = "1.12.0"
 prospector-profile-utils = "1.27.0"
-ruff = "0.15.14"
+ruff = "0.15.19"
 typing-extensions = "4.15.0"
 c2cwsgiutils = { version = "6.1.9", extras = ["standard", "test_images"] }
 requests = "2.34.2"

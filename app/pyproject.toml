@@ -45,10 +45,10 @@ aiohttp = "3.14.1"
 anyio = "4.14.0"
 
 [tool.poetry.group.dev.dependencies]
-prospector = { version = "1.18.0", extras = ["with_mypy", "with_bandit", "with_pyroma", "with_ruff"] }
+prospector = { version = "1.19.0", extras = ["with_mypy", "with_bandit", "with_pyroma", "with_ruff"] }
 prospector-profile-duplicated = "1.12.0"
 prospector-profile-utils = "1.27.0"
-ruff = "0.15.14"
+ruff = "0.15.19"
 types-pyyaml = "6.0.12.20260518"
 pytest = "9.1.1"
 pytest-asyncio = "1.4.0"
