@@ -1,3 +1,4 @@
+# Copyright (c) 2026, Camptocamp SA
 import re
 
 from anyio import Path
