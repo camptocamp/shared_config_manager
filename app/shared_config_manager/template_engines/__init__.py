@@ -1,3 +1,4 @@
+# Copyright (c) 2026, Camptocamp SA
 from shared_config_manager.configuration import TemplateEnginesConfig
 from shared_config_manager.template_engines import base, mako, shell
 

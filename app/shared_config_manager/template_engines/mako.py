@@ -1,3 +1,4 @@
+# Copyright (c) 2026, Camptocamp SA
 import mako.template  # pylint: disable=no-name-in-module,import-error
 from anyio import Path
 

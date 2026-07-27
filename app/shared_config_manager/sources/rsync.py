@@ -1,3 +1,4 @@
+# Copyright (c) 2026, Camptocamp SA
 from anyio import Path
 
 from shared_config_manager.sources.ssh import SshBaseSource

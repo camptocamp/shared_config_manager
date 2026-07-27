@@ -1,3 +1,4 @@
+# Copyright (c) 2026, Camptocamp SA
 import shutil
 from pathlib import Path
 from tempfile import mkdtemp

@@ -1,3 +1,4 @@
+# Copyright (c) 2026, Camptocamp SA
 import logging
 from typing import Protocol
 

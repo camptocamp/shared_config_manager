@@ -1,3 +1,4 @@
+# Copyright (c) 2026, Camptocamp SA
 from typing import Literal, TypedDict
 
 from c2casgiutils.auth import AuthConfig

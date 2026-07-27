@@ -1,3 +1,4 @@
+# Copyright (c) 2026, Camptocamp SA
 from shared_config_manager import config
 
 _SLAVE = None

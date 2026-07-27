@@ -1,3 +1,4 @@
+# Copyright (c) 2026, Camptocamp SA
 """The configuration environment variables."""
 
 import logging
