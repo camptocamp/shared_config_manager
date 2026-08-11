@@ -9,6 +9,7 @@ import urllib.parse
 from typing import Any, Protocol
 
 import aiohttp
+from aiohttp import ClientTimeout
 from anyio import Path
 from c2casgiutils import broadcast
 from fastapi import HTTPException, Request
@@ -134,7 +135,7 @@ class BaseSource:
                     session.get(
                         url,
                         headers={"X-Scm-Secret": config.settings.secret or ""},
-                        timeout=config.settings.slave.requests_timeout,
+                        timeout=ClientTimeout(total=config.settings.slave.requests_timeout),
                     ) as response,
                 ):
                     response.raise_for_status()
