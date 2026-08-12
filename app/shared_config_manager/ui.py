@@ -3,13 +3,11 @@ import asyncio
 import logging
 import math
 import re
-from collections.abc import Callable, Sequence
-from typing import Annotated, cast
+from typing import TYPE_CHECKING, Annotated, cast
 
 import aiohttp
 from anyio import Path
 from c2casgiutils import broadcast
-from c2casgiutils.broadcast import types as broadcast_type
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -18,7 +16,13 @@ from fastapi.templating import Jinja2Templates
 from shared_config_manager import broadcast_status, config, slave_status
 from shared_config_manager.security import Allowed, User, get_identity, permits
 from shared_config_manager.sources import registry
-from shared_config_manager.sources.base import BaseSource
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Sequence
+
+    from c2casgiutils.broadcast import types as broadcast_type
+
+    from shared_config_manager.sources.base import BaseSource
 
 _LOG = logging.getLogger(__name__)
 _REPO_RE = re.compile(r"^git@github.com:(.*).git$")

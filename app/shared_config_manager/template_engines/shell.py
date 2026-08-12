@@ -1,10 +1,13 @@
 # Copyright (c) 2026, Camptocamp SA
 import asyncio
+from typing import TYPE_CHECKING
 
-from anyio import Path
-
-from shared_config_manager.configuration import TemplateEnginesConfig
 from shared_config_manager.template_engines.base import BaseEngine
+
+if TYPE_CHECKING:
+    from anyio import Path
+
+    from shared_config_manager.configuration import TemplateEnginesConfig
 
 
 class ShellEngine(BaseEngine):

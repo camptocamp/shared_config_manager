@@ -1,8 +1,10 @@
 # Copyright (c) 2026, Camptocamp SA
-from typing import Literal, TypedDict
+from typing import TYPE_CHECKING, Literal, TypedDict
 
-from c2casgiutils.auth import AuthConfig
 from pydantic import BaseModel
+
+if TYPE_CHECKING:
+    from c2casgiutils.auth import AuthConfig
 
 
 class SourceBase(TypedDict, total=False):

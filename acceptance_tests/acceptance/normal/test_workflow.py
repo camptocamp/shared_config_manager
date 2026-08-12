@@ -3,12 +3,15 @@
 import os
 import subprocess
 import time
+from typing import TYPE_CHECKING
 
 import pytest
 import requests
-from c2cwsgiutils.acceptance.connection import Connection
 
 from acceptance import get_hash, wait_sync
+
+if TYPE_CHECKING:
+    from c2cwsgiutils.acceptance.connection import Connection
 
 
 @pytest.fixture

@@ -2,8 +2,7 @@
 import asyncio
 import logging
 import tempfile
-from collections.abc import Mapping
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import yaml
 from anyio import Path
@@ -12,8 +11,12 @@ from c2casgiutils import broadcast
 from fastapi import HTTPException, Request
 
 from shared_config_manager import broadcast_status, config, configuration
-from shared_config_manager.security import User
 from shared_config_manager.sources import base, git, mode, rclone, rsync
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    from shared_config_manager.security import User
 
 _LOG = logging.getLogger(__name__)
 _ENGINES = {"git": git.GitSource, "rsync": rsync.RsyncSource, "rclone": rclone.RcloneSource}

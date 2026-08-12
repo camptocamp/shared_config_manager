@@ -6,7 +6,7 @@ import asyncio
 import logging
 import logging.config
 import signal
-from types import FrameType
+from typing import TYPE_CHECKING
 
 import c2casgiutils.config
 import prometheus_client
@@ -17,6 +17,9 @@ from c2casgiutils.tools import logging_ as logging_tools
 
 from shared_config_manager import config, slave_status
 from shared_config_manager.sources import base, registry
+
+if TYPE_CHECKING:
+    from types import FrameType
 
 _stop_event = asyncio.Event()
 _LOGGER = logging.getLogger("shared_config_slave")

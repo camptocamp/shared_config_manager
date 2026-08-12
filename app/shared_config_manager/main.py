@@ -3,8 +3,8 @@ import asyncio
 import logging
 import os
 import re
-from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
+from typing import TYPE_CHECKING
 
 import c2casgiutils.config
 import sentry_sdk
@@ -19,6 +19,9 @@ from prometheus_fastapi_instrumentator import Instrumentator
 
 from shared_config_manager import api, config, slave_status, ui
 from shared_config_manager.sources import base, registry
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncGenerator
 
 _LOGGER = logging.getLogger(__name__)
 _WATCH_SOURCE_TASK: asyncio.Task[None] | None = None

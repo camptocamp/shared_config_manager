@@ -1,11 +1,14 @@
 # pylint: disable=unspecified-encoding
 
 import os
+from typing import TYPE_CHECKING
 
 import yaml
-from c2cwsgiutils.acceptance.connection import Connection
 
 from acceptance import get_hash, wait_sync
+
+if TYPE_CHECKING:
+    from c2cwsgiutils.acceptance.connection import Connection
 
 
 def test_ok(app_connection: Connection) -> None:
