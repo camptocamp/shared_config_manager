@@ -29,13 +29,38 @@ FROM base-all AS base
 
 WORKDIR /acceptance_tests
 
+# The installed libs are for Chrome
 RUN --mount=type=cache,target=/var/lib/apt/lists \
     --mount=type=cache,target=/var/cache,sharing=locked \
     apt-get update \
-    && apt-get install --assume-yes --no-install-recommends npm git
+    && apt-get install --assume-yes --no-install-recommends npm git unzip \
+        libasound2t64 \
+        libatk-bridge2.0-0 \
+        libatk1.0-0 \
+        libcairo2 \
+        libcups2 \
+        libdrm2 \
+        libgbm1 \
+        libglib2.0-0 \
+        libnspr4 \
+        libnss3 \
+        libpango-1.0-0 \
+        libx11-6 \
+        libx11-xcb1 \
+        libxcb1 \
+        libxcomposite1 \
+        libxdamage1 \
+        libxext6 \
+        libxfixes3 \
+        libxkbcommon0 \
+        libxrandr2 \
+        libxrender1 \
+        libxss1 \
+        libxtst6
 
 COPY package.json package-lock.json ./
-RUN npm install --ignore-scripts
+RUN npm install --ignore-scripts \
+    && npm rebuild puppeteer
 
 RUN --mount=type=cache,target=/var/lib/apt/lists \
     --mount=type=cache,target=/var/cache,sharing=locked \
