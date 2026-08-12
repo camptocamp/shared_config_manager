@@ -1,12 +1,10 @@
 # Copyright (c) 2026, Camptocamp SA
-from typing import TYPE_CHECKING, Literal
+from typing import Literal
 
+from c2casgiutils.auth import AuthConfig  # noqa: TC002
 from pydantic import BaseModel
 
-if TYPE_CHECKING:
-    from c2casgiutils.auth import AuthConfig
-
-    from shared_config_manager import configuration
+from shared_config_manager import configuration  # noqa: TC001
 
 
 class SourceStatus(BaseModel):

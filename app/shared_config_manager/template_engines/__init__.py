@@ -1,4 +1,5 @@
 # Copyright (c) 2026, Camptocamp SA
+
 from typing import TYPE_CHECKING
 
 from shared_config_manager.template_engines import base, mako, shell

@@ -1,4 +1,5 @@
 # Copyright (c) 2026, Camptocamp SA
+
 from typing import TYPE_CHECKING
 
 import mako.template  # pylint: disable=no-name-in-module,import-error
