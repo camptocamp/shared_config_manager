@@ -113,7 +113,7 @@ if c2casgiutils.config.settings.sentry.dsn or "SENTRY_DSN" in os.environ:
 
 
 @asynccontextmanager
-async def _lifespan(main_app: FastAPI) -> AsyncGenerator[None, None]:
+async def _lifespan(main_app: FastAPI) -> AsyncGenerator[None]:
     """Handle application lifespan events."""
 
     _LOGGER.info("Starting the application")

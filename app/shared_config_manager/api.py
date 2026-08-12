@@ -284,7 +284,7 @@ async def _tarball(
         files.remove(gitstats_filename)
         files.append(gitstats_filename)
 
-    async def tarball_generator() -> AsyncGenerator[bytes, None]:
+    async def tarball_generator() -> AsyncGenerator[bytes]:
         args = [
             "tar",
             "--create",
