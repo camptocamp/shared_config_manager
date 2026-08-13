@@ -58,7 +58,7 @@ class SlaveSettings(BaseModel):
         return value
 
     @model_validator(mode="after")
-    def validate_enabled_requires_api_base_url(self) -> "SlaveSettings":
+    def validate_enabled_requires_api_base_url(self) -> SlaveSettings:
         if self.enabled and self.api_base_url is None:
             msg = "SCM__SLAVE__API_BASE_URL is required when SCM__SLAVE__ENABLED is true"
             raise ValueError(msg)

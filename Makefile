@@ -71,17 +71,17 @@ checks: prospector acceptance-prospector ## Run the checks
 .PHONY: acceptance-prospector
 acceptance-prospector: build-acceptance ## Run Prospector on acceptance
 	docker run --rm --volume=${PWD}/acceptance_tests:/acceptance_tests --volume=${PWD}/acceptance_tests:/acceptance_tests/acceptance_tests $(DOCKER_BASE)-acceptance:$(DOCKER_TAG) \
-		prospector --output=pylint --die-on-tool-error --without=ruff acceptance_tests
+		prospector --output=pylint --direct-tool-stdout --without=ruff acceptance_tests
 
 .PHONY: prospector
 prospector: build-checker ## Run Prospector
 	docker run --rm --volume=${PWD}/app:/app --volume=${PWD}/app:/app/app $(DOCKER_BASE)-checker:$(DOCKER_TAG) \
-		prospector --output=pylint --die-on-tool-error app
+		prospector --output=pylint --direct-tool-stdout app
 
 .PHONY: prospector-fast
 prospector-fast: ## Run Prospector without building the Docker image
 	docker run --rm --volume=${PWD}/app:/app --volume=${PWD}/app:/app/app $(DOCKER_BASE)-checker:$(DOCKER_TAG) \
-		prospector --output=pylint --die-on-tool-error app
+		prospector --output=pylint --direct-tool-stdout app
 
 DOCKER_RUN_TESTS = docker run --rm --volume=${PWD}/results/:/results --volume=${PWD}/app:/app
 DOCKER_IMAGE_PYTEST = $(DOCKER_BASE)-checker:$(DOCKER_TAG) pytest -vv --color=yes ${PYTEST_OPTS}

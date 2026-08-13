@@ -1,10 +1,10 @@
 # Copyright (c) 2026, Camptocamp SA
 from typing import Literal
 
-from c2casgiutils.auth import AuthConfig
+from c2casgiutils.auth import AuthConfig  # noqa: TC002
 from pydantic import BaseModel
 
-from shared_config_manager import configuration
+from shared_config_manager import configuration  # noqa: TC001
 
 
 class SourceStatus(BaseModel):

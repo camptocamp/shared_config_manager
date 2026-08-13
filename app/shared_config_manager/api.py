@@ -4,7 +4,6 @@ import logging
 import re
 import shlex
 import subprocess
-from collections.abc import AsyncGenerator
 from typing import TYPE_CHECKING, Annotated, cast
 
 from c2casgiutils import broadcast
@@ -17,6 +16,8 @@ from shared_config_manager.security import User, get_identity
 from shared_config_manager.sources import registry
 
 if TYPE_CHECKING:
+    from collections.abc import AsyncGenerator
+
     from c2casgiutils.broadcast import types as broadcast_types
 
     from shared_config_manager.sources import git
@@ -284,7 +285,7 @@ async def _tarball(
         files.remove(gitstats_filename)
         files.append(gitstats_filename)
 
-    async def tarball_generator() -> AsyncGenerator[bytes, None]:
+    async def tarball_generator() -> AsyncGenerator[bytes]:
         args = [
             "tar",
             "--create",

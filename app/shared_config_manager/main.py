@@ -3,8 +3,8 @@ import asyncio
 import logging
 import os
 import re
-from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
+from typing import TYPE_CHECKING
 
 import c2casgiutils.config
 import sentry_sdk
@@ -19,6 +19,9 @@ from prometheus_fastapi_instrumentator import Instrumentator
 
 from shared_config_manager import api, config, slave_status, ui
 from shared_config_manager.sources import base, registry
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncGenerator
 
 _LOGGER = logging.getLogger(__name__)
 _WATCH_SOURCE_TASK: asyncio.Task[None] | None = None
@@ -113,7 +116,7 @@ if c2casgiutils.config.settings.sentry.dsn or "SENTRY_DSN" in os.environ:
 
 
 @asynccontextmanager
-async def _lifespan(main_app: FastAPI) -> AsyncGenerator[None, None]:
+async def _lifespan(main_app: FastAPI) -> AsyncGenerator[None]:
     """Handle application lifespan events."""
 
     _LOGGER.info("Starting the application")

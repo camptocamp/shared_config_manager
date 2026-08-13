@@ -5,12 +5,15 @@ import logging
 import os
 import subprocess
 import tempfile
+from typing import TYPE_CHECKING
 
 from anyio import Path
 
-from shared_config_manager import broadcast_status
 from shared_config_manager.sources import mode
 from shared_config_manager.sources.ssh import SshBaseSource
+
+if TYPE_CHECKING:
+    from shared_config_manager import broadcast_status
 
 TEMP_DIR = Path(tempfile.gettempdir())
 LOG = logging.getLogger(__name__)

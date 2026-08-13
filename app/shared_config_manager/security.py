@@ -2,14 +2,16 @@
 import hashlib
 import hmac
 import logging
-from typing import Annotated
+from typing import TYPE_CHECKING, Annotated
 
 import c2casgiutils.auth
 import c2casgiutils.config
 from fastapi import Depends, Header, Request
 
 from shared_config_manager import config
-from shared_config_manager.configuration import SourceConfig
+
+if TYPE_CHECKING:
+    from shared_config_manager.configuration import SourceConfig
 
 _LOG = logging.getLogger(__name__)
 

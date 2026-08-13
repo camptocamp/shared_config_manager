@@ -1,10 +1,13 @@
 # Copyright (c) 2026, Camptocamp SA
 import re
+from typing import TYPE_CHECKING
 
 from anyio import Path
 
-from shared_config_manager import broadcast_status
 from shared_config_manager.sources.base import BaseSource
+
+if TYPE_CHECKING:
+    from shared_config_manager import broadcast_status
 
 
 class RcloneSource(BaseSource):

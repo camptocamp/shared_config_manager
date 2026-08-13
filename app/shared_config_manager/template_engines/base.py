@@ -1,16 +1,19 @@
 # Copyright (c) 2026, Camptocamp SA
 import logging
 import os
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
-from anyio import Path
 from prometheus_client import Counter, Gauge
 
 from shared_config_manager import config
-from shared_config_manager.configuration import (
-    TemplateEnginesConfig,
-    TemplateEnginesStatus,
-)
+
+if TYPE_CHECKING:
+    from anyio import Path
+
+    from shared_config_manager.configuration import (
+        TemplateEnginesConfig,
+        TemplateEnginesStatus,
+    )
 
 _LOG = logging.getLogger(__name__)
 _ERROR_COUNTER = Counter(

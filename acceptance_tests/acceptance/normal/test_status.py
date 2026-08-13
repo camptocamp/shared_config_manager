@@ -1,6 +1,8 @@
 from pprint import pformat
+from typing import TYPE_CHECKING
 
-from c2cwsgiutils.acceptance.connection import Connection
+if TYPE_CHECKING:
+    from c2cwsgiutils.acceptance.connection import Connection
 
 
 def test_all(app_connection: Connection) -> None:

@@ -1,9 +1,15 @@
 # Copyright (c) 2026, Camptocamp SA
-import mako.template  # pylint: disable=no-name-in-module,import-error
-from anyio import Path
 
-from shared_config_manager.configuration import TemplateEnginesConfig
+from typing import TYPE_CHECKING
+
+import mako.template  # pylint: disable=no-name-in-module,import-error
+
 from shared_config_manager.template_engines.base import BaseEngine
+
+if TYPE_CHECKING:
+    from anyio import Path
+
+    from shared_config_manager.configuration import TemplateEnginesConfig
 
 
 class MakoEngine(BaseEngine):

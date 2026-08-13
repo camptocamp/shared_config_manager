@@ -1,10 +1,13 @@
 # Copyright (c) 2026, Camptocamp SA
 import os
+from typing import TYPE_CHECKING
 
 from anyio import Path
 
-from shared_config_manager.configuration import SourceConfig
 from shared_config_manager.sources.base import BaseSource
+
+if TYPE_CHECKING:
+    from shared_config_manager.configuration import SourceConfig
 
 
 class SshBaseSource(BaseSource):

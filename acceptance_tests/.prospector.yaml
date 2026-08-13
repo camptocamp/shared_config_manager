@@ -3,3 +3,7 @@ inherits:
   - utils:c2cwsgiutils
   - utils:fix
   - duplicated
+
+mypy:
+  options:
+    python-version: '3.14'
