@@ -82,10 +82,8 @@ COPY logging.yaml ./
 COPY scripts/ /usr/bin/
 COPY shared_config_manager/ ./shared_config_manager/
 
-RUN mkdir -p /prometheus-metrics \
-    && chmod a+rwx /prometheus-metrics
-ENV PROMETHEUS_MULTIPROC_DIR=/prometheus-metrics \
-    C2C__ROUTE_PREFIX=/scm/
+ENV C2C__ROUTE_PREFIX=/scm/ \
+    C2C__TOOLS__LOGGING__APPLICATION_MODULE=shared_config_manager
 
 CMD ["start", "uvicorn", "shared_config_manager.main:app", "--host=0.0.0.0", "--port=8080", "--log-config=/app/logging.yaml", "--proxy-headers", "--forwarded-allow-ips=*"]
 
