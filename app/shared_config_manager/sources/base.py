@@ -219,11 +219,17 @@ class BaseSource:
     def get_id(self) -> str:
         return self._id
 
-    async def validate_auth(self, identity: User | None, request: Request) -> None:
-        permission = await permits(identity, self.get_config(), self._id)
+    async def validate_auth(
+        self,
+        identity: User | None,
+        request: Request,
+        access_type: str = "read",
+    ) -> None:
+        permission = await permits(identity, self.get_config(), self._id, access_type=access_type)
         if not isinstance(permission, Allowed):
             if identity is not None:
-                message = "Not allowed to access this source"
+                access_label = "write access" if access_type == "write" else "access"
+                message = f"Not allowed to {access_label} this source"
                 raise HTTPException(status_code=403, detail=message)
 
             # To avoid circular import
