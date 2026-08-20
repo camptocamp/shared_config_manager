@@ -283,6 +283,16 @@ Returns the status for the given source ID, looking like that:
 
 Returns a `.tar.gz` containing the current content for the given source.
 
+## Authentication and Permissions
+
+The shared config manager supports GitHub OAuth authentication. User permissions are determined by their access level on the configured GitHub repository:
+
+- **Read access (pull)**: Users with only read access can view the status, download tarballs, and browse the web UI in read-only mode. They cannot trigger source refreshes.
+- **Write access (push)**: Users with write access can perform all read operations and additionally trigger source refreshes manually or via webhooks.
+- **Admin access**: Users with admin access have full control over all sources and operations.
+
+When a user without write access attempts to refresh a source (via API or webhook), they will receive an HTTP 403 Forbidden response. The web UI will display a "Read-only mode" indicator and hide the refresh button for users without write permissions.
+
 ## Contributing
 
 Install the pre-commit hooks:

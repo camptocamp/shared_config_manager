@@ -95,6 +95,10 @@ async def ui_index(
         zip(await asyncio.gather(*[_is_valid(source) for source in sources_list]), sources_list, strict=True),
     )
 
+    has_write_access = False
+    if identity is not None and registry.MASTER_SOURCE:
+        has_write_access = await identity.has_write_access(registry.MASTER_SOURCE.get_config())
+
     try:
         nonce = request.state.nonce
     except AttributeError as exc:
@@ -107,6 +111,7 @@ async def ui_index(
             "identity": identity,
             "nonce": nonce,
             "valid_sources": valid_sources,
+            "has_write_access": has_write_access or is_admin,
         },
     )
 
@@ -260,6 +265,10 @@ async def ui_source(
         response, _ = elem
         return response.hostname
 
+    has_write_access = False
+    if identity is not None:
+        has_write_access = await identity.has_write_access(source.get_config())
+
     try:
         nonce = request.state.nonce
     except AttributeError as exc:
@@ -275,5 +284,6 @@ async def ui_source(
             "source": source,
             "attributes": attributes4,
             "slave_status": sorted(_slave_status, key=_get_sort_key),
+            "has_write_access": has_write_access or is_admin,
         },
     )

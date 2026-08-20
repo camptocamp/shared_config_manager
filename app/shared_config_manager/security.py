@@ -2,10 +2,11 @@
 import hashlib
 import hmac
 import logging
-from typing import TYPE_CHECKING, Annotated
+from typing import TYPE_CHECKING, Annotated, Any
 
 import c2casgiutils.auth
 import c2casgiutils.config
+from c2casgiutils.config import GitHubAccessType
 from fastapi import Depends, Header, Request
 
 from shared_config_manager import config
@@ -53,14 +54,60 @@ class User:
         )
 
     async def has_access(self, source_config: SourceConfig) -> bool:
+        """Check if user has read access (pull permission) to the source repository."""
         if await self.is_admin():
             return True
 
-        auth_config = c2casgiutils.auth.AuthConfig.model_validate(
-            source_config["auth"] if "auth" in source_config else c2casgiutils.auth.AuthConfig()
+        auth_data: dict[str, Any] = {}
+        if "auth" in source_config:
+            auth_config = source_config["auth"]
+            # AuthConfig is a Pydantic model, convert to dict
+            if hasattr(auth_config, "model_dump"):
+                auth_data = auth_config.model_dump(exclude_none=True)
+            else:
+                auth_data = dict(auth_config)
+
+        read_auth_config = c2casgiutils.auth.AuthConfig.model_validate(
+            {
+                "github_repository": auth_data.get("github_repository"),
+                "github_access_type_read_only": auth_data.get(
+                    "github_access_type_read_only",
+                    GitHubAccessType.PULL,
+                ),
+            }
         )
-        if auth_config.github_repository and self.auth_info is not None:
-            return await c2casgiutils.auth.check_access(self.auth_info, auth_config)
+
+        if read_auth_config.github_repository and self.auth_info is not None:
+            return await c2casgiutils.auth.check_access(self.auth_info, read_auth_config)
+
+        return False
+
+    async def has_write_access(self, source_config: SourceConfig) -> bool:
+        """Check if user has write access (push permission) to the source repository."""
+        if await self.is_admin():
+            return True
+
+        auth_data: dict[str, Any] = {}
+        if "auth" in source_config:
+            auth_config = source_config["auth"]
+            # AuthConfig is a Pydantic model, convert to dict
+            if hasattr(auth_config, "model_dump"):
+                auth_data = auth_config.model_dump(exclude_none=True)
+            else:
+                auth_data = dict(auth_config)
+
+        write_auth_config = c2casgiutils.auth.AuthConfig.model_validate(
+            {
+                "github_repository": auth_data.get("github_repository"),
+                "github_access_type_read_write": auth_data.get(
+                    "github_access_type_read_write",
+                    GitHubAccessType.PUSH,
+                ),
+            }
+        )
+
+        if write_auth_config.github_repository and self.auth_info is not None:
+            return await c2casgiutils.auth.check_access(self.auth_info, write_auth_config)
 
         return False
 
@@ -148,6 +195,7 @@ async def permits(
     identity: User | None,
     context: SourceConfig | None,
     permission: str,
+    access_type: str = "read",
 ) -> Allowed | Denied:
     """Allow access to everything if signed in."""
     if identity is None:
@@ -158,6 +206,14 @@ async def permits(
         return Allowed("The User is admin.")
     if permission == "all":
         return Denied("Root access is required.")
-    if context is not None and await identity.has_access(context):
-        return Allowed(f"The User has access to source {permission}.")
-    return Denied(f"The User has no access to source {permission}.")
+    if context is not None:
+        # Check the appropriate access type based on the parameter
+        if access_type == "write":
+            has_access = await identity.has_write_access(context)
+        else:
+            has_access = await identity.has_access(context)
+
+        if has_access:
+            access_label = "write access" if access_type == "write" else "access"
+            return Allowed(f"The User has {access_label} to source {permission}.")
+    return Denied(f"The User has no {access_type} access to source {permission}.")

@@ -58,7 +58,11 @@
 
         <p class="text-right">
           <a class="btn btn-secondary" href="{{ url_for('ui_index') }}">Back to the list</a>
+          {% if has_write_access %}
           <a class="btn btn-secondary" target="_blank" href="{{ url_for('_refresh_view', source_id=source.get_id()) }}">Refresh</a>
+          {% else %}
+          <span class="badge bg-warning text-dark">Read-only mode</span>
+          {% endif %}
         </p>
       </div>
 

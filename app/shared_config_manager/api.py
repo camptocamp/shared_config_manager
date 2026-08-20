@@ -79,6 +79,7 @@ async def _refresh_view(
     if source is None:
         message = f"Unknown id {source_id}"
         raise HTTPException(status_code=404, detail=message)
+    await source.validate_auth(identity, request, access_type="write")
     return await _refresh(source_id, identity, request)
 
 
@@ -94,6 +95,8 @@ async def _refresh_webhook(
     if source is None:
         message = f"Unknown id {source_id}"
         raise HTTPException(status_code=404, detail=message)
+
+    await source.validate_auth(identity, request, access_type="write")
 
     if source.get_type() != "git":
         message = f"Non GIT source {source_id} cannot be refreshed by a webhook"
@@ -134,7 +137,7 @@ async def _refresh_all(
     if not registry.MASTER_SOURCE:
         message = "Master source not initialized"
         raise HTTPException(status_code=500, detail=message)
-    await registry.MASTER_SOURCE.validate_auth(identity=identity, request=request)
+    await registry.MASTER_SOURCE.validate_auth(identity, request, access_type="write")
     source_ids = list(registry.get_sources())
     results = await asyncio.gather(
         *[registry.refresh(source_id=sid, identity=identity, request=request) for sid in source_ids],
@@ -164,7 +167,7 @@ async def _refresh_all_webhook(
     if not registry.MASTER_SOURCE:
         message = "Master source not initialized"
         raise HTTPException(status_code=500, detail=message)
-    await registry.MASTER_SOURCE.validate_auth(identity=identity, request=request)
+    await registry.MASTER_SOURCE.validate_auth(identity, request, access_type="write")
 
     if x_github_event != "push":
         _LOG.info("Ignoring webhook notif for a non-push event")
