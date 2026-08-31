@@ -14,31 +14,52 @@
     'github>camptocamp/gs-renovate-config-preset:own.json5#1.13.0',
     'github>camptocamp/gs-renovate-config-preset:security.json5#1.13.0',
   ],
-  baseBranchPatterns: ['master', '3.5', '4.0'],
+  baseBranchPatterns: [
+    'master',
+    '3.5',
+    '4.0',
+  ],
   html: {
-    managerFilePatterns: ['/\\.html?$/', '/\\.html?.mako$/'],
+    managerFilePatterns: [
+      '/\\.html?$/',
+      '/\\.html?.mako$/',
+    ],
   },
   packageRules: [
-    /** Docker images versioning */
     {
-      matchDatasources: ['docker'],
+      matchDatasources: [
+        'docker',
+      ],
       versioning: 'loose',
     },
     {
-      matchFiles: ['acceptance_tests/Dockerfile', 'app/Dockerfile'],
-      matchDatasources: ['docker'],
+      matchFileNames: [
+        'acceptance_tests/Dockerfile',
+        'app/Dockerfile',
+      ],
+      matchDatasources: [
+        'docker',
+      ],
       versioning: 'ubuntu',
     },
     {
-      matchDatasources: ['docker'],
+      matchDatasources: [
+        'docker',
+      ],
       versioning: 'regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$',
-      matchDepNames: ['redis'],
+      matchDepNames: [
+        'redis',
+      ],
     },
-    /** Disable upgrading the supported Python version */
     {
-      matchFileNames: ['app/pyproject.toml', 'acceptance_tests/pyproject.toml'],
+      matchFileNames: [
+        'app/pyproject.toml',
+        'acceptance_tests/pyproject.toml',
+      ],
       enabled: false,
-      matchDepNames: ['python'],
+      matchDepNames: [
+        'python',
+      ],
     },
   ],
 }
