@@ -5,10 +5,11 @@ import os
 import shutil
 import subprocess
 import urllib.parse
+import uuid
 from typing import Any, Protocol
 
 import aiohttp
-from anyio import Path
+from anyio import Path, to_thread
 from c2casgiutils import broadcast
 from fastapi import HTTPException, Request
 from prometheus_client import Counter, Gauge, Summary
@@ -59,6 +60,7 @@ class BaseSource:
         self._config = config
         self._is_master = is_master
         self._is_loaded = False
+        self._lock = asyncio.Lock()
         self._template_engines = [
             template_engines.create_engine(self.get_id(), engine_conf)
             for engine_conf in config.get("template_engines", [])
@@ -72,21 +74,22 @@ class BaseSource:
 
     async def refresh(self) -> None:
         _LOG.info("Doing a refresh of %s", self.get_id())
-        try:
-            self._is_loaded = False
-            with _REFRESH_SUMMARY.labels(self.get_id()).time():
-                await self._do_refresh()
-            await self._eval_templates()
-            await _set_refresh_success(source=self.get_id())
-        except Exception:
-            _LOG.warning("Error with source %s", self.get_id(), exc_info=True)
-            _REFRESH_ERROR_COUNTER.labels(self.get_id()).inc()
-            _REFRESH_ERROR_GAUGE.labels(self.get_id()).set(1)
-            raise
-        finally:
-            self._is_loaded = True
+        async with self._lock:
+            try:
+                self._is_loaded = False
+                with _REFRESH_SUMMARY.labels(self.get_id()).time():
+                    await self._do_refresh()
+                await self._eval_templates()
+                await _set_refresh_success(source=self.get_id())
+            except Exception:
+                _LOG.warning("Error with source %s", self.get_id(), exc_info=True)
+                _REFRESH_ERROR_COUNTER.labels(self.get_id()).inc()
+                _REFRESH_ERROR_GAUGE.labels(self.get_id()).set(1)
+                raise
+            finally:
+                self._is_loaded = True
 
-    async def _eval_templates(self) -> None:
+    async def _eval_templates(self, root_dir: Path | None = None) -> None:
         if mode.is_master_with_slaves():
             # masters with slaves don't need to evaluate templates
             return
@@ -94,7 +97,8 @@ class BaseSource:
         # the previous template engines. This method is always called with a root_dir that is clean from
         # all the files that are created by template engines (see the --delete rsync flag in
         # BaseSource._copy).
-        root_dir = self.get_path()
+        if root_dir is None:
+            root_dir = self.get_path()
         files = [p.relative_to(root_dir) async for p in root_dir.glob("**/*")]
 
         for engine in self._template_engines:
@@ -102,30 +106,44 @@ class BaseSource:
                 await engine.evaluate(root_dir, files)
 
     async def fetch(self) -> None:
-        try:
-            self._is_loaded = False
-            with (
-                _FETCH_SUMMARY.labels(self.get_id()).time(),
-                _FETCH_ERROR_COUNTER.labels(self.get_id()).count_exceptions(),
-            ):
-                await self._do_fetch()
-            await self._eval_templates()
-            await _set_fetch_success(source=self.get_id())
-        except Exception:
-            _LOG.warning("Error with source %s", self.get_id(), exc_info=True)
-            _FETCH_ERROR_GAUGE.labels(self.get_id()).set(1)
-            raise
-        finally:
-            self._is_loaded = True
+        async with self._lock:
+            tmp_dir: Path | None = None
+            try:
+                self._is_loaded = False
+                await _cleanup_leftovers(self.get_path())
+                with (
+                    _FETCH_SUMMARY.labels(self.get_id()).time(),
+                    _FETCH_ERROR_COUNTER.labels(self.get_id()).count_exceptions(),
+                ):
+                    tmp_dir = await self._do_fetch()
+                await self._eval_templates(root_dir=tmp_dir)
+                await self._install(tmp_dir)
+                tmp_dir = None
+                await _set_fetch_success(source=self.get_id())
+            except Exception:
+                _LOG.warning("Error with source %s", self.get_id(), exc_info=True)
+                _FETCH_ERROR_GAUGE.labels(self.get_id()).set(1)
+                raise
+            finally:
+                if tmp_dir is not None:
+                    await _rmtree(tmp_dir)
+                self._is_loaded = True
 
     async def _do_refresh(self) -> None:
         pass
 
-    async def _do_fetch(self) -> None:
+    async def _do_fetch(self) -> Path:
+        """
+        Download the source tarball from the master and extract it in a temporary directory.
+
+        The target directory is left untouched, the caller is responsible to install the
+        fetched content, that way, the target directory is never empty nor partially updated.
+        """
         path = self.get_path()
         url = mode.get_fetch_url(self.get_id())
 
         for i in list(range(config.settings.retry_number))[::-1]:
+            tmp_dir = path.parent / f".{path.name}.fetch-{uuid.uuid4().hex}"
             try:
                 _LOG.info("Doing a fetch of %s, on %s", self.get_id(), url)
                 async with (
@@ -137,9 +155,7 @@ class BaseSource:
                     ) as response,
                 ):
                     response.raise_for_status()
-                    if await path.exists():
-                        shutil.rmtree(path)
-                    await path.mkdir(parents=True, exist_ok=True)
+                    await tmp_dir.mkdir(parents=True)
                     tar = await asyncio.create_subprocess_exec(
                         "tar",
                         "--extract",
@@ -148,7 +164,7 @@ class BaseSource:
                         "--no-same-permissions",
                         "--touch",
                         "--no-overwrite-dir",
-                        cwd=path,
+                        cwd=tmp_dir,
                         stdin=asyncio.subprocess.PIPE,
                     )
                     if tar.stdin is not None:
@@ -157,6 +173,7 @@ class BaseSource:
                         tar.stdin.close()
                     assert await tar.wait() == 0
             except Exception as exception:  # pylint: disable=broad-exception-caught
+                await _rmtree(tmp_dir)
                 if not isinstance(exception, aiohttp.ClientConnectorError):
                     _LOG.exception("Unexpected error while fetching the source from url %s", url)
                 _DO_FETCH_ERROR_COUNTER.labels(self.get_id()).inc()
@@ -172,7 +189,26 @@ class BaseSource:
                 else:
                     raise
             else:
-                return
+                return tmp_dir
+        msg = "Number of retries exhausted"
+        raise AssertionError(msg)
+
+    async def _install(self, new_dir: Path) -> None:
+        """Atomically replace the target directory with the fetched one."""
+        path = self.get_path()
+        backup = path.parent / f".{path.name}.old-{uuid.uuid4().hex}"
+        try:
+            await path.rename(backup)
+        except FileNotFoundError:
+            await new_dir.rename(path)
+        else:
+            try:
+                await new_dir.rename(path)
+            except Exception:
+                # Restore the previous version if the installation failed
+                await backup.rename(path)
+                raise
+            await _rmtree(backup)
 
     async def _copy(self, source: Path, excludes: list[str] | None = None) -> None:
         await self.get_path().mkdir(parents=True, exist_ok=True)
@@ -197,8 +233,9 @@ class BaseSource:
     async def delete_target_dir(self) -> None:
         dest = self.get_path()
         _LOG.info("Deleting target dir %s", dest)
+        await _cleanup_leftovers(dest)
         if await dest.is_dir():
-            shutil.rmtree(dest)
+            await _rmtree(dest)
 
     def get_path(self) -> Path:
         if "target_dir" in self._config:
@@ -297,6 +334,24 @@ class BaseSource:
             k = key.upper()
             if "KEY" in k or "PASSWORD" in k or "SECRET" in k:
                 data[key] = "•••"
+
+
+async def _rmtree(path: Path) -> None:
+    try:
+        await to_thread.run_sync(shutil.rmtree, str(path))
+    except FileNotFoundError:
+        # Already removed by an other task or process
+        pass
+
+
+async def _cleanup_leftovers(path: Path) -> None:
+    """Remove the temporary directories left by interrupted fetches of the source."""
+    if not await path.parent.is_dir():
+        return
+    for pattern in (f".{path.name}.fetch-*", f".{path.name}.old-*"):
+        async for leftover in path.parent.glob(pattern):
+            if await leftover.is_dir():
+                await _rmtree(leftover)
 
 
 class _SetRefreshSuccessProto(Protocol):

@@ -65,6 +65,13 @@ A few environment variables can be used to tune the containers:
 
 See [https://github.com/camptocamp/c2casgiutils] for other parameters.
 
+### Slave fetch behavior
+
+On the slaves, a source is fetched from the master in a temporary directory where the
+templates are evaluated, then the temporary directory is moved atomically in place of the
+source directory. That way, the source directory is never empty nor partially updated, and
+the fetches and refreshes of a source are serialized.
+
 ### Sources
 
 #### Common source configuration parameters
