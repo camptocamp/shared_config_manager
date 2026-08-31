@@ -8,6 +8,13 @@ All notable changes to this project will be documented in this file.
 
 - Grouped slave configuration under `SCM__SLAVE__*` environment variables.
 
+### Fixed
+
+- The source directory on slaves is no longer emptied or partially updated while fetching
+  it from the master: the source is fetched and the templates are evaluated in a temporary
+  directory, which is then moved atomically in place. Fetches and refreshes of a source are
+  also serialized to avoid concurrent corruptions of the source directory.
+
 ### Breaking changes
 
 - Renamed environment variables for slave settings:
