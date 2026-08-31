@@ -24,7 +24,7 @@ c2cwsgiutils = { version = "6.1.10", extras = ["standard", "test_images"] }
 requests = "2.34.2"
 boltons = "26.1.0"
 netifaces = "0.11.0"
-lxml = "6.1.1"
+lxml = "6.1.2"
 pylint = "4.0.6"
 
 [project]
