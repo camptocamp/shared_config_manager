@@ -25,7 +25,7 @@
       versioning: 'loose',
     },
     {
-      matchFiles: ['acceptance_tests/Dockerfile', 'app/Dockerfile'],
+      matchFileNames: ['acceptance_tests/Dockerfile', 'app/Dockerfile'],
       matchDatasources: ['docker'],
       versioning: 'ubuntu',
     },
