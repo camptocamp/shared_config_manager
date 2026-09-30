@@ -26,6 +26,9 @@ boltons = "26.1.0"
 netifaces = "0.11.0"
 lxml = "6.1.2"
 pylint = "4.0.8"
+oauthlib = "4.0.0"
+pyjwt = "2.15.0"
+urllib3 = "2.8.0"
 
 [project]
 name = "shared-config-manager-acceptance"
