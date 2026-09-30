@@ -26,16 +26,16 @@ asyncinotify = "4.4.4"
 c2cwsgiutils = { version = "6.1.10", extras = [] }
 c2casgiutils = { version = "0.14.0", extras = ["fastapi", "sqlalchemy", "prometheus", "sentry"] }
 redis = "8.1.0"
-mako = "1.4.1"
+mako = "1.4.3"
 aiohttp = "3.14.3"
-anyio = "4.14.2"
+anyio = "4.15.1"
 
 [tool.poetry.group.dev.dependencies]
 prospector = { version = "1.19.1", extras = ["with_mypy", "with_bandit", "with_pyroma", "with_ruff"] }
 prospector-profile-duplicated = "1.12.0"
 prospector-profile-utils = "1.27.0"
 ruff = "0.16.8"
-types-pyyaml = "6.0.12.20260815"
+types-pyyaml = "6.0.12.20260906"
 pytest = "9.1.1"
 pytest-asyncio = "1.4.0"
 pylint = "4.0.9"
