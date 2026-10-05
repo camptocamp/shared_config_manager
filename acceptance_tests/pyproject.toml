@@ -29,6 +29,7 @@ pylint = "4.0.9"
 oauthlib = "4.0.0"
 pyjwt = "2.15.0"
 urllib3 = "2.8.0"
+mako = "1.4.2"
 
 [project]
 name = "shared-config-manager-acceptance"
