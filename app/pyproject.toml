@@ -27,7 +27,7 @@ c2cwsgiutils = { version = "6.1.10", extras = [] }
 c2casgiutils = { version = "0.14.0", extras = ["fastapi", "sqlalchemy", "prometheus", "sentry"] }
 redis = "8.1.0"
 mako = "1.4.3"
-aiohttp = "3.14.3"
+aiohttp = "3.14.4"
 anyio = "4.15.1"
 
 [tool.poetry.group.dev.dependencies]
