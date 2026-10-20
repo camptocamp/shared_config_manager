@@ -1,2 +1,4 @@
 c2cwsgiutils[broadcast,standard]==6.1.10
 yamllint==1.38.0
+certifi>=2026.10.19 # not directly required, pinned by Snyk to avoid a vulnerability
+pillow>=13.0.0 # not directly required, pinned by Snyk to avoid a vulnerability
