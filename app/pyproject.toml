@@ -53,6 +53,7 @@ pydantic-settings = "2.14.2"
 multidict = "6.9.1"
 certifi = "2026.10.19"
 pillow = "13.0.0"
+dnspython = "2.9.0"
 
 [tool.poetry.group.dev.dependencies]
 prospector = { version = "1.18.0", extras = ["with_mypy", "with_bandit", "with_pyroma", "with_ruff"] }
