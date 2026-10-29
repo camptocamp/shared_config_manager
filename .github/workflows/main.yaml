@@ -130,7 +130,6 @@ jobs:
 
       - name: Publish
         run: uv run --locked --isolated --project=.github/publish tag-publish
-        if: env.HAS_SECRETS == 'HAS_SECRETS'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
