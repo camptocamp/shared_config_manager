@@ -83,7 +83,7 @@ camptocamp/shared_config_manager:latest:
   ubuntu_26_04/libpam-modules-bin: 1.7.0-5ubuntu3.2
   ubuntu_26_04/libpam-runtime: 1.7.0-5ubuntu3.2
   ubuntu_26_04/libpam0g: 1.7.0-5ubuntu3.2
-  ubuntu_26_04/libpcre2-8-0: 10.46-1build1
+  ubuntu_26_04/libpcre2-8-0: 10.46-1ubuntu0.1
   ubuntu_26_04/libperl5.40: 5.40.1-7ubuntu0.3
   ubuntu_26_04/libpopt0: 1.19+dfsg-2build1
   ubuntu_26_04/libproc2-0: 2:4.0.4-9ubuntu1
