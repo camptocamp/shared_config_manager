@@ -1,12 +1,12 @@
 camptocamp/shared_config_manager:latest:
   ubuntu_26_04/adduser: 3.153ubuntu1
-  ubuntu_26_04/apt: 3.2.0
+  ubuntu_26_04/apt: 3.2.1ubuntu0.1
   ubuntu_26_04/base-passwd: 3.6.8
   ubuntu_26_04/bash: 5.3-2ubuntu1
   ubuntu_26_04/binutils: 2.46-3ubuntu2
   ubuntu_26_04/binutils-common: 2.46-3ubuntu2
   ubuntu_26_04/bsdutils: 1:2.41.3-3ubuntu2.2
-  ubuntu_26_04/ca-certificates: 20260816ubuntu0.26.04.1
+  ubuntu_26_04/ca-certificates: 20260816ubuntu0.26.04.2
   ubuntu_26_04/coreutils: 9.5-1ubuntu2+0.0.0~ubuntu25
   ubuntu_26_04/coreutils-from-uutils: 0.0.0~ubuntu25
   ubuntu_26_04/cpp: 4:15.2.0-5ubuntu1
@@ -29,7 +29,7 @@ camptocamp/shared_config_manager:latest:
   ubuntu_26_04/hostname: 3.25build1
   ubuntu_26_04/init-system-helpers: '1.69'
   ubuntu_26_04/libacl1: 2.3.2-2
-  ubuntu_26_04/libapt-pkg7.0: 3.2.0
+  ubuntu_26_04/libapt-pkg7.0: 3.2.1ubuntu0.1
   ubuntu_26_04/libattr1: 1:2.5.2-4ubuntu0.1
   ubuntu_26_04/libaudit-common: 1:4.1.2-1build1
   ubuntu_26_04/libaudit1: 1:4.1.2-1build1
