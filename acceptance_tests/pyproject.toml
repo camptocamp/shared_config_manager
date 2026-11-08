@@ -30,6 +30,8 @@ pyjwt = "2.15.1"
 webob = "1.8.11"
 pillow = "12.3.0"
 oauthlib = "4.0.1"
+certifi = "2026.10.18"
+pylint = "4.0.9"
 
 [project]
 name = "shared-config-manager-acceptance"
