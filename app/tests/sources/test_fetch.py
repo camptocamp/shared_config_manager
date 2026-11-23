@@ -1,7 +1,9 @@
 # Copyright (c) 2026, Camptocamp SA
 import asyncio
+import errno
 import gzip
 import io
+import pathlib
 import tarfile
 from typing import TYPE_CHECKING
 
@@ -104,6 +106,37 @@ async def test_fetch_installs_content_and_evaluates_templates(slave_env, master_
     assert (target / "config.yaml.mako").read_text(encoding="utf-8") == "value: ${FOO}"
     assert (target / "other.txt").read_text(encoding="utf-8") == "static"
     assert source.is_loaded()
+    leftovers = [path.name for path in slave_env.iterdir() if path.name.startswith(f".{SOURCE_ID}.")]
+    assert leftovers == []
+
+
+@pytest.mark.asyncio
+async def test_fetch_installs_after_cross_device_rename_error(slave_env, master_server, monkeypatch) -> None:
+    """On overlayfs, renaming a directory living only in a lower layer fails with EXDEV."""
+    target = slave_env / SOURCE_ID
+    target.mkdir()
+    (target / "old-marker").write_text("old", encoding="utf-8")
+    master_server.payload = _make_tar_gz({"new-file": "new"})
+
+    real_rename = pathlib.Path.rename
+    failed_once = False
+
+    def fake_rename(self, dst, *args):
+        nonlocal failed_once
+        if not failed_once and str(self) == str(target) and ".old-" in str(dst):
+            failed_once = True
+            raise OSError(errno.EXDEV, "Invalid cross-device link")
+        return real_rename(self, dst, *args)
+
+    monkeypatch.setattr(pathlib.Path, "rename", fake_rename)
+
+    source = _create_source({"type": "rsync", "source": "/unused"})
+    await source.fetch()
+
+    assert failed_once
+    assert (target / "new-file").read_text(encoding="utf-8") == "new"
+    assert not (target / "old-marker").exists()
+    assert [path.name for path in target.iterdir() if ".overlay-copy-up" in path.name] == []
     leftovers = [path.name for path in slave_env.iterdir() if path.name.startswith(f".{SOURCE_ID}.")]
     assert leftovers == []
 
