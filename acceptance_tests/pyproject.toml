@@ -30,7 +30,7 @@ oauthlib = "4.0.1"
 pyjwt = "2.15.1"
 urllib3 = "2.8.0"
 mako = "1.4.3"
-certifi = "2026.10.23"
+certifi = "2026.11.20"
 pillow = "13.0.0"
 
 [project]
