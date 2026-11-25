@@ -1,8 +1,10 @@
 # Copyright (c) 2026, Camptocamp SA
 import asyncio
 import copy
+import errno
 import logging
 import os
+import pathlib
 import shutil
 import subprocess
 import urllib.parse
@@ -199,18 +201,10 @@ class BaseSource:
         """Atomically replace the target directory with the fetched one."""
         path = self.get_path()
         backup = path.parent / f".{path.name}.old-{uuid.uuid4().hex}"
-        try:
-            await path.rename(backup)
-        except FileNotFoundError:
-            await new_dir.rename(path)
-        else:
-            try:
-                await new_dir.rename(path)
-            except Exception:
-                # Restore the previous version if the installation failed
-                await backup.rename(path)
-                raise
-            await _rmtree(backup)
+        # The whole swap is done inside a single worker thread, doing the two renames in
+        # separate awaited steps would let the event loop observe the target directory
+        # missing between them.
+        await to_thread.run_sync(_swap_install, str(path), str(backup), str(new_dir))
 
     async def _copy(self, source: Path, excludes: list[str] | None = None) -> None:
         await self.get_path().mkdir(parents=True, exist_ok=True)
@@ -348,6 +342,48 @@ class BaseSource:
             k = key.upper()
             if "KEY" in k or "PASSWORD" in k or "SECRET" in k:
                 data[key] = "•••"
+
+
+def _swap_install(path: str, backup: str, new_dir: str) -> None:
+    """
+    Move the current target directory to a backup, then install the fetched one.
+
+    This is run in a worker thread (see BaseSource._install), so the blocking pathlib calls
+    never run on the event loop, and doing the renames in this single function avoids that
+    the event loop observes the target directory missing between them.
+    """
+    current = pathlib.Path(path)
+    try:
+        current.rename(backup)
+    except FileNotFoundError:
+        pathlib.Path(new_dir).rename(path)
+        return
+    except OSError as exception:
+        if exception.errno != errno.EXDEV:
+            raise
+        # On overlayfs (Docker containers), a directory coming from a lower layer of the image
+        # cannot be renamed whatever the destination, even after being instantiated in the
+        # writable layer, when the kernel disables the redirect_dir feature. Removing it works
+        # instead (the removal is recorded as a whiteout), so delete the old version and install
+        # the fetched one in place. This only happens once, when converting the directory
+        # delivered in the image; the target directory created by the rename is then owned by
+        # the writable layer and the normal swap works. The directory is shortly missing during
+        # this one-time conversion.
+        try:
+            current.rmdir()
+        except OSError as remove_exception:
+            if remove_exception.errno != errno.ENOTEMPTY:
+                raise
+            shutil.rmtree(current)
+        pathlib.Path(new_dir).rename(path)
+        return
+    try:
+        pathlib.Path(new_dir).rename(path)
+    except Exception:
+        # Restore the previous version if the installation failed
+        pathlib.Path(backup).rename(path)
+        raise
+    shutil.rmtree(backup)
 
 
 async def _rmtree(path: Path) -> None:
