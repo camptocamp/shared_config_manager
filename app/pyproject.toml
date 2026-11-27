@@ -35,6 +35,7 @@ multidict = "6.9.1"
 certifi = "2026.11.20"
 pillow = "13.0.0"
 dnspython = "2.9.2"
+pydantic = "2.14.2"
 
 [tool.poetry.group.dev.dependencies]
 prospector = { version = "1.19.1", extras = ["with_mypy", "with_bandit", "with_pyroma", "with_ruff"] }
