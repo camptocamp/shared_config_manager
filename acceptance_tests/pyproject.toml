@@ -32,6 +32,7 @@ urllib3 = "2.8.0"
 mako = "1.4.3"
 certifi = "2026.11.20"
 pillow = "13.0.0"
+gunicorn = "27.0.0"
 
 [project]
 name = "shared-config-manager-acceptance"
